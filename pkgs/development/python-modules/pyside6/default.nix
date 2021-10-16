@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ninja qt6.qmake python ];
   buildInputs = with qt6; [
-    qtbase qtmultimedia qttools qtx11extras qtlocation qtscript
+    qtbase qtmultimedia qttools qtlocation
     qtwebsockets qtwebengine qtwebchannel qtcharts qtsensors qtsvg
   ];
   propagatedBuildInputs = [ shiboken6 ];
