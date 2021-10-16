@@ -17,7 +17,7 @@ stdenv.mkDerivation rec {
   CLANG_INSTALL_DIR = llvmPackages.libclang.out;
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ llvmPackages.libclang python qt6.qtbase qt6.qtxmlpatterns ];
+  buildInputs = [ llvmPackages.libclang python qt6.qtbase ];
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
