@@ -182,6 +182,8 @@ with pkgs;
 
   althttpd = callPackage ../servers/althttpd { };
 
+  among-sus = callPackage ../games/among-sus { };
+
   ankisyncd = callPackage ../servers/ankisyncd { };
 
   aocd = with python3Packages; toPythonApplication aocd;
@@ -211,6 +213,8 @@ with pkgs;
   bakelite = callPackage ../tools/backup/bakelite { };
 
   beyond-identity = callPackage ../tools/security/beyond-identity {};
+
+  bacnet-stack = callPackage ../tools/networking/bacnet-stack {};
 
   breakpad = callPackage ../development/misc/breakpad { };
 
