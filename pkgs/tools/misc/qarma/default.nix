@@ -12,7 +12,6 @@ mkDerivation rec {
   version = "2021-10-05";
 
   src = fetchFromGitHub {
-    name = "${pname}-${version}-source";
     owner = "luebking";
     repo = pname;
     rev = "605ea4213406718ba869dd146875195e57488786";
