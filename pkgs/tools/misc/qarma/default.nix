@@ -19,7 +19,7 @@ mkDerivation rec {
     sha256 = "KFoFywFeGqNmE1y49DrXJZ1jIK5jMOCOspkkFME+DR8=";
   };
 
-  patchPhase = ''
+  postPatch = ''
     sed -i.bak -E "s,(target\.path \+=) /usr/bin,\1 $out/bin," qarma.pro
   '';
 
