@@ -14,7 +14,7 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-    cd sources/${pname}
+    cd $sourceRoot/${pname}
   '';
 
   nativeBuildInputs = [ cmake wrapPython ];

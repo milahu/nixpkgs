@@ -38,13 +38,11 @@ stdenv.mkDerivation rec {
   configurePhase = ":";
 
   buildPhase = ''
-    echo buildPhase
-    python setup.py build
+    ${python.interpreter} setup.py build
   '';
 
   installPhase = ''
-    echo installPhase
-    python setup.py install
+    ${python.interpreter} setup.py install
   '';
 
   cmakeFlags = [
