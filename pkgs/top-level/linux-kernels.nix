@@ -189,6 +189,13 @@ in {
       ];
     };
 
+    linux_firecracker = callPackage ../os-specific/linux/kernel/linux-firecracker.nix {
+      kernelPatches = [
+        kernelPatches.bridge_stp_helper
+        kernelPatches.request_key_helper
+      ];
+    };
+
     linux_lqx = callPackage ../os-specific/linux/kernel/linux-lqx.nix {
       kernelPatches = [
         kernelPatches.bridge_stp_helper

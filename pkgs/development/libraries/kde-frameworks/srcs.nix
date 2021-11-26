@@ -1,5 +1,5 @@
 # DO NOT EDIT! This file is generated automatically.
-# Command: ./maintainers/scripts/fetch-kde-qt.sh pkgs/development/libraries/kde-frameworks
+# Command: ./maintainers/scripts/fetch-kde-qt.sh pkgs/development/libraries/kde-frameworks/
 { fetchurl, mirror }:
 
 {
@@ -203,36 +203,12 @@
       name = "kded-5.85.0.tar.xz";
     };
   };
-  kdelibs4support = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kdelibs4support-5.85.0.tar.xz";
-      sha256 = "1c4zd60s7l1qv719nl28j7gh3lpr1cwqq5vcibb9a6di04k27mm0";
-      name = "kdelibs4support-5.85.0.tar.xz";
-    };
-  };
-  kdesignerplugin = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kdesignerplugin-5.85.0.tar.xz";
-      sha256 = "0pchfvmy7r2mkd412nbzk2pkji2dx5lispwcnk759ffm4wlnxncf";
-      name = "kdesignerplugin-5.85.0.tar.xz";
-    };
-  };
   kdesu = {
     version = "5.85.0";
     src = fetchurl {
       url = "${mirror}/stable/frameworks/5.85/kdesu-5.85.0.tar.xz";
       sha256 = "1xqzkyd9flglr3aqabkh54yl7a5a429d24mpqphakc3djmdv5d08";
       name = "kdesu-5.85.0.tar.xz";
-    };
-  };
-  kdewebkit = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kdewebkit-5.85.0.tar.xz";
-      sha256 = "14w254wfp35sldadff1y62yl6f1kshlfk4vlhlan626vyidypc43";
-      name = "kdewebkit-5.85.0.tar.xz";
     };
   };
   kdnssd = {
@@ -289,14 +265,6 @@
       url = "${mirror}/stable/frameworks/5.85/kholidays-5.85.0.tar.xz";
       sha256 = "0nrxn8sjzp1lg3va7703d5hxmda33d0f91rgq2s99mxi77a82yi2";
       name = "kholidays-5.85.0.tar.xz";
-    };
-  };
-  khtml = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/khtml-5.85.0.tar.xz";
-      sha256 = "0ma9sk51pszxqmvzlrfdsnh2f8fm09wd0kaywsrkvbh2q2f6kg8g";
-      name = "khtml-5.85.0.tar.xz";
     };
   };
   ki18n = {
@@ -379,30 +347,6 @@
       name = "kjobwidgets-5.85.0.tar.xz";
     };
   };
-  kjs = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kjs-5.85.0.tar.xz";
-      sha256 = "0inliv97x63174n3mn5jqyy8d440863g3m5pn69cq1i2mr5zyswb";
-      name = "kjs-5.85.0.tar.xz";
-    };
-  };
-  kjsembed = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kjsembed-5.85.0.tar.xz";
-      sha256 = "1j8prfg7hpk0g7manilds27ivrcgxr3hidjzy0yzn13ckvv3ccj1";
-      name = "kjsembed-5.85.0.tar.xz";
-    };
-  };
-  kmediaplayer = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kmediaplayer-5.85.0.tar.xz";
-      sha256 = "1bmj24d3si937svh8zdi7xs0y4j1ibyj8z8q1y4k2vp8fa9fack6";
-      name = "kmediaplayer-5.85.0.tar.xz";
-    };
-  };
   knewstuff = {
     version = "5.85.0";
     src = fetchurl {
@@ -473,14 +417,6 @@
       url = "${mirror}/stable/frameworks/5.85/kquickcharts-5.85.0.tar.xz";
       sha256 = "1hnbr3qkjy48pq8hkvl7lcfd8cywkkr77n8qf296rjmrv23jw4xf";
       name = "kquickcharts-5.85.0.tar.xz";
-    };
-  };
-  kross = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kross-5.85.0.tar.xz";
-      sha256 = "07gnh98avv5zzybh4262jqkjy8kg0cplryv356kvsbarl4ksy4kr";
-      name = "kross-5.85.0.tar.xz";
     };
   };
   krunner = {
@@ -561,14 +497,6 @@
       url = "${mirror}/stable/frameworks/5.85/kxmlgui-5.85.0.tar.xz";
       sha256 = "1ciwrm16a5cgmkkm8cv72cyr45q418gsrxc3qrjq3iic9ycf6fi5";
       name = "kxmlgui-5.85.0.tar.xz";
-    };
-  };
-  kxmlrpcclient = {
-    version = "5.85.0";
-    src = fetchurl {
-      url = "${mirror}/stable/frameworks/5.85/portingAids/kxmlrpcclient-5.85.0.tar.xz";
-      sha256 = "117cvdf7iy1139sx0vk906whmkm3ffw0wivqdjdcfwxsdxi6s6d1";
-      name = "kxmlrpcclient-5.85.0.tar.xz";
     };
   };
   modemmanager-qt = {

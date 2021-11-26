@@ -1,4 +1,14 @@
-# Qt 5 Maintainer's Notes
+# Qt 6 Maintainer's Notes
+
+## qt5to6: Migrating code from Qt5 to Qt6
+
+<!-- TODO more -->
+
+* [What's New in Qt 6.0](https://doc-snapshots.qt.io/qt6-dev/whatsnew60.html)
+  * "Qt 6.0 is streamlined compared to Qt 5 and some modules are no longer in the default installation of Qt 6.0. Because of the modularized structure of Qt, new modules or previous Qt 5 modules may appear in future releases of Qt 6."
+  * New Modules in Qt 6.0
+  * Removed Modules in Qt 6.0
+  * [Changes to Qt Extras Modules](https://www.qt.io/blog/qt-extras-modules-in-qt-6)
 
 ## Minor Updates
 

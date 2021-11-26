@@ -1,3 +1,10 @@
+/*
+
+FIXME
+cycle error out -> bin -> out = plugins -> lib -> plugins
+
+*/
+
 { qtModule
 , qtbase
 , libglvnd, libxkbcommon, vulkan-headers # TODO should be inherited from qtbase
@@ -12,16 +19,22 @@
 
 }:
 
-# TODO? qtModule rec { ... }
-# -> in splitBuildInstall, can use pname, version
+let
+  pname = "qtdeclarative";
+  version = "6.2.1";
+  self = { inherit qtbase; };
+  args = { postFixup = ""; };
+in
 
 qtModule {
   pname = "qtdeclarative";
   qtInputs = [ qtbase qtshadertools ];
   buildInputs = [ openssl openssl.dev python3 /* openvg.shivavg openvg-headers */ libglvnd libxkbcommon vulkan-headers ];
   outputs = [ "out" "dev" "bin" ];
+  # FIXME set QT_ADDITIONAL_PACKAGES_PREFIX_PATH automatically from buildInputs
   preConfigure = ''
     NIX_CFLAGS_COMPILE+=" -DNIXPKGS_QML2_IMPORT_PREFIX=\"$qtQmlPrefix\""
+    export QT_ADDITIONAL_PACKAGES_PREFIX_PATH="${qtshadertools.dev}/lib/cmake"
   '';
   configureFlags = [ "-qml-debug" ];
   # TODO build/?
@@ -40,6 +53,7 @@ qtModule {
 
   # debug: install is failing
   splitBuildInstall =
+  #if true then null else # disable splitBuildInstall
   let
     # workaround for splitBuildInstall
     pname = "qtdeclarative";
@@ -48,17 +62,9 @@ qtModule {
     args = { postFixup = ""; };
   in
   {
-    # needed to disable rebuild
-    # TODO simpler way? cmake hooks trigger rebuild?
-    /*
-    installPhase = ''
-      cmake -P cmake_install.cmake
-    '';
-    */
 
-
-  # copy from nixpkgs/pkgs/development/libraries/qt-6/qtModule.nix
-  # TODO move back when working
+# copy-paste from qtModule.nix
+# fix cycle error: cycle detected in build
   postFixup = ''
     if [ -d "''${!outputDev}/lib/pkgconfig" ]; then
         find "''${!outputDev}/lib/pkgconfig" -name '*.pc' | while read pc; do
@@ -71,8 +77,6 @@ qtModule {
 
     # TODO refactor. same code in qtbase.nix and qtModule.nix
     echo "patching output paths in cmake files ..."
-    (
-    cd $dev/lib/cmake
     moduleNAME="${lib.toUpper pname}"
     outEscaped=$(echo $out | sed 's,/,\\/,g')
     devEscaped=$(echo $dev | sed 's,/,\\/,g')
@@ -95,7 +99,7 @@ qtModule {
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?plugins/\\\''${_''${moduleNAME}_NIX_BIN}\/lib\/qt-${version}\/plugins/g;"
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?bin/\\\''${_''${moduleNAME}_NIX_DEV}\/bin/g;" # qmake ...
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?mkspecs/\\\''${_''${moduleNAME}_NIX_DEV}\/mkspecs/g;"
-    s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?qml/\\\''${_''${moduleNAME}_NIX_OUT}\/lib\/qt-${version}\/lib\/qml/g;"
+    s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?qml/\\\''${_''${moduleNAME}_NIX_OUT}\/qml/g;"
     s+="s/set\(_IMPORT_PREFIX\)"
     s+="/set(_''${moduleNAME}_NIX_OUT)"
     s+="\nset(_''${moduleNAME}_NIX_DEV)"
@@ -117,31 +121,18 @@ qtModule {
     perlRegex="$s"
 
     echo "debug: perlRegex = $perlRegex"
-    find . -name '*.cmake' -exec perl -00 -p -i -e "$perlRegex" '{}' \;
+    find $dev/lib/cmake -name '*.cmake' -exec perl -00 -p -i -e "$perlRegex" '{}' \;
     echo "rc of find = $?" # zero when perl returns nonzero?
     # FIXME catch errors from perl: find -> xargs
     echo "patching output paths in cmake files done"
 
-    echo "verify that all _IMPORT_PREFIX are replaced ..."
-    matches="$(find . -name '*.cmake' -exec grep -HnF _IMPORT_PREFIX '{}' \;)"
-    if [ -n "$matches" ]; then
-      echo "fatal: _IMPORT_PREFIX was not replaced in:"
-      echo "$matches"
-      exit 1
-    fi
-    echo "verify that all _IMPORT_PREFIX are replaced done"
-    )
-
     moveQtDevTools
 
-    # wontfix? moving plugins from $out to $bin:
-    # error: cycle detected in the references of output 'bin' from output 'out'
-    # -> keep all qt plugins in $out? for consistency
-    mkdir $bin || true
-    if false; then
+    if true; then # fix cycle error
+    #if false; then # produce cycle error
+      mkdir $bin
+    else
       if [ -d $out/plugins ]; then
-        echo "found plugins in $out/plugins"
-        ( cd $out/plugins; find . )
         if [ -z "$bin" ]; then
           echo 'fatal error: qt module has plugins but no "bin" output'
           echo 'listing plugins ...'
@@ -162,6 +153,15 @@ qtModule {
     fi
 
     ${args.postFixup or ""}
+
+    echo "verify that all _IMPORT_PREFIX are replaced ..."
+    matches="$(find $dev/lib/cmake -name '*.cmake' -exec grep -HnF _IMPORT_PREFIX '{}' \;)"
+    if [ -n "$matches" ]; then
+      echo "fatal: _IMPORT_PREFIX was not replaced in:"
+      echo "$matches"
+      exit 1
+    fi
+    echo "verify that all _IMPORT_PREFIX are replaced done"
   '';
 
   installPhase = ''
@@ -171,13 +171,13 @@ qtModule {
     runHook postInstall
   '';
 
-  postInstall = ''
-    find $out/lib/cmake -name '*Targets.cmake' | while read f
-    do
-      echo "patching cmake file $f"
-      sed -i -E 's,INTERFACE_INCLUDE_DIRECTORIES,INTERFACE_LINK_DIRECTORIES "''${_QTDECLARATIVE_NIX_OUT}/lib" # NixOS was here\n  &,' "$f"
-    done
+  /*
+  # workaround for cycle error
+  preDist = ''
+    echo "workaround: moving plugins from $bin to $out"
+    mv $bin/lib/qt-${qtbase.version}/plugins $out
   '';
+  */
 
   # TODO build/?
   devTools = [

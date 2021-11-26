@@ -156,12 +156,35 @@ let
         fi
         ln -sv ${configfile} $buildRoot/.config
 
+        echo "debug: grep generate-config.pl ..."
+        grep generate-config.pl $buildRoot/.config || true
+        echo "debug: grep generate-config.pl done"
+
+        echo "debug: print env ..."
+        env
+        echo "debug: print env done"
+
+        echo "debug: enabling xtrace"
+        set -o xtrace
+
+        # TODO how are these "prompts" answered?
+        # when i run "make oldconfig" in terminal, it blocks waiting for my input
+
         # reads the existing .config file and prompts the user for options in
         # the current kernel source that are not found in the file.
-        make $makeFlags "''${makeFlagsArray[@]}" oldconfig
-        runHook postConfigure
 
+        echo "debug: make oldconfig ..."
+        make $makeFlags "''${makeFlagsArray[@]}" oldconfig
+        echo "debug: make oldconfig done"
+
+        echo "debug: runHook postConfigure ..."
+        runHook postConfigure
+        echo "debug: runHook postConfigure done"
+
+        echo "debug: make prepare ..."
         make $makeFlags "''${makeFlagsArray[@]}" prepare
+        echo "debug: make prepare done"
+
         actualModDirVersion="$(cat $buildRoot/include/config/kernel.release)"
         if [ "$actualModDirVersion" != "${modDirVersion}" ]; then
           echo "Error: modDirVersion ${modDirVersion} specified in the Nix expression is wrong, it should be: $actualModDirVersion"
@@ -172,6 +195,8 @@ let
         buildFlagsArray+=("KBUILD_BUILD_TIMESTAMP=$(date -u -d @$SOURCE_DATE_EPOCH)")
 
         cd $buildRoot
+
+        echo "debug: done configurePhase of manual-config.nix"
       '';
 
       buildFlags = [
@@ -308,6 +333,15 @@ assert lib.versionAtLeast version "5.8" -> elfutils != null;
 stdenv.mkDerivation ((drvAttrs config stdenv.hostPlatform.linux-kernel kernelPatches configfile) // {
   pname = "linux";
   inherit version;
+
+  preBuildPhase = ''
+
+    echo "debug: preBuildPhase of linux"
+    set -o xtrace
+    echo "debug: calling make ..."
+
+  '';
+  # buildPhase = "make"
 
   enableParallelBuilding = true;
 

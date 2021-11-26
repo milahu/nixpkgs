@@ -3,9 +3,18 @@
 , fetchFromGitHub
 , wrapQtAppsHook
 , qtbase
+/*
 , qmake
+*/
 , qtx11extras
+, qmake2cmake
+, cmake
 }:
+
+/*
+FIXME
+Could not find qmake spec 'linux-g++'.
+*/
 
 mkDerivation rec {
   pname = "qarma";
@@ -23,7 +32,7 @@ mkDerivation rec {
   '';
 
   buildInputs = [ qtbase qtx11extras ];
-  nativeBuildInputs = [ qmake wrapQtAppsHook ]; 
+  nativeBuildInputs = [ qmake2cmake cmake wrapQtAppsHook ];
 
   meta = with lib; {
     description = "CLI tool to create GUI dialogs with Qt";

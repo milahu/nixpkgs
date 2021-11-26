@@ -94,7 +94,14 @@ drv1 = mkDerivation (args // {
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?include/\\\''${_''${moduleNAME}_NIX_DEV}\/include/g;"
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?libexec/\\\''${_''${moduleNAME}_NIX_OUT}\/libexec/g;"
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?lib/\\\''${_''${moduleNAME}_NIX_OUT}\/lib/g;" # must come after libexec
+
+    #if true; then # workaround for cycle error
+    if false; then
+    s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?plugins/\\\''${_''${moduleNAME}_NIX_OUT}\/plugins/g;"
+    else
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?plugins/\\\''${_''${moduleNAME}_NIX_BIN}\/lib\/qt-${version}\/plugins/g;"
+    fi
+
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?bin/\\\''${_''${moduleNAME}_NIX_DEV}\/bin/g;" # qmake ...
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?mkspecs/\\\''${_''${moduleNAME}_NIX_DEV}\/mkspecs/g;"
     s+="s/\\\''${_IMPORT_PREFIX}\/(\.\/)?qml/\\\''${_''${moduleNAME}_NIX_OUT}\/qml/g;"
@@ -126,6 +133,8 @@ drv1 = mkDerivation (args // {
 
     moveQtDevTools
 
+    #if false; then # workaround for cycle error in qtdeclarative: plugins -> lib -> plugins
+    if true; then
     if [ -d $out/plugins ]; then
       if [ -z "$bin" ]; then
         echo 'fatal error: qt module has plugins but no "bin" output'
@@ -144,6 +153,7 @@ drv1 = mkDerivation (args // {
       echo 'todo: in qtModule for ${pname}-${version}, remove:'
       echo '  outputs = [ "out" "dev" "bin" ];'
     fi
+    fi # workaround end
 
     ${args.postFixup or ""}
 

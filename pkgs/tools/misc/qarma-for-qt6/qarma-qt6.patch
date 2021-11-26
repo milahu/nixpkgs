@@ -1,11 +1,5 @@
-commit e6f53948cd203e5f66f660474162ba2f01f1b3dc
-Author: Thomas Lübking <thomas.luebking@gmail.com>
-Date:   Mon Nov 8 15:24:11 2021 +0100
-
-    attempted Qt6 fix
-
 diff --git a/Qarma.cpp b/Qarma.cpp
-index bab600e..63abc32 100644
+index bab600e..354d287 100644
 --- a/Qarma.cpp
 +++ b/Qarma.cpp
 @@ -28,7 +28,6 @@
@@ -21,7 +15,7 @@ index bab600e..63abc32 100644
  
  #ifdef WS_X11
 +#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-+#include <QX11Application>
++#include <QGuiApplication>
 +#else
  #include <QX11Info>
 +#endif
@@ -35,7 +29,7 @@ index bab600e..63abc32 100644
 -            XSetTransientForHint(QX11Info::display(), m_dialog->winId(), m_parentWindow);
 +            Display *dpy;
 +#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-+            dpy = QGuiApplication::nativeInterface<QX11Application*>()->display();
++            dpy = QGuiApplication::nativeInterface<QNativeInterface::QX11Application>()->display();
 +#else
 +            dpy = QX11Info::display();
 +#endif
@@ -43,6 +37,15 @@ index bab600e..63abc32 100644
  #endif
          }
      }
+@@ -1526,7 +1535,7 @@ QString Qarma::labelText(const QString &s) const
+             int sz = 0;
+             while (sz < 3 && r.at(idx+sz+1).isDigit())
+                 ++sz;
+-            r.replace(idx, sz+1, QChar(r.midRef(idx+1, sz).toUInt(nullptr, 8)));
++            r.replace(idx, sz+1, QChar(r.mid(idx+1, sz).toUInt(nullptr, 8)));
+         }
+         r.remove("\\").replace(("\a"), "\\");
+         return r;
 diff --git a/qarma.pro b/qarma.pro
 index 33da748..56a7bc2 100644
 --- a/qarma.pro

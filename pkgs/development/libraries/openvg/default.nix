@@ -12,7 +12,8 @@
 , freeglut
 , libglvnd
 , glew
-, xlibs
+, xlibsWrapper
+, zstd
 , libjpeg
 , mmv # mcp
 }:
@@ -37,7 +38,7 @@ rec {
       libglvnd
       glew
       libjpeg
-      xlibs.libX11
+      xlibsWrapper
     ];
 
     src = fetchFromGitHub {

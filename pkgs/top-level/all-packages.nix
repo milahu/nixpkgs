@@ -27254,6 +27254,7 @@ with pkgs;
 
   qarma = libsForQt5.callPackage ../tools/misc/qarma { };
   qarmaForQt6 = libsForQt6.callPackage ../tools/misc/qarma-for-qt6 { };
+  qarmaForQt6Qmake = libsForQt6.callPackage ../tools/misc/qarma-for-qt6/default.qmake.nix { };
 
   qbittorrent = libsForQt5.callPackage ../applications/networking/p2p/qbittorrent { };
   qbittorrent-nox = qbittorrent.override {
