@@ -1710,6 +1710,7 @@ in {
   commoncode = callPackage ../development/python-modules/commoncode { };
 
   CommonMark = callPackage ../development/python-modules/commonmark { };
+  commonmark = callPackage ../development/python-modules/commonmark { };
 
   compiledb = callPackage ../development/python-modules/compiledb { };
 
