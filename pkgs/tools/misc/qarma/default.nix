@@ -23,7 +23,7 @@ mkDerivation rec {
   '';
 
   buildInputs = [ qtbase qtx11extras ];
-  nativeBuildInputs = [ qmake wrapQtAppsHook ]; 
+  nativeBuildInputs = [ qmake wrapQtAppsHook ];
 
   meta = with lib; {
     description = "CLI tool to create GUI dialogs with Qt";
