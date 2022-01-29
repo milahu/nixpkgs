@@ -7958,7 +7958,6 @@
     email = "milahu@gmail.com";
     github = "milahu";
     githubId = 12958815;
-    matrix = "@milahu:matrix.org";
     name = "Milan Hauth";
   };
   milesbreslin = {
