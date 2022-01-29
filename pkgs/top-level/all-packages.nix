@@ -182,8 +182,6 @@ with pkgs;
 
   althttpd = callPackage ../servers/althttpd { };
 
-  among-sus = callPackage ../games/among-sus { };
-
   ankisyncd = callPackage ../servers/ankisyncd { };
 
   aocd = with python3Packages; toPythonApplication aocd;
@@ -213,8 +211,6 @@ with pkgs;
   bakelite = callPackage ../tools/backup/bakelite { };
 
   beyond-identity = callPackage ../tools/security/beyond-identity {};
-
-  bacnet-stack = callPackage ../tools/networking/bacnet-stack {};
 
   breakpad = callPackage ../development/misc/breakpad { };
 
@@ -4257,7 +4253,7 @@ with pkgs;
     anthy = callPackage ../tools/inputmethods/ibus-engines/ibus-anthy { };
 
     bamboo = callPackage ../tools/inputmethods/ibus-engines/ibus-bamboo {
-      go = go_1_15;
+      go = go_1_17;
     };
 
     hangul = callPackage ../tools/inputmethods/ibus-engines/ibus-hangul { };
@@ -16570,8 +16566,7 @@ with pkgs;
   ganv = callPackage ../development/libraries/ganv { };
 
   garble = callPackage ../build-support/go/garble.nix {
-    # https://github.com/burrowers/garble/issues/124
-    buildGoModule = buildGo115Module;
+    buildGoModule = buildGo117Module;
   };
 
   gcab = callPackage ../development/libraries/gcab { };
@@ -19588,11 +19583,6 @@ with pkgs;
     qt5 = qt512;
   });
 
-  libsForQt62 = recurseIntoAttrs (import ./qt6-packages.nix {
-    inherit lib pkgs;
-    qt6 = qt62;
-  });
-
   libsForQt514 = recurseIntoAttrs (import ./qt5-packages.nix {
     inherit lib pkgs;
     qt5 = qt514;
@@ -19603,9 +19593,17 @@ with pkgs;
     qt5 = qt515;
   });
 
+  libsForQt62 = recurseIntoAttrs (import ./qt6-packages.nix {
+    inherit lib pkgs;
+    qt6 = qt62;
+  });
+
   # TODO bump to 5.14 on darwin once it's not broken; see #95199
   qt5 =        if stdenv.hostPlatform.isDarwin then qt512 else qt515;
   libsForQt5 = if stdenv.hostPlatform.isDarwin then libsForQt512 else libsForQt515;
+
+  qt6 = qt62;
+  libsForQt6 = libsForQt62;
 
   # plasma5Packages maps to the Qt5 packages set that is used to build the plasma5 desktop
   plasma5Packages = libsForQt515;
@@ -19613,8 +19611,8 @@ with pkgs;
   qtEnv = qt5.env;
   qt5Full = qt5.full;
 
-  qt6 = qt62;
-  libsForQt6 = libsForQt62;
+  qt6Env = qt6.env;
+  qt6Full = qt6.full;
 
   qtscriptgenerator = callPackage ../development/libraries/qtscriptgenerator { };
 
@@ -28293,7 +28291,7 @@ with pkgs;
 
   qjackctl = libsForQt5.callPackage ../applications/audio/qjackctl { };
 
-  qimgv = libsForQt6.callPackage ../applications/graphics/qimgv { };
+  qimgv = libsForQt5.callPackage ../applications/graphics/qimgv { };
 
   qlandkartegt = libsForQt514.callPackage ../applications/misc/qlandkartegt {
     gdal = gdal.override {
