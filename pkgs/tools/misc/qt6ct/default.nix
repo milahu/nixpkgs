@@ -5,6 +5,7 @@
 , qtsvg
 , qttools
 , cmake
+, wrapQtAppsHook
 }:
 
 #let inherit (lib) getDev; in
@@ -14,15 +15,15 @@ stdenv.mkDerivation rec {
   version = "2021-12-22";
 
   src = fetchFromGitHub {
-    url = "";
-    repo = pname;
     owner = "trialuser02";
+    repo = pname;
     rev = "e41923da5723e310310f183dd28dee64293e00ae";
-    sha256 = "sha256-1j0M4W00QnIH2GUx9wpxxbnIUARN1bLcsihVMfQW5JA="; # todo
+    sha256 = "1Pclif3CDaDXun0OrWDAQPNTACO9nXu5eNm3AyyDSGE=";
   };
 
   nativeBuildInputs = [
     cmake
+    wrapQtAppsHook
     #qttools
   ];
 
