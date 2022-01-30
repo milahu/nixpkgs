@@ -33,6 +33,7 @@ stdenv.mkDerivation rec {
   ];
 
   # find bin/qtpaths
+  # not working
   preConfigure = ''
     export PATH=$PATH:${qtbase}/bin
   '';
@@ -40,6 +41,7 @@ stdenv.mkDerivation rec {
   # TODO debug cmake.
   # qtbase-dev/lib/cmake -> wrong location for $out/bin/qtpaths?
   cmakeFlags = [
+    "--trace-expand" # debug cmake
   ];
 
 /*
