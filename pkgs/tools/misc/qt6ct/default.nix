@@ -32,6 +32,16 @@ stdenv.mkDerivation rec {
     #qtsvg
   ];
 
+  # find bin/qtpaths
+  preConfigure = ''
+    export PATH=$PATH:${qtbase}/bin
+  '';
+
+  # TODO debug cmake.
+  # qtbase-dev/lib/cmake -> wrong location for $out/bin/qtpaths?
+  cmakeFlags = [
+  ];
+
 /*
   qmakeFlags = [
     "LRELEASE_EXECUTABLE=${getDev qttools}/bin/lrelease"
