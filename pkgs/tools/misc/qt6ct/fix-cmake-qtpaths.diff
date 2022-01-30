@@ -1,5 +1,5 @@
---- CMakeLists.txt.bak	2022-01-30 21:22:53.992812457 +0100
-+++ CMakeLists.txt	2022-01-30 21:23:33.112831793 +0100
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
 @@ -24,14 +24,14 @@
  
  find_package(Qt6 COMPONENTS BuildInternals Widgets Concurrent LinguistTools REQUIRED)
