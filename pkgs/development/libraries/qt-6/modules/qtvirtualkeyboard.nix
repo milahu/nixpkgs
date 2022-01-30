@@ -25,6 +25,8 @@ qtModule {
 
   # TODO debug cycle error
   splitBuildInstall =
+    if true then {} # produce cycle error?
+    else
     let
       # set vars for postFixup
       patch-cmake-files-sh = ../patch-cmake-files.sh;
