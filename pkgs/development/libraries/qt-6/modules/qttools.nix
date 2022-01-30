@@ -11,7 +11,7 @@ qtModule {
   pname = "qttools";
   qtInputs = [ qtbase qtdeclarative ];
   buildInputs = [ clang_13 ];
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [ pkg-config clang_13 ];
   outputs = [ "out" "dev" "bin" ];
 
   postConfigure = ''
