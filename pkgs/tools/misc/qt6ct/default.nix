@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
   ];
 
   patches = [
-    ./fix-cmake-qtpaths.diff;
+    ./fix-cmake-qtpaths.diff
   ];
 
   # find bin/qtpaths
