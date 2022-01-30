@@ -42,7 +42,7 @@ stdenv.mkDerivation rec {
   # TODO debug cmake.
   # qtbase-dev/lib/cmake -> wrong location for $out/bin/qtpaths?
   cmakeFlags = [
-    #"--trace-expand" # debug cmake
+    "--trace-expand" # debug cmake
   ];
 
 /*
