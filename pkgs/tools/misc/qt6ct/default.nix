@@ -2,13 +2,10 @@
 , lib
 , fetchFromGitHub
 , qtbase
-, qtsvg
 , qttools
 , cmake
 , wrapQtAppsHook
 }:
-
-#let inherit (lib) getDev; in
 
 stdenv.mkDerivation rec {
   pname = "qt6ct";
@@ -21,44 +18,18 @@ stdenv.mkDerivation rec {
     sha256 = "1Pclif3CDaDXun0OrWDAQPNTACO9nXu5eNm3AyyDSGE=";
   };
 
-  outputs = [ "out" "bin" ]; # bin -> plugins
-
-  nativeBuildInputs = [
-    cmake
-    wrapQtAppsHook
-    qttools
-  ];
-
-  buildInputs = [
-    qtbase
-    #qtsvg
-  ];
+  outputs = [ "out" ];
+  nativeBuildInputs = [ cmake wrapQtAppsHook ];
+  buildInputs = [ qtbase qttools ];
 
   patches = [
-    ./fix-cmake-qtpaths.diff
-    ./set-plugindir-path.diff
+    ./fix-cmake-qtpaths.diff # https://github.com/trialuser02/qt6ct/issues/8
+    ./set-plugindir-path.diff # https://github.com/trialuser02/qt6ct/issues/9
   ];
 
-  # find bin/qtpaths
-  # not working
-  preConfigure = ''
-    export PATH=$PATH:${qtbase.dev}/bin
-    stat ${qtbase.dev}/bin/qtpaths
-  '';
-
-  # TODO debug cmake.
-  # qtbase-dev/lib/cmake -> wrong location for $out/bin/qtpaths?
   cmakeFlags = [
-    "--trace-expand" # debug cmake
-    "-DPLUGINDIR=$bin"
+    "-DPLUGINDIR=${qtbase.qtPluginPrefix}" # -> $out/lib/qt-6.2.2/plugins
   ];
-
-/*
-  qmakeFlags = [
-    "LRELEASE_EXECUTABLE=${getDev qttools}/bin/lrelease"
-    "PLUGINDIR=${placeholder "out"}/${qtbase.qtPluginPrefix}"
-  ];
-*/
 
   meta = with lib; {
     description = "Qt6 Configuration Tool";
