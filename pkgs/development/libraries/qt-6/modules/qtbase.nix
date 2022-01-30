@@ -431,17 +431,18 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "bin" "dev" ];
 
+  # mv $out/bin $dev/ # assume that all $out/bin are devTools
+  # mv $out/libexec $dev/ # TODO verify. cycle error?
   postInstall = ''
     mkdir -p $dev $(dirname $bin/${qtPluginPrefix})
-    mv $out/plugins $bin/${qtPluginPrefix}
+    mv $out/plugins $bin/${qtPluginPrefix}/
     mv $out/mkspecs $out/bin $dev/
+    mv $out/bin $dev/
+    mv $out/libexec $dev/
   '';
   # postFixup: ln -v -s $out/libexec $dev/
-  # cannot move libexec, dep cycle
-  # cmake files require libexec/moc from both $out and $dev
-  # TODO patch cmake files to use only $dev
+  # cannot move libexec, cycle error
 
-  # TODO refactor. same code in qtbase.nix and qtModule.nix
   postFixup = ''
     sed '/QMAKE_DEFAULT_.*DIRS/ d' -i $dev/mkspecs/qconfig.pri
     fixQtModulePaths "''${!outputDev}/mkspecs/modules"
