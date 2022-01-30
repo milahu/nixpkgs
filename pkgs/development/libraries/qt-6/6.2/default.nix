@@ -144,7 +144,7 @@ let
       qttools = callPackage ../modules/qttools.nix { };
       qttranslations = callPackage ../modules/qttranslations.nix { };
       # FIXME cycle error
-      # qtvirtualkeyboard = callPackage ../modules/qtvirtualkeyboard.nix {};
+      qtvirtualkeyboard = callPackage ../modules/qtvirtualkeyboard.nix {};
       qtwayland = callPackage ../modules/qtwayland.nix { };
       qtwebchannel = callPackage ../modules/qtwebchannel.nix { };
       qtwebengine = callPackage ../modules/qtwebengine.nix {
