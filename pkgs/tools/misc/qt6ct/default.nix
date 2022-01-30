@@ -32,6 +32,10 @@ stdenv.mkDerivation rec {
     #qtsvg
   ];
 
+  patches = [
+    ./fix-cmake-qtpaths.diff;
+  ];
+
   # find bin/qtpaths
   # not working
   preConfigure = ''
