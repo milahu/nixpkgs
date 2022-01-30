@@ -21,6 +21,8 @@ stdenv.mkDerivation rec {
     sha256 = "1Pclif3CDaDXun0OrWDAQPNTACO9nXu5eNm3AyyDSGE=";
   };
 
+  outputs = [ "out" "bin" ]; # bin -> plugins
+
   nativeBuildInputs = [
     cmake
     wrapQtAppsHook
@@ -34,6 +36,7 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./fix-cmake-qtpaths.diff
+    ./set-plugindir-path.diff
   ];
 
   # find bin/qtpaths
@@ -47,6 +50,7 @@ stdenv.mkDerivation rec {
   # qtbase-dev/lib/cmake -> wrong location for $out/bin/qtpaths?
   cmakeFlags = [
     "--trace-expand" # debug cmake
+    "-DPLUGINDIR=$bin"
   ];
 
 /*
