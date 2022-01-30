@@ -1,5 +1,5 @@
---- CMakeLists.txt.bak2	2022-01-30 21:36:14.720780195 +0100
-+++ CMakeLists.txt	2022-01-30 21:37:55.666378067 +0100
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
 @@ -39,8 +39,10 @@
      message(FATAL_ERROR "Could NOT find lrelease executable")
  endif()
