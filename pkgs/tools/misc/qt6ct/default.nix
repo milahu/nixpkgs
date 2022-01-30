@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     wrapQtAppsHook
-    #qttools
+    qttools
   ];
 
   buildInputs = [
