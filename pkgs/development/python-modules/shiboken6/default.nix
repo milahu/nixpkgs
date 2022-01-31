@@ -9,7 +9,10 @@
 , llvm
 , libclang
 , llvmPackages
+, llvmPackages_13
 }:
+
+# sphinx-build - not found! doc target disabled
 
 stdenv.mkDerivation rec {
   pname = "shiboken6";
@@ -29,8 +32,15 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
 
   buildInputs = [
-    llvm
-    libclang
+    #llvm
+    #libclang
+    # too old?
+    # pyside-setup-opensource-src-6.2.2/sources/shiboken6/ApiExtractor/clangparser/clangbuilder.cpp:330:10:
+    # error: 'CXCursor_ExceptionSpecificationKind_NoThrow' was not declared in this scope;
+    # did you mean 'CXCursor_ExceptionSpecificationKind_None'?
+    llvmPackages_13.libllvm
+    llvmPackages_13.clang-unwrapped
+
     #llvmPackages.libclang
     python
     qt6.qtbase
