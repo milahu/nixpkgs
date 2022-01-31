@@ -42,6 +42,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     llvmPackages.libclang # ClangConfig.cmake
+    llvmPackages.libllvm # LLVMConfig.cmake
     /*
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
