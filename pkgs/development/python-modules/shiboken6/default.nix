@@ -13,9 +13,7 @@
 stdenv.mkDerivation rec {
   pname = "shiboken6";
 
-  #inherit (pyside6) version src;
-  inherit (pyside6) version;
-  src = pyside6.srcShiboken;
+  inherit (pyside6) version src;
 
   patches = [
     #./nix_compile_cflags.patch
