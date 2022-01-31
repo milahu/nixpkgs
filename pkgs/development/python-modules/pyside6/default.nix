@@ -41,13 +41,17 @@ stdenv.mkDerivation rec {
   };
   */
 
+  patches = [
+    ./dont_ignore_optional_modules.patch
+    # a: optional module X skipped
+    # b: optional module X found
+  ];
+
   postPatch = ''
     cd sources/${pname}
   '';
 
-  patches = [
-    ./dont_ignore_optional_modules.patch
-  ];
+  CLANG_INSTALL_DIR = llvmPackages.libclang.out;
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
@@ -59,6 +63,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
+    llvmPackages.libclang.lib # /lib/clang
     qt6.full
   ] ++ (with pythonPackages; [
     packaging
