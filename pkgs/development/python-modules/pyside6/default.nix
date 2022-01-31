@@ -13,7 +13,7 @@ let
   sha256OfQtVersion = {
     pyside6 = {
       "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
-      "6.2.2" = "HPyU53RhmRr/c+SlbPpaaDKfHVl00Jx+ecwsE6b+eR8="; # todo
+      "6.2.2" = "cKdMfHyeWvRsrlsZQ7w5oTmcQzKzQtLEgQOhz+mYkag=";
     };
     shiboken6 = {
       "6.2.0" = "3OO0NNXRvlC4kgeZZHu7I0bf2TMb+SJCUSgIUCAJfLg=";
