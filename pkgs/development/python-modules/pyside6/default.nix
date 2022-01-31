@@ -11,8 +11,14 @@
 
 let
   sha256OfQtVersion = {
-    "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
-    "6.2.2" = "HPyU53RhmRr/c+SlbPp1JDKfHVl00Jx+ecwsE6b+eR8=";
+    pyside6 = {
+      "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
+      "6.2.2" = "HPyU53RhmRr/c+SlbPpaaDKfHVl00Jx+ecwsE6b+eR8="; # todo
+    };
+    shiboken6 = {
+      "6.2.0" = "3OO0NNXRvlC4kgeZZHu7I0bf2TMb+SJCUSgIUCAJfLg=";
+      "6.2.2" = "HPyU53RhmRr/c+SlbPp1JDKfHVl00Jx+ecwsE6b+eR8=";
+    };
   };
 in
 
@@ -22,12 +28,12 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-${version}-src/pyside-setup-opensource-src-${version}.tar.xz";
-    sha256 = sha256OfQtVersion.${version};
+    sha256 = sha256OfQtVersion.pyside6.${version};
   };
 
   srcShiboken = fetchurl {
     url = "https://download.qt.io/official_releases/QtForPython/pyside6/shiboken6-${version}-${version}-cp36.cp37.cp38.cp39.cp310-abi3-manylinux1_x86_64.whl";
-    sha256 = "3OO0NNXRvlC4kgeZZHu7I0bf2TMb+SJCUSgIUCAJfLg=";
+    sha256 = sha256OfQtVersion.shiboken6.${version};
   };
 
   patches = [
