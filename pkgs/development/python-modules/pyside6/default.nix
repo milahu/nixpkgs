@@ -111,7 +111,8 @@ stdenv.mkDerivation rec {
     #llvmPackages.libclang.lib # /lib/clang
     llvmPackages.libclang # /lib/clang
     llvmPackages.libcxx # include <type_traits>
-    qt6.full
+    #qt6.full
+    qt6.qtbase
   ] ++ (with pythonPackages; [
     packaging
     numpy
