@@ -45,9 +45,9 @@
                  if (headerPath.path.endsWith(frameworkPath())) {
 +// milahu debug
 +qCInfo(lcShiboken) <<
-+  "milahu 1: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath();
++  "milahu 1: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData();
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath() << '\n';
++  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
                      headerPath.type = HeaderType::FrameworkSystem;
                      headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
 +// milahu debug
