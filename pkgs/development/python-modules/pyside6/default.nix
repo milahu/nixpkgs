@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
     ./dont_ignore_optional_modules.patch
     # a: optional module X skipped
     # b: optional module X found
-    ../shiboken6/milahu-debug.patch
+    #../shiboken6/milahu-debug.patch
   ];
 
   postPatch = ''

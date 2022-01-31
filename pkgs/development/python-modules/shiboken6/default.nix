@@ -23,10 +23,11 @@ stdenv.mkDerivation rec {
     # https://bugreports.qt.io/browse/PYSIDE-787
     # sources/shiboken2/ApiExtractor/clangparser/compilersupport.cpp
 
-    ./milahu-debug.patch
+    #./milahu-debug.patch
   ];
 
   postPatch = ''
+    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
     cd sources/${pname}
   '';
 
