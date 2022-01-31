@@ -321,9 +321,11 @@ static QStringList findClangBuiltInIncludesDirList()
         const QString clangDirName = clangPathLibDir + QLatin1String("/clang");
         QDir clangDir(clangDirName);
 
+        // reached
+
         // milahu debug
-        std::cerr << "milahu cerr: clangPathLibDir = " << clangPathLibDir.toStdString() << '\n';
-        std::cerr << "milahu cerr: clangDirName = " << clangDirName.toStdString() << '\n';
+        std::cerr << "milahu cerr: findClangBuiltInIncludesDirList: clangPathLibDir = " << clangPathLibDir.toStdString() << '\n';
+        std::cerr << "milahu cerr: findClangBuiltInIncludesDirList: clangDirName = " << clangDirName.toStdString() << '\n';
         //std::cerr << "milahu cerr: clangDir = " << clangDir << '\n';
 
         /*
@@ -350,8 +352,11 @@ static QStringList findClangBuiltInIncludesDirList()
                 }
             }
         }
-        if (!candidate.isEmpty())
+        if (!candidate.isEmpty()) {
+            std::cerr << "milahu cerr: findClangBuiltInIncludesDirList: add candidate: " << candidate.toStdString() << "/include\n";
             result << candidate + QStringLiteral("/include");
+
+        }
     }
     return result;
 }
@@ -391,8 +396,11 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
     } else {
         for (QString clangBuiltinIncludesDir : clangBuiltinIncludesDirList) {
 
-// milahu debug
-std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir.toStdString() << '\n';
+
+            // reached
+
+            // milahu debug
+            std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir.toStdString() << '\n';
 
             qCInfo(lcShiboken, "CLANG builtins includes directory: %s",
                 qPrintable(clangBuiltinIncludesDir));
@@ -432,14 +440,20 @@ QByteArrayList emulatedCompilerOptions()
         break;
     case Compiler::Clang:
 
-        std::cerr << "milahu err: gppInternalIncludePaths clang++\n";
+        std::cerr << "milahu err: Compiler::Clang\n";
+        std::cerr << "milahu err: Compiler::Clang: gppInternalIncludePaths clang++\n";
 
         headerPaths.append(gppInternalIncludePaths(compilerFromCMake(u"clang++"_qs)));
         result.append(noStandardIncludeOption());
         break;
     case Compiler::Gpp:
-        if (needsClangBuiltinIncludes())
+
+        std::cerr << "milahu err: Compiler::Gpp\n";
+
+        if (needsClangBuiltinIncludes()) {
+            std::cerr << "milahu err: Compiler::Gpp: needsClangBuiltinIncludes -> appendClangBuiltinIncludes\n";
             appendClangBuiltinIncludes(&headerPaths);
+        }
         break;
     }
 
