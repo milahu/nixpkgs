@@ -411,6 +411,16 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
 
 
 // milahu debug
+std::cout << "milahu cerr: clangBuiltinIncludesDir: manually add libcxx include path: /nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1\n";
+
+p->append(HeaderPath{
+  QFile::encodeName(
+    //clangBuiltinIncludesDir
+    "/nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1" // ${llvmPackages_9.libcxx.dev}/include/c++/v1
+  ),
+  HeaderType::System
+});
+
 /*
     {
         QString clangBuiltinIncludesDir("");
@@ -448,9 +458,11 @@ QByteArrayList emulatedCompilerOptions()
         break;
     case Compiler::Gpp:
 
+        // reached
         std::cerr << "milahu err: Compiler::Gpp\n";
 
         if (needsClangBuiltinIncludes()) {
+            // reached
             std::cerr << "milahu err: Compiler::Gpp: needsClangBuiltinIncludes -> appendClangBuiltinIncludes\n";
             appendClangBuiltinIncludes(&headerPaths);
         }

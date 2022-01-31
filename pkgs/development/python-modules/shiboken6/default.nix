@@ -41,6 +41,7 @@ stdenv.mkDerivation rec {
     llvmPackages.clang-unwrapped
     llvmPackages.libclang # ${llvmPackages_9.libclang.lib}/lib/clang/9.0.1/include
     llvmPackages.libcxx # include <type_traits> -> ${llvmPackages_9.libcxx.dev}/include/c++/v1/type_traits
+    # /nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1/type_traits
     python
     qt6.qtbase
   ];
