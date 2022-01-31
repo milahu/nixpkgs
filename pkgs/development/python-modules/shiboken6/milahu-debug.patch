@@ -9,7 +9,23 @@
  namespace clang {
  
  QVersionNumber libClangVersion()
-@@ -163,15 +165,40 @@
+@@ -158,20 +160,55 @@
+          << QStringLiteral("-") << QStringLiteral("-v");
+     QByteArray stdOut;
+     QByteArray stdErr;
+-    if (!runProcess(compiler, arguments, &stdOut, &stdErr))
++
++// milahu debug
++std::cerr << "milahu err: g++ -E -x c++ - -v\n";
++std::cerr << "milahu err: arguments = " << arguments << '\n';
++
++    if (!runProcess(compiler, arguments, &stdOut, &stdErr)) {
++
++// milahu debug
++std::cerr << "milahu err: runProcess failed\n";
++
+         return result;
++    }
      const QByteArrayList stdErrLines = stdErr.split('\n');
      bool isIncludeDir = false;
      for (const QByteArray &line : stdErrLines) {
@@ -29,24 +45,84 @@
                  if (headerPath.path.endsWith(frameworkPath())) {
 +// milahu debug
 +qCInfo(lcShiboken) <<
-+  "milahu 1: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData();
++  "milahu 1: headerPath.path = " << headerPath.path << " : ends with frameworkPath = " << frameworkPath();
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
++  "milahu 2: headerPath.path = " << headerPath.path << " : ends with frameworkPath = " << frameworkPath() << '\n';
                      headerPath.type = HeaderType::FrameworkSystem;
                      headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
 +// milahu debug
 +qCInfo(lcShiboken) <<
-+  "headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix";
++  "headerPath.path = " << headerPath.path << " : truncated = remove frameworkPath suffix";
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
++  "milahu 2: headerPath.path = " << headerPath.path << " : truncated = remove frameworkPath suffix" << '\n';
                  }
 +// milahu debug
 +else {
 +qCInfo(lcShiboken) <<
-+  "headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
++  "headerPath.path = " << headerPath.path << " : no frameworkPath";
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
++  "milahu 2: headerPath.path = " << headerPath.path << " : no frameworkPath";
 +}
                  result.append(headerPath);
              }
          } else if (line.startsWith(QByteArrayLiteral("#include <...> search starts here"))) {
+@@ -254,10 +291,19 @@
+         QVersionNumber lastVersionNumber(1, 0, 0);
+         const QString clangDirName = clangPathLibDir + QLatin1String("/clang");
+         QDir clangDir(clangDirName);
++
++// milahu debug
++std::cerr << "milahu cerr: clangPathLibDir = " << clangPathLibDir << '\n';
++std::cerr << "milahu cerr: clangDirName = " << clangDirName << '\n';
++//std::cerr << "milahu cerr: clangDir = " << clangDir << '\n';
++
+         const QFileInfoList versionDirs =
+             clangDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+         if (versionDirs.isEmpty())
+             qWarning("%s: No subdirectories found in %s.", __FUNCTION__, qPrintable(clangDirName));
++
++// (shiboken) findClangBuiltInIncludesDir: No subdirectories found in /nix/store/vjcxibppbkmcsibv832a660wxal72n8k-llvm-9.0.1-lib/lib/clang.
++
+         for (const QFileInfo &fi : versionDirs) {
+             const QString fileName = fi.fileName();
+             if (fileName.at(0).isDigit()) {
+@@ -289,16 +335,39 @@
+ {
+     const QString clangBuiltinIncludesDir =
+         QDir::toNativeSeparators(findClangBuiltInIncludesDir());
++
++// milahu debug
++std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir << '\n';
++
+     if (clangBuiltinIncludesDir.isEmpty()) {
+         qCWarning(lcShiboken, "Unable to locate Clang's built-in include directory "
+                   "(neither by checking the environment variables LLVM_INSTALL_DIR, CLANG_INSTALL_DIR "
+                   " nor running llvm-config). This may lead to parse errors.");
++
++// milahu debug
++// qt.shiboken: (shiboken) Unable to locate Clang's built-in include directory
++// (neither by checking the environment variables LLVM_INSTALL_DIR, CLANG_INSTALL_DIR
++// nor running llvm-config). This may lead to parse errors.
++
+     } else {
+         qCInfo(lcShiboken, "CLANG builtins includes directory: %s",
+                qPrintable(clangBuiltinIncludesDir));
+         p->append(HeaderPath{QFile::encodeName(clangBuiltinIncludesDir),
+                              HeaderType::System});
+     }
++
++
++// milahu debug
++/*
++    {
++        QString clangBuiltinIncludesDir("");
++        qCInfo(lcShiboken, "CLANG builtins includes directory: %s",
++               qPrintable(clangBuiltinIncludesDir));
++        p->append(HeaderPath{QFile::encodeName(clangBuiltinIncludesDir),
++                             HeaderType::System});
++    }
++*/
++
+ }
+ 
+ // Returns clang options needed for emulating the host compiler
