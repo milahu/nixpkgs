@@ -85,6 +85,10 @@ stdenv.mkDerivation rec {
   # /nix/store/r2hc62469m060alj70a86vyminlhbcsz-clang-9.0.1-lib/lib/clang/9.0.1/include/
   # /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include/
 
+  # -- CLANG: /nix/store/n1ngp19bmngn7rdfqsf9vipwzx9y8vh3-clang-9.0.1-dev/lib/cmake/clang, /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/libclang.so.9 detected
+  # qt.shiboken: (shiboken) CLANG builtins includes directory: /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include # ok
+  # qt.shiboken: (shiboken) No C++ classes found!
+
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
     #"-DPYTHON_EXECUTABLE=${python.interpreter}"
@@ -103,7 +107,7 @@ stdenv.mkDerivation rec {
     llvmPackages.clang-unwrapped
     #llvmPackages.libclang.lib # /lib/clang
     llvmPackages.libclang # /lib/clang
-    llvmPackages.libcxx.dev # include <type_traits>
+    llvmPackages.libcxx # include <type_traits>
     qt6.full
   ] ++ (with pythonPackages; [
     packaging

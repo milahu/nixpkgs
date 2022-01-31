@@ -38,6 +38,8 @@ stdenv.mkDerivation rec {
   buildInputs = [
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
+    llvmPackages.libclang # /lib/clang
+    llvmPackages.libcxx # include <type_traits>
     python
     qt6.qtbase
   ];
