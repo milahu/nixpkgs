@@ -7,6 +7,7 @@
 , cmake
 , qt6
 , llvm
+, libclang
 , llvmPackages
 }:
 
@@ -29,6 +30,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     llvm
+    libclang
     #llvmPackages.libclang
     python
     qt6.qtbase
