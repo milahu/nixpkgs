@@ -6,15 +6,12 @@
 , pyside6
 , cmake
 , qt6
-, llvm
-, libclang
-, llvmPackages
-, llvmPackages_13 # ok
-#, llvmPackages_8 # error
-, llvmPackages_9 # test
+, llvmPackages_9 # https://bugreports.qt.io/browse/QTBUG-100344
 }:
 
 # sphinx-build - not found! doc target disabled
+
+let llvmPackages = llvmPackages_9; in
 
 stdenv.mkDerivation rec {
   pname = "shiboken6";
@@ -34,22 +31,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
 
   buildInputs = [
-    #llvm
-    #libclang
-    # too old?
-    # pyside-setup-opensource-src-6.2.2/sources/shiboken6/ApiExtractor/clangparser/clangbuilder.cpp:330:10:
-    # error: 'CXCursor_ExceptionSpecificationKind_NoThrow' was not declared in this scope;
-    # did you mean 'CXCursor_ExceptionSpecificationKind_None'?
-
-    #llvmPackages_13.libllvm llvmPackages_13.clang-unwrapped
-    # ok
-
-    #llvmPackages_8.libllvm llvmPackages_8.clang-unwrapped
-    # /build/pyside-setup-opensource-src-6.2.2/sources/shiboken6/ApiExtractor/clangparser/clangbuilder.cpp:330:10: error: 'CXCursor_ExceptionSpecificationKind_NoThrow' was not declared in this scope; did you mean 'CXCursor_ExceptionSpecificationKind_None'?
-
-    llvmPackages_9.libllvm llvmPackages_9.clang-unwrapped
-
-    #llvmPackages.libclang
+    llvmPackages.libllvm
+    llvmPackages.clang-unwrapped
     python
     qt6.qtbase
   ];
