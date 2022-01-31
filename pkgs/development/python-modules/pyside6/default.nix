@@ -54,8 +54,8 @@ stdenv.mkDerivation rec {
   '';
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
-  CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang
   #LLVM_INSTALL_DIR = llvmPackages.libclang.lib;
+  #CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
@@ -73,7 +73,9 @@ stdenv.mkDerivation rec {
   buildInputs = [
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
-    llvmPackages.libclang.lib # /lib/clang
+    #llvmPackages.libclang.lib # /lib/clang
+    llvmPackages.libclang # /lib/clang
+    llvmPackages.libcxx # include <type_traits>
     qt6.full
   ] ++ (with pythonPackages; [
     packaging
