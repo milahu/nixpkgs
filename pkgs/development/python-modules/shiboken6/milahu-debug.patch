@@ -16,9 +16,9 @@
 +
 +// milahu debug
 +qCInfo(lcShiboken) <<
-+  "milahu 1: g++ output line = " << line;
++  "milahu 1: g++ output line = " << line.constData();
 +std::cerr <<
-+  "milahu 2: g++ output line = " << line << '\n';
++  "milahu 2: g++ output line = " << line.constData() << '\n';
 +
 +
          if (isIncludeDir) {
