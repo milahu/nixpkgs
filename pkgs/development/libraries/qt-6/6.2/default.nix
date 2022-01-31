@@ -116,7 +116,6 @@ let
       qtdeclarative = callPackage ../modules/qtdeclarative.nix { };
       qtdoc = callPackage ../modules/qtdoc.nix { };
       qtimageformats = callPackage ../modules/qtimageformats.nix { };
-      #qtlocation = callPackage ../modules/qtlocation.nix {};
       qtmultimedia = callPackage ../modules/qtmultimedia.nix {
         inherit gstreamer gst-plugins-base;
       };
@@ -173,7 +172,6 @@ let
         qtdeclarative
         qtdoc
         qtimageformats
-        # qtlocation
         qtmultimedia
         qtsensors
         qtserialport
@@ -184,7 +182,7 @@ let
         # qtvirtualkeyboard
         qtwebchannel
         qtwebengine
-        # qtwebkit
+        # qtwebkit # TODO?
         qtwebsockets
         qtwebview
       ] ++ lib.optional (!stdenv.isDarwin) qtwayland);
