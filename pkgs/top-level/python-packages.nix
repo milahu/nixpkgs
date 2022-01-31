@@ -8977,7 +8977,7 @@ in {
   });
 
   shiboken6 = toPythonModule (callPackage ../development/python-modules/shiboken6 {
-    inherit (pkgs) cmake llvmPackages qt6;
+#    inherit (pkgs) cmake llvmPackages qt6;
   });
 
   shippai = callPackage ../development/python-modules/shippai { };
