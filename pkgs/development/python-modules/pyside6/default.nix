@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
     sha256 = sha256OfQtVersion.pyside6.${version};
   };
 
-  srcShiboken = fetchurl {
+  shibokenWhl = fetchurl {
     url = "https://download.qt.io/official_releases/QtForPython/pyside6/shiboken6-${version}-${version}-cp36.cp37.cp38.cp39.cp310-abi3-manylinux1_x86_64.whl";
     sha256 = sha256OfQtVersion.shiboken6.${version};
   };
