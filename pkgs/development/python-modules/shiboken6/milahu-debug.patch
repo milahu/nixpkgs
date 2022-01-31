@@ -17,7 +17,7 @@
 +
 +// milahu debug
 +std::cerr << "milahu err: g++ -E -x c++ - -v\n";
-+std::cerr << "milahu err: arguments = " << arguments.join("  ").toStdString() << '\n';
++//std::cerr << "milahu err: arguments = " << arguments.join("  ").toStdString() << '\n'; // error: qstring is private (what??)
 +
 +    if (!runProcess(compiler, arguments, &stdOut, &stdErr)) {
 +
