@@ -1,5 +1,6 @@
 { buildPythonPackage
 , python
+, pythonPackages
 , fetchurl
 , lib
 , stdenv
@@ -39,7 +40,7 @@ stdenv.mkDerivation rec {
   patches = [
     #./dont_ignore_optional_modules.patch
   ];
-
+/*
   postPatch = ''
     echo postPatch
     ls
@@ -50,6 +51,8 @@ stdenv.mkDerivation rec {
     find . -name setup.py
 
     #cd sources/${pname}
+
+    echo python.version = ${python.version}
   '';
 
   configurePhase = ":";
@@ -66,9 +69,9 @@ stdenv.mkDerivation rec {
     "-DBUILD_TESTS=OFF"
     "-DPYTHON_EXECUTABLE=${python.interpreter}"
   ];
-
+*/
   nativeBuildInputs = [ cmake ninja qt6.qmake python ];
-  buildInputs = with qt6; [
+  buildInputs = (with qt6; [
     qtbase
     qtmultimedia
     qttools
@@ -79,7 +82,9 @@ stdenv.mkDerivation rec {
     qtcharts
     qtsensors
     qtsvg
-  ];
+  ]) ++ (with pythonPackages; [
+    packaging
+  ]);
   propagatedBuildInputs = [ shiboken6 ];
 
   dontWrapQtApps = true;
