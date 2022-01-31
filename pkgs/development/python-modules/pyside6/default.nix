@@ -3,7 +3,7 @@
 , pythonPackages
 , fetchurl
 , lib
-, stdenv
+#, stdenv
 , cmake
 , ninja
 , qt6
@@ -39,6 +39,8 @@ let
   # pyside6 requires clang >= 9
   #llvmPackages = llvmPackages_9;
   llvmPackages = llvmPackages_13;
+  stdenv = llvmPackages.stdenv;
+
   sha256OfQtVersion = {
     pyside6 = {
       "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
