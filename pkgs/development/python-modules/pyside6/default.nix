@@ -12,7 +12,31 @@
 , llvmPackages_13
 }:
 
+/*
+
+(core) clang_parseTranslationUnit2(
+  0x0,
+  cmd[12]=
+    -fPIC
+    -Wno-constant-logical-operand
+    -std=c++17
+    -I/build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6
+    -I/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/mkspecs/linux-g++
+    -I/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include
+    -I/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtCore
+    -I/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include /build/QtCore_global_QCfFQK.hpp
+    "-DQT_ANNOTATE_ACCESS_SPECIFIER(a)=__attribute__((annotate(#a)))"
+    "-DQT_ANNOTATE_CLASS(type,...)=static_assert(sizeof(#__VA_ARGS__),#type);"
+    -DQSIMD_H
+  )
+
+/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtCore/qglobal.h:45:12:
+fatal error: 'type_traits' file not found
+
+*/
+
 let
+  # pyside6 requires clang >= 9
   #llvmPackages = llvmPackages_9;
   llvmPackages = llvmPackages_13;
   sha256OfQtVersion = {
@@ -56,6 +80,7 @@ stdenv.mkDerivation rec {
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
   #LLVM_INSTALL_DIR = llvmPackages.libclang.lib;
   #CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang
+  CLANG_INSTALL_DIR = "${llvmPackages.libclang.lib}:${llvmPackages.libcxx.dev}"; # /lib/clang
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
