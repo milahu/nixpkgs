@@ -416,7 +416,7 @@ std::cout << "milahu cerr: clangBuiltinIncludesDir: manually add libcxx include 
 p->append(HeaderPath{
   QFile::encodeName(
     //clangBuiltinIncludesDir
-    "/nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1" // ${llvmPackages_9.libcxx.dev}/include/c++/v1
+    QString("/nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1") // ${llvmPackages_9.libcxx.dev}/include/c++/v1
   ),
   HeaderType::System
 });
