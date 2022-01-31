@@ -51,7 +51,9 @@ stdenv.mkDerivation rec {
     cd sources/${pname}
   '';
 
-  CLANG_INSTALL_DIR = llvmPackages.libclang.out;
+  #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
+  CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang
+  #LLVM_INSTALL_DIR = llvmPackages.libclang.lib;
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
