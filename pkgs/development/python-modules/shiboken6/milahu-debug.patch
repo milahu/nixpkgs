@@ -17,7 +17,7 @@
 +
 +// milahu debug
 +std::cerr << "milahu err: g++ -E -x c++ - -v\n";
-+std::cerr << "milahu err: arguments = " << arguments << '\n';
++std::cerr << "milahu err: arguments = " << arguments.join("  ").toStdString() << '\n';
 +
 +    if (!runProcess(compiler, arguments, &stdOut, &stdErr)) {
 +
@@ -72,8 +72,8 @@
          QDir clangDir(clangDirName);
 +
 +// milahu debug
-+std::cerr << "milahu cerr: clangPathLibDir = " << clangPathLibDir << '\n';
-+std::cerr << "milahu cerr: clangDirName = " << clangDirName << '\n';
++std::cerr << "milahu cerr: clangPathLibDir = " << clangPathLibDir.toStdString() << '\n';
++std::cerr << "milahu cerr: clangDirName = " << clangDirName.toStdString() << '\n';
 +//std::cerr << "milahu cerr: clangDir = " << clangDir << '\n';
 +
          const QFileInfoList versionDirs =
@@ -125,4 +125,4 @@
 +
  }
  
- // Returns clang options needed for emulating the host compiler
+ // Returns clang options needed for emulating the host 
