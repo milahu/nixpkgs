@@ -75,7 +75,7 @@ stdenv.mkDerivation rec {
     llvmPackages.clang-unwrapped
     #llvmPackages.libclang.lib # /lib/clang
     llvmPackages.libclang # /lib/clang
-    llvmPackages.libcxx # include <type_traits>
+    llvmPackages.libcxx.dev # include <type_traits>
     qt6.full
   ] ++ (with pythonPackages; [
     packaging
