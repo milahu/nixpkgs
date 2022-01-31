@@ -361,9 +361,6 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
 
 
 
-// milahu debug
-std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir.toStdString() << '\n';
-
     if (clangBuiltinIncludesDirList.size() == 0) {
         qCWarning(lcShiboken, "Unable to locate Clang's built-in include directory "
                   "(neither by checking the environment variables LLVM_INSTALL_DIR, CLANG_INSTALL_DIR "
@@ -376,6 +373,10 @@ std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDi
 
     } else {
         for (QString clangBuiltinIncludesDir : clangBuiltinIncludesDirList) {
+
+// milahu debug
+std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir.toStdString() << '\n';
+
             qCInfo(lcShiboken, "CLANG builtins includes directory: %s",
                 qPrintable(clangBuiltinIncludesDir));
             p->append(HeaderPath{QFile::encodeName(clangBuiltinIncludesDir),
