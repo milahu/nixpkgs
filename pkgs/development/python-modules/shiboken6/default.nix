@@ -20,13 +20,17 @@ stdenv.mkDerivation rec {
 
   patches = [
     #./nix_compile_cflags.patch
+    # https://bugreports.qt.io/browse/PYSIDE-787
+    # sources/shiboken2/ApiExtractor/clangparser/compilersupport.cpp
+
+    ./milahu-debug.patch
   ];
 
   postPatch = ''
     cd sources/${pname}
   '';
 
-  #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
+  CLANG_INSTALL_DIR = llvmPackages.libclang.out;
 
   nativeBuildInputs = [ cmake ];
 
