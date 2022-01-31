@@ -34,62 +34,33 @@ stdenv.mkDerivation rec {
     sha256 = sha256OfQtVersion.pyside6.${version};
   };
 
+  /*
   shibokenWhl = fetchurl {
     url = "https://download.qt.io/official_releases/QtForPython/pyside6/shiboken6-${version}-${version}-cp36.cp37.cp38.cp39.cp310-abi3-manylinux1_x86_64.whl";
     sha256 = sha256OfQtVersion.shiboken6.${version};
   };
+  */
 
   patches = [
-    #./dont_ignore_optional_modules.patch
+    ./dont_ignore_optional_modules.patch
   ];
-/*
-  postPatch = ''
-    echo postPatch
-    ls
-    #ls sources
-    #stat ${shibokenWhl}
-
-    ls
-    find . -name setup.py
-
-    #cd sources/${pname}
-
-    echo python.version = ${python.version}
-  '';
-
-  configurePhase = ":";
-
-  buildPhase = ''
-    ${python.interpreter} setup.py build
-  '';
-
-  installPhase = ''
-    ${python.interpreter} setup.py install
-  '';
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
-    "-DPYTHON_EXECUTABLE=${python.interpreter}"
+    #"-DPYTHON_EXECUTABLE=${python.interpreter}"
   ];
-*/
+
   nativeBuildInputs = [ cmake ninja qt6.qmake python ];
-  buildInputs = (with qt6; [
-    qtbase
-    qtmultimedia
-    qttools
-    # qtlocation
-    qtwebsockets
-    qtwebengine
-    qtwebchannel
-    qtcharts
-    qtsensors
-    qtsvg
-  ]) ++ (with pythonPackages; [
-    packaging
-  ]) ++ [
+
+  buildInputs = [
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
-  ];
+    qt6.full
+  ] ++ (with pythonPackages; [
+    packaging
+    numpy
+  ]);
+
   propagatedBuildInputs = [ shiboken6 ];
 
   dontWrapQtApps = true;
