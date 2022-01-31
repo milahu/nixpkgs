@@ -120,16 +120,6 @@ let
         inherit gstreamer gst-plugins-base;
       };
 
-      # experiment
-      qtbaseDistbuild = callPackage ../modules/qtbase.distbuild.nix {
-        inherit (srcs.qtbase) src version;
-        inherit bison cups harfbuzz libGL dconf gtk3 developerBuild decryptSslTraffic;
-        withGtk3 = true;
-        inherit (darwin.apple_sdk.frameworks) AGL AppKit ApplicationServices Carbon Cocoa CoreAudio CoreBluetooth
-          CoreLocation CoreServices DiskArbitration Foundation OpenGL MetalKit IOKit;
-        inherit (darwin) libobjc;
-      };
-
       qtnetworkauth = callPackage ../modules/qtnetworkauth.nix { };
       qtpositioning = callPackage ../modules/qtpositioning.nix { };
       qtsensors = callPackage ../modules/qtsensors.nix { };
