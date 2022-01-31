@@ -353,9 +353,9 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
     const QStringList clangBuiltinIncludesDirList = findClangBuiltInIncludesDirList();
 
     std::transform(
-        findClangBuiltInIncludesDirList.begin(),
-        findClangBuiltInIncludesDirList.end(),
-        findClangBuiltInIncludesDirList.begin(),
+        findClangBuiltInIncludesDirList.cbegin(),
+        findClangBuiltInIncludesDirList.cend(),
+        findClangBuiltInIncludesDirList.cbegin(),
         QDir::toNativeSeparators
     );
 
