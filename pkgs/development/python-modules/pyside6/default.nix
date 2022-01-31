@@ -12,7 +12,7 @@
 let
   sha256OfQtVersion = {
     "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
-    "6.2.2" = "00IQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE="; # todo
+    "6.2.2" = "HPyU53RhmRr/c+SlbPp1JDKfHVl00Jx+ecwsE6b+eR8=";
   };
 in
 
