@@ -80,7 +80,10 @@ stdenv.mkDerivation rec {
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
   #LLVM_INSTALL_DIR = llvmPackages.libclang.lib;
   #CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang
-  CLANG_INSTALL_DIR = "${llvmPackages.libclang.lib}:${llvmPackages.libcxx.dev}"; # /lib/clang
+  #CLANG_INSTALL_DIR = "${llvmPackages.libclang.lib}:${llvmPackages.libcxx.dev}"; # /lib/clang
+  CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang/*/include/
+  # /nix/store/r2hc62469m060alj70a86vyminlhbcsz-clang-9.0.1-lib/lib/clang/9.0.1/include/
+  # /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include/
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
