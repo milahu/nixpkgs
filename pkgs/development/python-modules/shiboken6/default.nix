@@ -8,13 +8,15 @@
 , qt6
 , llvmPackages_9 # https://bugreports.qt.io/browse/QTBUG-100344
 , llvmPackages_13
+, llvmPackages_10
 }:
 
 # sphinx-build - not found! doc target disabled
 
 let
   #llvmPackages = llvmPackages_9;
-  llvmPackages = llvmPackages_13;
+  #llvmPackages = llvmPackages_13;
+  llvmPackages = llvmPackages_10;
   stdenv = llvmPackages.stdenv;
 in
 
