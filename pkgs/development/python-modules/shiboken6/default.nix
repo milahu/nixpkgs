@@ -41,6 +41,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
 
   buildInputs = [
+    llvmPackages.libclang # ClangConfig.cmake
     /*
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
