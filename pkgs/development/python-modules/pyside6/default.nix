@@ -8,9 +8,11 @@
 , ninja
 , qt6
 , shiboken6
+, llvmPackages_9
 }:
 
 let
+  llvmPackages = llvmPackages_9;
   sha256OfQtVersion = {
     pyside6 = {
       "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
@@ -84,7 +86,10 @@ stdenv.mkDerivation rec {
     qtsvg
   ]) ++ (with pythonPackages; [
     packaging
-  ]);
+  ]) ++ [
+    llvmPackages.libllvm
+    llvmPackages.clang-unwrapped
+  ];
   propagatedBuildInputs = [ shiboken6 ];
 
   dontWrapQtApps = true;
