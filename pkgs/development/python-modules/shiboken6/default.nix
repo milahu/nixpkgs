@@ -7,12 +7,14 @@
 , cmake
 , qt6
 , llvmPackages_9 # https://bugreports.qt.io/browse/QTBUG-100344
+, llvmPackages_13
 }:
 
 # sphinx-build - not found! doc target disabled
 
 let
-  llvmPackages = llvmPackages_9;
+  #llvmPackages = llvmPackages_9;
+  llvmPackages = llvmPackages_13;
   stdenv = llvmPackages.stdenv;
 in
 
@@ -43,6 +45,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     llvmPackages.libclang # ClangConfig.cmake
     llvmPackages.libllvm # LLVMConfig.cmake
+    # clang 9: qtbase-6.2.2-dev/include/QtCore/qmetatype.h: error: constexpr variable 'len' must be initialized by a constant
     /*
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
