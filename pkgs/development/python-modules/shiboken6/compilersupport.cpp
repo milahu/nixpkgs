@@ -154,8 +154,12 @@ static void filterHomebrewHeaderPaths(HeaderPaths &headerPaths)
 // /usr/local/include
 // /System/Library/Frameworks (framework directory)
 // End of search list.
+
+// TODO(milahu) revert patch
 static HeaderPaths gppInternalIncludePaths(const QString &compiler)
 {
+    std::cerr << "milahu err: gppInternalIncludePaths: compiler = " << compiler.toStdString() << '\n';
+
     HeaderPaths result;
     QStringList arguments;
     arguments << QStringLiteral("-E") << QStringLiteral("-x") << QStringLiteral("c++")
@@ -163,26 +167,33 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
     QByteArray stdOut;
     QByteArray stdErr;
 
-// milahu debug
-std::cerr << "milahu err: g++ -E -x c++ - -v\n";
-//std::cerr << "milahu err: arguments = " << arguments.join("  ").toStdString() << '\n'; // error: qstring is private (what??)
+    // milahu debug
+    std::cerr << "milahu err: g++ -E -x c++ - -v\n";
+    //std::cerr << "milahu err: arguments = " << arguments.join("  ").toStdString() << '\n'; // error: qstring is private (what??)
+
+    for (QString arg : arguments)
+      std::cerr << "milahu err: gppInternalIncludePaths: argument[] = " << arg.toStdString() << '\n';
 
     if (!runProcess(compiler, arguments, &stdOut, &stdErr)) {
 
-// milahu debug
-std::cerr << "milahu err: runProcess failed\n";
+        // milahu debug
+        std::cerr << "milahu err: gppInternalIncludePaths: runProcess failed\n";
 
         return result;
     }
+
+    std::cerr << "milahu err: gppInternalIncludePaths: runProcess stdOut = " << stdOut.constData() << '\n';
+    std::cerr << "milahu err: gppInternalIncludePaths: runProcess stdErr = " << stdErr.constData() << '\n';
+
     const QByteArrayList stdErrLines = stdErr.split('\n');
     bool isIncludeDir = false;
     for (const QByteArray &line : stdErrLines) {
 
-// milahu debug
-qCInfo(lcShiboken) <<
-  "milahu 1: g++ output line = " << line.constData();
-std::cerr <<
-  "milahu 2: g++ output line = " << line.constData() << '\n';
+        // milahu debug
+        qCInfo(lcShiboken) <<
+          "milahu 1: gppInternalIncludePaths: g++ output line = " << line.constData();
+        std::cerr <<
+          "milahu 2: gppInternalIncludePaths: g++ output line = " << line.constData() << '\n';
 
         if (isIncludeDir) {
             if (line.startsWith(QByteArrayLiteral("End of search list"))) {
@@ -190,26 +201,30 @@ std::cerr <<
             } else {
                 HeaderPath headerPath{line.trimmed(), HeaderType::System};
                 if (headerPath.path.endsWith(frameworkPath())) {
-// milahu debug
-qCInfo(lcShiboken) <<
-  "milahu 1: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData();
-std::cerr <<
-  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
+
+                    // milahu debug
+                    qCInfo(lcShiboken) <<
+                      "milahu 1: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData();
+                    std::cerr <<
+                      "milahu 2: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
+
                     headerPath.type = HeaderType::FrameworkSystem;
                     headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
-// milahu debug
-qCInfo(lcShiboken) <<
-  "headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix";
-std::cerr <<
-  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
+
+                // milahu debug
+                qCInfo(lcShiboken) <<
+                  "milahu 1: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix";
+                std::cerr <<
+                  "milahu 2: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
+                                }
+                // milahu debug
+                else {
+                qCInfo(lcShiboken) <<
+                  "milahu 1: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
+                std::cerr <<
+                  "milahu 2: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
                 }
-// milahu debug
-else {
-qCInfo(lcShiboken) <<
-  "headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
-std::cerr <<
-  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
-}
+
                 result.append(headerPath);
             }
         } else if (line.startsWith(QByteArrayLiteral("#include <...> search starts here"))) {
@@ -259,16 +274,23 @@ static bool needsClangBuiltinIncludes()
     return platform() != Platform::macOS;
 }
 
+// TODO(milahu) revert patch. wrong place for libcxx include path
 static QStringList findClangLibDirList()
 {
     QStringList result;
     for (const char *envVar : {"LLVM_INSTALL_DIR", "CLANG_INSTALL_DIR"}) {
         if (qEnvironmentVariableIsSet(envVar)) {
-            const QString path = QFile::decodeName(qgetenv(envVar)) + QLatin1String("/lib");
-            if (QFileInfo::exists(path))
-                result << path;
-            else
-                qWarning("%s: %s as pointed to by %s does not exist.", __FUNCTION__, qPrintable(path), envVar);
+            QByteArray pathBytesList = qgetenv(envVar); // colon-separated list of paths
+            for (QByteArray pathBytes : pathBytesList.split(':')) {
+              const QString path = QFile::decodeName(pathBytes) + QLatin1String("/lib");
+              // libclang -> ${llvmPackages_9.libclang.lib}/lib/clang/9.0.1/include     // ok
+              // libcxx   -> ${llvmPackages_9.libcxx.dev  }/include/c++/v1/type_traits  // wrong!
+              // -> libcxx include path must come from somewhere else.
+              if (QFileInfo::exists(path))
+                  result << path;
+              else
+                  qWarning("%s: %s as pointed to by %s does not exist.", __FUNCTION__, qPrintable(path), envVar);
+            }
         }
     }
     if (result.size() > 0)
@@ -299,24 +321,24 @@ static QStringList findClangBuiltInIncludesDirList()
         const QString clangDirName = clangPathLibDir + QLatin1String("/clang");
         QDir clangDir(clangDirName);
 
-// milahu debug
-std::cerr << "milahu cerr: clangPathLibDir = " << clangPathLibDir.toStdString() << '\n';
-std::cerr << "milahu cerr: clangDirName = " << clangDirName.toStdString() << '\n';
-//std::cerr << "milahu cerr: clangDir = " << clangDir << '\n';
+        // milahu debug
+        std::cerr << "milahu cerr: clangPathLibDir = " << clangPathLibDir.toStdString() << '\n';
+        std::cerr << "milahu cerr: clangDirName = " << clangDirName.toStdString() << '\n';
+        //std::cerr << "milahu cerr: clangDir = " << clangDir << '\n';
 
-/*
-milahu cerr: clangPathLibDir = /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib
-milahu cerr: clangDirName = /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang
-milahu cerr: clangBuiltinIncludesDir = /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include
-qt.shiboken: (shiboken) CLANG builtins includes directory: /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include
-*/
+        /*
+        milahu cerr: clangPathLibDir = /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib
+        milahu cerr: clangDirName = /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang
+        milahu cerr: clangBuiltinIncludesDir = /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include
+        qt.shiboken: (shiboken) CLANG builtins includes directory: /nix/store/r0zab6w8bwf93id0pq9pkwf3iw441zs7-clang-9.0.1-lib/lib/clang/9.0.1/include
+        */
 
         const QFileInfoList versionDirs =
             clangDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
         if (versionDirs.isEmpty())
             qWarning("%s: No subdirectories found in %s.", __FUNCTION__, qPrintable(clangDirName));
 
-// (shiboken) findClangBuiltInIncludesDirList: No subdirectories found in /nix/store/vjcxibppbkmcsibv832a660wxal72n8k-llvm-9.0.1-lib/lib/clang.
+        // (shiboken) findClangBuiltInIncludesDirList: No subdirectories found in /nix/store/vjcxibppbkmcsibv832a660wxal72n8k-llvm-9.0.1-lib/lib/clang.
 
         for (const QFileInfo &fi : versionDirs) {
             const QString fileName = fi.fileName();
@@ -409,6 +431,9 @@ QByteArrayList emulatedCompilerOptions()
             appendClangBuiltinIncludes(&headerPaths);
         break;
     case Compiler::Clang:
+
+        std::cerr << "milahu err: gppInternalIncludePaths clang++\n";
+
         headerPaths.append(gppInternalIncludePaths(compilerFromCMake(u"clang++"_qs)));
         result.append(noStandardIncludeOption());
         break;

@@ -32,15 +32,15 @@ stdenv.mkDerivation rec {
   '';
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
-  CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang/*/include/
+  CLANG_INSTALL_DIR = "${llvmPackages.libclang.lib}:${llvmPackages.libcxx.dev}"; # /lib/clang/9.0.1/include/
 
   nativeBuildInputs = [ cmake ];
 
   buildInputs = [
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
-    llvmPackages.libclang # /lib/clang
-    llvmPackages.libcxx # include <type_traits>
+    llvmPackages.libclang # ${llvmPackages_9.libclang.lib}/lib/clang/9.0.1/include
+    llvmPackages.libcxx # include <type_traits> -> ${llvmPackages_9.libcxx.dev}/include/c++/v1/type_traits
     python
     qt6.qtbase
   ];
