@@ -10,6 +10,7 @@
 , libclang
 , llvmPackages
 , llvmPackages_13
+, llvmPackages_8 # test
 }:
 
 # sphinx-build - not found! doc target disabled
@@ -38,8 +39,14 @@ stdenv.mkDerivation rec {
     # pyside-setup-opensource-src-6.2.2/sources/shiboken6/ApiExtractor/clangparser/clangbuilder.cpp:330:10:
     # error: 'CXCursor_ExceptionSpecificationKind_NoThrow' was not declared in this scope;
     # did you mean 'CXCursor_ExceptionSpecificationKind_None'?
-    llvmPackages_13.libllvm
-    llvmPackages_13.clang-unwrapped
+
+    #llvmPackages_13.libllvm
+    #llvmPackages_13.clang-unwrapped
+    # ok
+
+    llvmPackages_8.libllvm
+    llvmPackages_8.clang-unwrapped
+    # test
 
     #llvmPackages.libclang
     python
