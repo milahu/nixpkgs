@@ -1,21 +1,32 @@
-{ buildPythonPackage, python, fetchurl, lib, stdenv,
-  cmake, ninja, qt6, shiboken6 }:
+{ buildPythonPackage
+, python
+, fetchurl
+, lib
+, stdenv
+, cmake
+, ninja
+, qt6
+, shiboken6
+}:
 
 let
-  pnameCamel = "PySide6";
+  sha256OfQtVersion = {
+    "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
+    "6.2.2" = "00IQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE="; # todo
+  };
 in
 
 stdenv.mkDerivation rec {
   pname = "pyside6";
-  version = "6.2.0";
+  version = "6.2.2";
 
   src = fetchurl {
-    url = "https://download.qt.io/official_releases/QtForPython/${pname}/${pnameCamel}-${version}-src/pyside-setup-opensource-src-${version}.tar.xz";
-    sha256 = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
+    url = "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-${version}-src/pyside-setup-opensource-src-${version}.tar.xz";
+    sha256 = sha256OfQtVersion.${version};
   };
 
   srcShiboken = fetchurl {
-    url = "https://download.qt.io/official_releases/QtForPython/${pname}/shiboken6-${version}-${version}-cp36.cp37.cp38.cp39.cp310-abi3-manylinux1_x86_64.whl";
+    url = "https://download.qt.io/official_releases/QtForPython/pyside6/shiboken6-${version}-${version}-cp36.cp37.cp38.cp39.cp310-abi3-manylinux1_x86_64.whl";
     sha256 = "3OO0NNXRvlC4kgeZZHu7I0bf2TMb+SJCUSgIUCAJfLg=";
   };
 
@@ -52,8 +63,16 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ninja qt6.qmake python ];
   buildInputs = with qt6; [
-    qtbase qtmultimedia qttools qtlocation
-    qtwebsockets qtwebengine qtwebchannel qtcharts qtsensors qtsvg
+    qtbase
+    qtmultimedia
+    qttools
+    # qtlocation
+    qtwebsockets
+    qtwebengine
+    qtwebchannel
+    qtcharts
+    qtsensors
+    qtsvg
   ];
   propagatedBuildInputs = [ shiboken6 ];
 
