@@ -6,13 +6,16 @@
 , pyside6
 , cmake
 , qt6
+, llvm
 , llvmPackages
 }:
 
 stdenv.mkDerivation rec {
   pname = "shiboken6";
 
-  inherit (pyside6) version src;
+  #inherit (pyside6) version src;
+  inherit (pyside6) version;
+  src = pyside6.srcShiboken;
 
   patches = [
     #./nix_compile_cflags.patch
@@ -22,10 +25,16 @@ stdenv.mkDerivation rec {
     cd sources/${pname}
   '';
 
-  CLANG_INSTALL_DIR = llvmPackages.libclang.out;
+  #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ llvmPackages.libclang python qt6.qtbase ];
+
+  buildInputs = [
+    llvm
+    #llvmPackages.libclang
+    python
+    qt6.qtbase
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
