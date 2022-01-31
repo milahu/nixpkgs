@@ -117,6 +117,8 @@ stdenv.mkDerivation rec {
     numpy
   ]);
 
+  ninjaFlags = [ "-j1" ]; # debug: disable parallel build
+
   propagatedBuildInputs = [ shiboken6 ];
 
   dontWrapQtApps = true;
