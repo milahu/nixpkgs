@@ -9,10 +9,12 @@
 , qt6
 , shiboken6
 , llvmPackages_9
+, llvmPackages_13
 }:
 
 let
-  llvmPackages = llvmPackages_9;
+  #llvmPackages = llvmPackages_9;
+  llvmPackages = llvmPackages_13;
   sha256OfQtVersion = {
     pyside6 = {
       "6.2.0" = "/tIQtmISmVUzLSYJqQC1uGQxMBNORoI3GyapumB0DQE=";
@@ -59,6 +61,12 @@ stdenv.mkDerivation rec {
     "-DBUILD_TESTS=OFF"
     #"-DPYTHON_EXECUTABLE=${python.interpreter}"
   ];
+
+  # clang 9:
+  # /nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtCore/qglobal.h:45:12: fatal: 'type_traits' file not found
+  # #ifdef __cplusplus
+  # #  include <type_traits>
+  # -> fails to include libcxx header
 
   nativeBuildInputs = [ cmake ninja qt6.qmake python ];
 
