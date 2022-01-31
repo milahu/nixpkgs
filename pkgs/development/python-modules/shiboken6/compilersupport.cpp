@@ -349,17 +349,12 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
 {
     //const QStringList clangBuiltinIncludesDirList =
     //    QDir::toNativeSeparators(findClangBuiltInIncludesDirList());
+    //const QStringList clangBuiltinIncludesDirList = findClangBuiltInIncludesDirList();
 
-    const QStringList clangBuiltinIncludesDirList = findClangBuiltInIncludesDirList();
+    QStringList clangBuiltinIncludesDirList;
 
-    std::transform(
-        findClangBuiltInIncludesDirList.cbegin(),
-        findClangBuiltInIncludesDirList.cend(),
-        findClangBuiltInIncludesDirList.cbegin(),
-        QDir::toNativeSeparators
-    );
-
-
+    for (QString path : findClangBuiltInIncludesDirList())
+      clangBuiltinIncludesDirList << QDir::toNativeSeparators(path);
 
     if (clangBuiltinIncludesDirList.size() == 0) {
         qCWarning(lcShiboken, "Unable to locate Clang's built-in include directory "
