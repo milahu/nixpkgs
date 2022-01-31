@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
     echo postPatch
     ls
     #ls sources
-    #stat ${srcShiboken}
+    #stat ${shibokenWhl}
 
     ls
     find . -name setup.py
