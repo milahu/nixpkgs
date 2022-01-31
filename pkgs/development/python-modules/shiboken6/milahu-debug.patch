@@ -45,23 +45,23 @@
                  if (headerPath.path.endsWith(frameworkPath())) {
 +// milahu debug
 +qCInfo(lcShiboken) <<
-+  "milahu 1: headerPath.path = " << headerPath.path << " : ends with frameworkPath = " << frameworkPath();
++  "milahu 1: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath();
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path << " : ends with frameworkPath = " << frameworkPath() << '\n';
++  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath() << '\n';
                      headerPath.type = HeaderType::FrameworkSystem;
                      headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
 +// milahu debug
 +qCInfo(lcShiboken) <<
-+  "headerPath.path = " << headerPath.path << " : truncated = remove frameworkPath suffix";
++  "headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix";
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path << " : truncated = remove frameworkPath suffix" << '\n';
++  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
                  }
 +// milahu debug
 +else {
 +qCInfo(lcShiboken) <<
-+  "headerPath.path = " << headerPath.path << " : no frameworkPath";
++  "headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
 +std::cerr <<
-+  "milahu 2: headerPath.path = " << headerPath.path << " : no frameworkPath";
++  "milahu 2: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
 +}
                  result.append(headerPath);
              }
@@ -125,4 +125,4 @@
 +
  }
  
- // Returns clang options needed for emulating the host 
+ // Returns clang options needed for emulating the host compiler
