@@ -92,7 +92,7 @@
          QDir::toNativeSeparators(findClangBuiltInIncludesDir());
 +
 +// milahu debug
-+std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir << '\n';
++std::cerr << "milahu cerr: clangBuiltinIncludesDir = " << clangBuiltinIncludesDir.toStdString() << '\n';
 +
      if (clangBuiltinIncludesDir.isEmpty()) {
          qCWarning(lcShiboken, "Unable to locate Clang's built-in include directory "
