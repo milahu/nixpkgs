@@ -41,6 +41,10 @@ stdenv.mkDerivation rec {
   };
   */
 
+  postPatch = ''
+    cd sources/${pname}
+  '';
+
   patches = [
     ./dont_ignore_optional_modules.patch
   ];
