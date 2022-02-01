@@ -188,7 +188,16 @@ stderr:
 #include "..." search starts here:
 #include <...> search starts here:
  /nix/store/fxzhmc5zgws2la9c21p577m8hmzbjisb-compiler-rt-libc-13.0.0-dev/include
+ /nix/store/9zig5f1s1745lj2f1k68wz129087y3ww-clang-13.0.0-dev/include
+ /nix/store/5lzxpdzrg7j47vvjrv3ryfz2amwvwnch-llvm-13.0.0-dev/include
+ /nix/store/03aqjxlvv0zhnzai2c1vxj63sd4v0v2k-ncurses-6.3-dev/include
+ /nix/store/pnjapywqwhbi7y8462bc858y0k2j00dn-zlib-1.2.11-dev/include
+ /nix/store/i6vabb4div9iy6lsl642d86k1q8riasn-python3-3.9.9/include
+ /nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include
  ...
+ /nix/store/9m0k71s1ddhsp5l84wlpk9yhcmh5n1wx-gcc-10.3.0/include/c++/10.3.0
+ /nix/store/9m0k71s1ddhsp5l84wlpk9yhcmh5n1wx-gcc-10.3.0/include/c++/10.3.0/x86_64-unknown-linux-gnu
+ /nix/store/jdnmdqrrjphi8n85d9d8im9ym30dkd68-clang-wrapper-13.0.0/resource-root/include
  /nix/store/93z3gj6kl0qvdm1mzwb5vaxlz7i481lz-glibc-2.33-62-dev/include
 End of search list.
 */

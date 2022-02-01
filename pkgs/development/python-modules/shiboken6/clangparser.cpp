@@ -276,10 +276,12 @@ static CXTranslationUnit createTranslationUnit(CXIndex index,
 
     QByteArrayList clangArgs;
 
+#ifdef MILAHU_PATCH_ARGV0
     //clangArgs.append(QByteArrayLiteral("/nix/store/6libmvgdy131yw5z1c4g3gl938c4c4rz-clang-wrapper-10.0.1/bin/clang"));
     clangArgs.append(QByteArrayLiteral("/nix/store/6libmvgdy131yw5z1c4g3gl938c4c4rz-clang-wrapper-10.0.1/bin/clang++"));
     // argv0 for clang_parseTranslationUnit2FullArgv
     // TODO try bin/clang++
+#endif
 
     if (addCompilerSupportArguments) {
         clangArgs += emulatedCompilerOptions();
@@ -302,8 +304,11 @@ static CXTranslationUnit createTranslationUnit(CXIndex index,
     */
 
     CXTranslationUnit tu;
-    //CXErrorCode err = clang_parseTranslationUnit2(index, nullptr, argv.data(),
+#ifdef MILAHU_PATCH_ARGV0
     CXErrorCode err = clang_parseTranslationUnit2FullArgv(index, nullptr, argv.data(),
+#else
+    CXErrorCode err = clang_parseTranslationUnit2(index, nullptr, argv.data(),
+#endif
                                                   clangArgs.size(), nullptr, 0,
                                                   defaultFlags | flags, &tu);
 
