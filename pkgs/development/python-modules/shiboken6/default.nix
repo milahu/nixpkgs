@@ -44,6 +44,7 @@ stdenv.mkDerivation rec {
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
   #CLANG_INSTALL_DIR = "${llvmPackages.libclang.lib}:${llvmPackages.libcxx.dev}"; # /lib/clang/9.0.1/include/
+  CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang/*/include/
 
   nativeBuildInputs = [ cmake ];
 

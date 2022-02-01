@@ -399,6 +399,7 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
     }
 
 
+/*
 // milahu debug
 std::cout << "milahu cerr: clangBuiltinIncludesDir: manually add libcxx include path: /nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1\n";
 
@@ -409,6 +410,7 @@ std::cout << "milahu cerr: clangBuiltinIncludesDir: manually add libcxx include 
     HeaderType::System
   });
 }
+*/
 
 /*
     {
