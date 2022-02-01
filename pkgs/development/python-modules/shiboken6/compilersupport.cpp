@@ -421,6 +421,7 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
 }
 {
   // fix: fatal error: 'stddef.h' file not found
+  // /nix/store/bj29nvjhx4hjfhfrwqwq1kazc3ibmq9m-clang-10.0.1-lib/lib/clang/10.0.1/include/stddef.h
   // this should be added by ...
   // qt.shiboken: (shiboken) CLANG builtins includes directory: /nix/store/bj29nvjhx4hjfhfrwqwq1kazc3ibmq9m-clang-10.0.1-lib/lib/clang/10.0.1/include
   QString clangBuiltinIncludesDir = QLatin1String("/nix/store/bj29nvjhx4hjfhfrwqwq1kazc3ibmq9m-clang-10.0.1-lib/lib/clang/10.0.1/include"); // ${llvmPackages_10.clang-unwrapped.lib}/lib/clang/10.0.1/include/stddef.h
