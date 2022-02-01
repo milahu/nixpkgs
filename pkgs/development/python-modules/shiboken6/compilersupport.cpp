@@ -344,6 +344,7 @@ static QStringList findClangBuiltInIncludesDirList()
         if (!candidate.isEmpty()) {
             std::cerr << "milahu debug: findClangBuiltInIncludesDirList: add candidate: " << candidate.toStdString() << "/include\n";
             result << candidate + QStringLiteral("/include");
+            // /nix/store/bj29nvjhx4hjfhfrwqwq1kazc3ibmq9m-clang-10.0.1-lib/lib/clang/10.0.1/include
 
         }
     }
