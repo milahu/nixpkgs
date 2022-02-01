@@ -168,9 +168,6 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
     QByteArray stdErr;
 
     // milahu debug
-    std::cerr << "milahu err: g++ -E -x c++ - -v\n";
-    //std::cerr << "milahu err: arguments = " << arguments.join("  ").toStdString() << '\n'; // error: qstring is private (what??)
-
     for (QString arg : arguments)
       std::cerr << "milahu err: gppInternalIncludePaths: argument[] = " << arg.toStdString() << '\n';
 
@@ -190,10 +187,8 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
     for (const QByteArray &line : stdErrLines) {
 
         // milahu debug
-        qCInfo(lcShiboken) <<
-          "milahu 1: gppInternalIncludePaths: g++ output line = " << line.constData();
         std::cerr <<
-          "milahu 2: gppInternalIncludePaths: g++ output line = " << line.constData() << '\n';
+          "milahu err: gppInternalIncludePaths: g++ output line = " << line.constData() << '\n';
 
         if (isIncludeDir) {
             if (line.startsWith(QByteArrayLiteral("End of search list"))) {
@@ -203,26 +198,20 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
                 if (headerPath.path.endsWith(frameworkPath())) {
 
                     // milahu debug
-                    qCInfo(lcShiboken) <<
-                      "milahu 1: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData();
                     std::cerr <<
-                      "milahu 2: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
+                      "milahu err: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
 
                     headerPath.type = HeaderType::FrameworkSystem;
                     headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
 
                 // milahu debug
-                qCInfo(lcShiboken) <<
-                  "milahu 1: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix";
                 std::cerr <<
-                  "milahu 2: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
+                  "milahu err: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
                                 }
                 // milahu debug
                 else {
-                qCInfo(lcShiboken) <<
-                  "milahu 1: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
-                std::cerr <<
-                  "milahu 2: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
+                  std::cerr <<
+                    "milahu err: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
                 }
 
                 result.append(headerPath);

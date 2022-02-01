@@ -3,7 +3,7 @@
 , pythonPackages
 , fetchurl
 , lib
-#, stdenv
+, stdenv # gcc
 , cmake
 , ninja
 , qt6
@@ -12,6 +12,49 @@
 , llvmPackages_13
 , llvmPackages_10
 }:
+
+# TODO refactor: pyside6 + shiboken6
+
+/*
+FIXME
+https://bugreports.qt.io/browse/PYSIDE-787
+(type) is specified in typesystem, but not declared
+
+here:
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:2966: enum 'QAbstractAnimation::DeletionPolicy' is specified in typesystem, but not declared.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:2967: enum 'QAbstractAnimation::Direction' is specified in typesystem, but not declared.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:2968: enum 'QAbstractAnimation::State' is specified in typesystem, but not declared.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:2123: type 'QAbstractEventDispatcher' is specified in typesystem, but not defined. This could potentially lead to compilation errors.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:2126: type 'QAbstractEventDispatcher::TimerInfo' is specified in typesystem, but not defined. This could potentially lead to compilation errors.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:1524: type 'QAbstractItemModel' is specified in typesystem, but not defined. This could potentially lead to compilation errors.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:1525: enum 'QAbstractItemModel::CheckIndexOption' is specified in typesystem, but not declared.
+qt.shiboken: (core) /build/pyside-setup-opensource-src-6.2.2/sources/pyside6/PySide6/QtCore/typesystem_core_common.xml:1526: enum 'QAbstractItemModel::LayoutChangeHint' is specified in typesystem, but not declared.
+
+Side6/QtCore/typesystem_core_common.xml:2435: enum 'QProcess::ExitStatus' is specified in typesystem, but not declared.
+Side6/QtCore/typesystem_core_common.xml:2436: enum 'QProcess::InputChannelMode' is specified in typesystem, but not declared.
+Side6/QtCore/typesystem_core_common.xml:2437: enum 'QProcess::ProcessChannel' is specified in typesystem, but not declared.
+Side6/QtCore/typesystem_core_common.xml:2438: enum 'QProcess::ProcessChannelMode' is specified in typesystem, but not declared.
+Side6/QtCore/typesystem_core_common.xml:2439: enum 'QProcess::ProcessError' is specified in typesystem, but not declared.
+Side6/QtCore/typesystem_core_common.xml:2440: enum 'QProcess::ProcessState' is specified in typesystem, but not declared.
+
+Side6/QtCore/typesystem_core_common.xml:581: enum 'Qt::ApplicationState' is specified in typesystem, but not declared.
+
+
+
+The "type 'xxx' is specified in typesystem, but not defined. This could potentially lead to compilation errors." messages appear when include paths or include headers are not found by shiboken / libclang code.
+Sounds like the build fails to find any qt headers.
+
+The core issue is that the include paths queried from "g++ -E -x c++ - -v </dev/null" are considered system include headers, and shiboken skips parsing most of them for 2 reasons: performance and some STL parsing issues.
+
+The build fails because your Qt headers are within those system include paths, and they are not parsed, thus all the missing type warnings, and failed build.
+
+For the build process to work, currently the Qt headers need to be placed in a location that is not reported by "g++ / clang -E -x c++ - -v </dev/null". In this case somewhere outside /usr/include. Perhaps you can try to symlink the Qt headers to /usr/local/include or some other similar location.
+
+
+
+
+
+*/
 
 /*
 
@@ -41,7 +84,7 @@ let
   #llvmPackages = llvmPackages_9;
   #llvmPackages = llvmPackages_13;
   llvmPackages = llvmPackages_10;
-  stdenv = llvmPackages.stdenv;
+  #stdenv = llvmPackages.stdenv; # gcc -> clang
 
   sha256OfQtVersion = {
     pyside6 = {
@@ -80,6 +123,8 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     cd sources/${pname}
+
+    export QT_LOGGING_RULES="*.debug=true"
   '';
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;

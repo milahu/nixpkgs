@@ -2,7 +2,7 @@
 , python
 , fetchurl
 , lib
-#, stdenv
+, stdenv # gcc
 , pyside6
 , cmake
 , qt6
@@ -17,7 +17,7 @@ let
   #llvmPackages = llvmPackages_9;
   #llvmPackages = llvmPackages_13;
   llvmPackages = llvmPackages_10;
-  stdenv = llvmPackages.stdenv;
+  #stdenv = llvmPackages.stdenv; # gcc -> clang
 in
 
 stdenv.mkDerivation rec {
@@ -33,10 +33,13 @@ stdenv.mkDerivation rec {
     #./milahu-debug.patch
   ];
 
-#    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
-
+#    cp ${./clangparser.cpp} sources/shiboken6/ApiExtractor/clangparser/clangparser.cpp
   postPatch = ''
+    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
+
     cd sources/${pname}
+
+    export QT_LOGGING_RULES="*.debug=true"
   '';
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
