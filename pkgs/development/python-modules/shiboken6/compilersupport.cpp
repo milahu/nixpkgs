@@ -182,6 +182,17 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
     std::cerr << "milahu debug: gppInternalIncludePaths: runProcess stdOut = " << stdOut.constData() << '\n';
     std::cerr << "milahu debug: gppInternalIncludePaths: runProcess stdErr = " << stdErr.constData() << '\n';
 
+/*
+stderr:
+
+#include "..." search starts here:
+#include <...> search starts here:
+ /nix/store/fxzhmc5zgws2la9c21p577m8hmzbjisb-compiler-rt-libc-13.0.0-dev/include
+ ...
+ /nix/store/93z3gj6kl0qvdm1mzwb5vaxlz7i481lz-glibc-2.33-62-dev/include
+End of search list.
+*/
+
     const QByteArrayList stdErrLines = stdErr.split('\n');
     bool isIncludeDir = false;
     for (const QByteArray &line : stdErrLines) {
@@ -200,6 +211,7 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
                     // milahu debug
                     std::cerr <<
                       "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : ends with frameworkPath = " << frameworkPath().constData() << '\n';
+                    // -> no path "ends with frameworkPath"
 
                     headerPath.type = HeaderType::FrameworkSystem;
                     headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
@@ -211,7 +223,7 @@ static HeaderPaths gppInternalIncludePaths(const QString &compiler)
                 // milahu debug
                 else {
                   std::cerr <<
-                    "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath";
+                    "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath\n";
                 }
 
                 result.append(headerPath);

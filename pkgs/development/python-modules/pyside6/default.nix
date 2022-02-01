@@ -84,7 +84,7 @@ let
   #llvmPackages = llvmPackages_9;
   llvmPackages = llvmPackages_13;
   #llvmPackages = llvmPackages_10;
-  stdenv = llvmPackages.stdenv; # gcc -> clang
+  #stdenv = llvmPackages.stdenv; # gcc -> clang
 
   sha256OfQtVersion = {
     pyside6 = {
