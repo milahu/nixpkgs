@@ -11,6 +11,11 @@
 , llvmPackages_10
 }:
 
+# TODO? clang_parseTranslationUnit2 calls clang but should call clang++ ?
+# #include <type_traits>
+# clang -> fatal error: 'type_traits' file not found
+# clang++ -> ok
+
 # sphinx-build - not found! doc target disabled
 
 let
@@ -34,8 +39,9 @@ stdenv.mkDerivation rec {
   ];
 
 #    cp ${./clangparser.cpp} sources/shiboken6/ApiExtractor/clangparser/clangparser.cpp
+#    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
   postPatch = ''
-    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
+    cp ${./apiextractor.cpp} sources/shiboken6/ApiExtractor/apiextractor.cpp
 
     cd sources/${pname}
 
