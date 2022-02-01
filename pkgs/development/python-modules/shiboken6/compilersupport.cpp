@@ -48,7 +48,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include <iostream>
+#include <iostream> // std::cerr
 
 namespace clang {
 

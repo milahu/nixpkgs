@@ -38,6 +38,8 @@
 #include <QtCore/QScopedArrayPointer>
 #include <QtCore/QString>
 
+#include <iostream> // std::cerr
+
 namespace clang {
 
 QString SourceFileCache::getFileName(CXFile file)
