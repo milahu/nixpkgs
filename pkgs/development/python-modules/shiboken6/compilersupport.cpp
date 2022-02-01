@@ -432,11 +432,6 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
 }
 
 
-llvmPackages_10.clang-unwrapped.lib.outPath
-/nix/store/bj29nvjhx4hjfhfrwqwq1kazc3ibmq9m-clang-10.0.1-lib/lib/clang/10.0.1/include
-
-
-
 
 /*
     {
