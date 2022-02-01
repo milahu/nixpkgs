@@ -222,11 +222,11 @@ bool ApiExtractor::runHelper(bool usePySideExtensions)
 
     for (const HeaderPath &headerPath : qAsConst(m_includePaths))
         arguments.append(HeaderPath::includeOption(headerPath));
-    
+
     // force language c++ for *.h header files like qglobal.h
     // workaround for: clang error: type_traits file not found https://bugreports.qt.io/browse/PYSIDE-1802
-    arguments.append(QLatin1String("-x"));
-    arguments.append(QLatin1String("c++"));
+    arguments.append(QByteArrayLiteral("-x"));
+    arguments.append(QByteArrayLiteral("c++"));
 
     arguments.append(QFile::encodeName(preprocessedCppFileName));
     if (ReportHandler::isDebug(ReportHandler::SparseDebug)) {
