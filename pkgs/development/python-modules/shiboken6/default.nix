@@ -69,9 +69,9 @@ stdenv.mkDerivation rec {
 
   #buildInputs = [
   propagatedBuildInputs = [
-    /* messing with llvmPackages.stdenv? -> "gppInternalIncludePaths: runProcess stdOut" shows no include paths
     llvmPackages.libclang # ClangConfig.cmake
     llvmPackages.libllvm # LLVMConfig.cmake
+    /* messing with llvmPackages.stdenv? -> "gppInternalIncludePaths: runProcess stdOut" shows no include paths
     llvmPackages.libcxxClang # bin/clang
     llvmPackages.libcxx # include <type_traits> -> ${llvmPackages_9.libcxx.dev}/include/c++/v1/type_traits
     */
