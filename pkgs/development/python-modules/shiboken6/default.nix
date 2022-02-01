@@ -25,7 +25,7 @@ let
   llvmPackages = llvmPackages_13;
   #llvmPackages = llvmPackages_10;
 
-  #stdenv = llvmPackages.stdenv; # gcc -> clang
+  stdenv = llvmPackages.stdenv; # gcc -> clang
   # gcc stdenv -> error: type_traits file not found
   #   https://bugreports.qt.io/browse/PYSIDE-1802
   # clang stdenv
@@ -33,6 +33,8 @@ let
   #     https://bugreports.qt.io/browse/PYSIDE-787
   #   qt.shiboken: (shiboken) No C++ classes found!
   #     https://bugreports.qt.io/browse/PYSIDE-733 -> building with clang is not tested "Are you building PySide2 with clang++ instead of gcc? // Because I don't think that combo was tested at all."
+  # https://bugs.gentoo.org/749330
+  #   cstddef: fatal error: stddef.h file not found
 in
 
 stdenv.mkDerivation rec {
