@@ -400,6 +400,8 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
 
 
 // milahu debug
+// TODO try as non-system headers
+/*
 {
   // fix: fatal error: 'type_traits' file not found
   //QString clangBuiltinIncludesDir = QLatin1String("/nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1"); // ${llvmPackages_9.libcxx.dev}/include/c++/v1/type_traits
@@ -419,6 +421,9 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
     HeaderType::System
   });
 }
+*/
+
+/*
 {
   // fix: fatal error: 'stddef.h' file not found
   // /nix/store/bj29nvjhx4hjfhfrwqwq1kazc3ibmq9m-clang-10.0.1-lib/lib/clang/10.0.1/include/stddef.h
@@ -431,7 +436,7 @@ static void appendClangBuiltinIncludes(HeaderPaths *p)
     HeaderType::System
   });
 }
-
+*/
 
 
 /*
