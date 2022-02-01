@@ -207,8 +207,7 @@ End of search list.
     for (const QByteArray &line : stdErrLines) {
 
         // milahu debug
-        std::cerr <<
-          "milahu debug: gppInternalIncludePaths: g++ output line = " << line.constData() << '\n';
+        //std::cerr << "milahu debug: gppInternalIncludePaths: g++ output line = " << line.constData() << '\n';
 
         if (isIncludeDir) {
             if (line.startsWith(QByteArrayLiteral("End of search list"))) {

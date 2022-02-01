@@ -288,6 +288,30 @@ static CXTranslationUnit createTranslationUnit(CXIndex index,
         clangArgs += defaultArgs;
     }
     clangArgs += args;
+
+    std::cerr << "milahu: manually add include paths for all qtbase components\n";
+
+    // find /nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/ -maxdepth 1
+
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtNetwork"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtWidgets"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtGui"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtInputSupport"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtFbSupport"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtSql"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtOpenGLWidgets"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtEglFSDeviceIntegration"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtTest"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtKmsSupport"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtConcurrent"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtOpenGL"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtDeviceDiscoverySupport"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtXml"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtPrintSupport"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtEglFsKmsSupport"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtCore"));
+    clangArgs.append(QByteArrayLiteral("-isystem/nix/store/0kb2vf3qnvd0cccgn6g98w4lyy7kadh7-qtbase-6.2.2-dev/include/QtDBus"));
+
     QScopedArrayPointer<const char *> argv(byteArrayListToFlatArgV(clangArgs));
     qDebug().noquote().nospace() << msgCreateTranslationUnit(clangArgs, flags);
     /*
