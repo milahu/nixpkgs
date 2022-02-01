@@ -54,9 +54,13 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ];
 
-  buildInputs = [
+  #buildInputs = [
+  propagatedBuildInputs = [
     llvmPackages.libclang # ClangConfig.cmake
     llvmPackages.libllvm # LLVMConfig.cmake
+
+    llvmPackages.libcxx # include <type_traits> -> ${llvmPackages_9.libcxx.dev}/include/c++/v1/type_traits
+
     # clang 9: qtbase-6.2.2-dev/include/QtCore/qmetatype.h: error: constexpr variable 'len' must be initialized by a constant
     /*
     llvmPackages.libllvm

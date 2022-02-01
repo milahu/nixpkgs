@@ -153,6 +153,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ninja qt6.qmake python ];
 
   buildInputs = [
+    /*
     llvmPackages.libllvm
     llvmPackages.clang-unwrapped
     #llvmPackages.libclang.lib # /lib/clang
@@ -160,6 +161,7 @@ stdenv.mkDerivation rec {
     llvmPackages.libcxx # include <type_traits>
     #qt6.full
     qt6.qtbase
+    */
   ] ++ (with pythonPackages; [
     packaging
     numpy
