@@ -5,6 +5,8 @@
 , qtdeclarative
 }:
 
+# qttools requires a statically linked clang? https://bugreports.qt.io/browse/PYSIDE-1806
+
 qtModule {
   pname = "qttools";
   qtInputs = [ qtbase qtdeclarative ];
