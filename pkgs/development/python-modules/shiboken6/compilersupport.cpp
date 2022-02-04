@@ -224,14 +224,26 @@ End of search list.
                     headerPath.type = HeaderType::FrameworkSystem;
                     headerPath.path.truncate(headerPath.path.size() - frameworkPath().size());
 
-                // milahu debug
-                std::cerr <<
-                  "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
-                                }
+                    // milahu debug
+                    std::cerr <<
+                    "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
+                }
+                // milahu: force qt paths to be "framework" paths
+                // based on nixpkgs/pkgs/development/python-modules/shiboken6/nix_compile_cflags.patch
+                else if (headerPath.path.contains("-qt")) {
+                    std::cerr << "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : contains qt -> force frameworkPath\n";
+                    // override headerType
+                    headerPath.type = HeaderType::FrameworkSystem;
+                }
                 // milahu debug
                 else {
                   std::cerr <<
                     "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath\n";
+                }
+
+                else {
+                    std::cerr << "milahu debug: add include path: " << path.toStdString() << '\n';
+                    extractor.addIncludePath(HeaderPath{path, headerType});
                 }
 
                 result.append(headerPath);
