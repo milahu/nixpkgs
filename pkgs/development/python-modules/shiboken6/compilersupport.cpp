@@ -236,7 +236,8 @@ End of search list.
                 else if (headerPath.path.contains("-qt")) {
                     std::cerr << "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : contains qt -> force frameworkPath\n";
                     // override headerType
-                    headerPath.type = HeaderType::FrameworkSystem;
+                    //headerPath.type = HeaderType::FrameworkSystem; // macos only?
+                    headerPath.type = HeaderType::Standard;
                 }
                 // milahu debug
                 else {
