@@ -51,13 +51,14 @@ stdenv.mkDerivation rec {
 
     #./milahu-debug.patch
   ];
-
-  postPatch = ''
+/*
     cp ${./apiextractor.cpp} sources/shiboken6/ApiExtractor/apiextractor.cpp
-    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
     cp ${./clangparser.cpp} sources/shiboken6/ApiExtractor/clangparser/clangparser.cpp
     cp ${./main.cpp} sources/shiboken6/generator/main.cpp
     cp ${./abstractmetabuilder.cpp} sources/shiboken6/ApiExtractor/abstractmetabuilder.cpp
+*/
+  postPatch = ''
+    cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
 
     cd sources/${pname}
 
