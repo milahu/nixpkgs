@@ -54,10 +54,12 @@ stdenv.mkDerivation rec {
     cp ${./apiextractor.cpp} sources/shiboken6/ApiExtractor/apiextractor.cpp
     cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
     cp ${./clangparser.cpp} sources/shiboken6/ApiExtractor/clangparser/clangparser.cpp
+    cp ${./main.cpp} sources/shiboken6/generator/main.cpp
 
     cd sources/${pname}
 
     export QT_LOGGING_RULES="*.debug=true"
+    export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/tmp/qtbase
   '';
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
