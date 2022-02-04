@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
     cd sources/${pname}
   '';
 
-  QT_LOGGING_RULES = "*.debug=true"; # debug
+  #QT_LOGGING_RULES = "*.debug=true"; # debug
 
   CLANG_INSTALL_DIR = llvmPackages.libclang.lib; # /lib/clang/*/include/
 
