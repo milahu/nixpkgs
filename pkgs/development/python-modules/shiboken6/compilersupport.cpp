@@ -217,6 +217,10 @@ End of search list.
                 isIncludeDir = false;
             } else {
                 HeaderPath headerPath{line.trimmed(), HeaderType::System};
+
+                std::cerr << "headerPath.path.startsWith(\"/nix/store/\") = " << headerPath.path.startsWith("/nix/store/") << '\n';
+                std::cerr << "headerPath.path.indexOf(\"-qt\") = " << headerPath.path.indexOf("-qt") << '\n';
+
                 if (headerPath.path.endsWith(frameworkPath())) {
 
                     // milahu debug
@@ -234,7 +238,7 @@ End of search list.
                 // milahu: force qt paths to be "Standard" paths
                 // based on nixpkgs/pkgs/development/python-modules/shiboken6/nix_compile_cflags.patch
                 // /nix/store/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-qtxxxxxxx-6.2.2
-                else if (headerPath.path.starts_with("/nix/store/") && headerPath.path.substr(43, 3) == "-qt") {
+                else if (headerPath.path.startsWith("/nix/store/") && headerPath.path.indexOf("-qt") == 43) {
                     std::cerr << "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : contains qt -> force frameworkPath\n";
                     headerPath.type = HeaderType::Standard;
                 }
