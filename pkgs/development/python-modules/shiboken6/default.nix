@@ -98,7 +98,10 @@ stdenv.mkDerivation rec {
     # /nix/store/vdfr889lwm84xzgabqhdnm9vwc0xrwy1-libcxx-9.0.1-dev/include/c++/v1/type_traits
     # /nix/store/vb1dk5c3xg9r8q6mdw3cl3qgzm6vgnvd-libcxx-10.0.1-dev/include/c++/v1/
     python
-    qt6.qtbase
+
+    #qt6.qtbase # TODO test
+    # does shiboken need qtbase?
+    # bugfix by moving qtbase to /tmp? (or why are qt headers not found?)
   ];
 
   cmakeFlags = [
