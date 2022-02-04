@@ -241,11 +241,6 @@ End of search list.
                     "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : no frameworkPath\n";
                 }
 
-                else {
-                    std::cerr << "milahu debug: add include path: " << path.toStdString() << '\n';
-                    extractor.addIncludePath(HeaderPath{path, headerType});
-                }
-
                 result.append(headerPath);
             }
         } else if (line.startsWith(QByteArrayLiteral("#include <...> search starts here"))) {
