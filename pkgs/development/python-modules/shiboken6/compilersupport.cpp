@@ -202,6 +202,9 @@ stderr:
 End of search list.
 */
 
+    // milahu debug
+    std::cerr << "milahu debug: gppInternalIncludePaths: frameworkPath = " << frameworkPath().constData() << '\n';
+
     const QByteArrayList stdErrLines = stdErr.split('\n');
     bool isIncludeDir = false;
     for (const QByteArray &line : stdErrLines) {
