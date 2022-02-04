@@ -59,7 +59,6 @@ stdenv.mkDerivation rec {
     cd sources/${pname}
 
     export QT_LOGGING_RULES="*.debug=true"
-    export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/tmp/qtbase
   '';
 
   #CLANG_INSTALL_DIR = llvmPackages.libclang.out;
@@ -101,9 +100,7 @@ stdenv.mkDerivation rec {
     # /nix/store/vb1dk5c3xg9r8q6mdw3cl3qgzm6vgnvd-libcxx-10.0.1-dev/include/c++/v1/
     python
 
-    #qt6.qtbase # TODO test
-    # does shiboken need qtbase?
-    # bugfix by moving qtbase to /tmp? (or why are qt headers not found?)
+    qt6.qtbase
   ];
 
   cmakeFlags = [
