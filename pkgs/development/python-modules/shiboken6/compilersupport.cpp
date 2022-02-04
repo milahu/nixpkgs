@@ -231,12 +231,11 @@ End of search list.
                     std::cerr <<
                     "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : truncated = remove frameworkPath suffix" << '\n';
                 }
-                // milahu: force qt paths to be "framework" paths
+                // milahu: force qt paths to be "Standard" paths
                 // based on nixpkgs/pkgs/development/python-modules/shiboken6/nix_compile_cflags.patch
-                else if (headerPath.path.contains("-qt")) {
+                // /nix/store/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-qtxxxxxxx-6.2.2
+                else if (headerPath.path.starts_with("/nix/store/") && headerPath.path.substr(43, 3) == "-qt") {
                     std::cerr << "milahu debug: gppInternalIncludePaths: headerPath.path = " << headerPath.path.constData() << " : contains qt -> force frameworkPath\n";
-                    // override headerType
-                    //headerPath.type = HeaderType::FrameworkSystem; // macos only?
                     headerPath.type = HeaderType::Standard;
                 }
                 // milahu debug
