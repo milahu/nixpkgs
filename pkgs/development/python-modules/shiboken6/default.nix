@@ -8,7 +8,8 @@
 , qt6
 , llvmPackages_9 # https://bugreports.qt.io/browse/QTBUG-100344
 , llvmPackages_13
-, llvmPackages_10
+, llvmPackages_10 # shiboken6/doc/gettingstarted.rst: libclang: recommended: version 10 for 6.0+.
+
 }:
 
 
@@ -22,11 +23,12 @@
 
 let
   #llvmPackages = llvmPackages_9;
-  llvmPackages = llvmPackages_13;
-  #llvmPackages = llvmPackages_10;
+  #llvmPackages = llvmPackages_13;
+  llvmPackages = llvmPackages_10;
 
   stdenv = llvmPackages.stdenv; # gcc -> clang
   # gcc stdenv -> error: type_traits file not found
+  #   = cannot find C++ headers
   #   https://bugreports.qt.io/browse/PYSIDE-1802
   # clang stdenv
   #   (type) is specified in typesystem, but not defined. This could potentially lead to compilation errors.
@@ -55,6 +57,7 @@ stdenv.mkDerivation rec {
     cp ${./compilersupport.cpp} sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
     cp ${./clangparser.cpp} sources/shiboken6/ApiExtractor/clangparser/clangparser.cpp
     cp ${./main.cpp} sources/shiboken6/generator/main.cpp
+    cp ${./abstractmetabuilder.cpp} sources/shiboken6/ApiExtractor/abstractmetabuilder.cpp
 
     cd sources/${pname}
 

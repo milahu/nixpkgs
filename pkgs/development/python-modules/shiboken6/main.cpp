@@ -432,9 +432,12 @@ static void parseIncludePathOption(const QString &option, HeaderType headerType,
         for (const QString &s : includePathListList) {
             auto path = QFile::encodeName(QDir::cleanPath(s));
 
-            //extractor.addIncludePath(HeaderPath{path, headerType});
+            extractor.addIncludePath(HeaderPath{path, headerType});
+
+            // not working
             // milahu: force qt paths to be "framework" paths
             // based on nixpkgs/pkgs/development/python-modules/shiboken6/nix_compile_cflags.patch
+            /*
             if (path.contains("-qt")) {
                 std::cerr << "milahu debug: add framework path: " << path.toStdString() << '\n';
                 // override headerType
@@ -444,6 +447,7 @@ static void parseIncludePathOption(const QString &option, HeaderType headerType,
                 std::cerr << "milahu debug: add include path: " << path.toStdString() << '\n';
                 extractor.addIncludePath(HeaderPath{path, headerType});
             }
+            */
         }
     }
 }

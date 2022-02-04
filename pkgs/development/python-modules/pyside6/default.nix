@@ -82,8 +82,8 @@ fatal error: 'type_traits' file not found
 let
   # pyside6 requires clang >= 9
   #llvmPackages = llvmPackages_9;
-  llvmPackages = llvmPackages_13;
-  #llvmPackages = llvmPackages_10;
+  #llvmPackages = llvmPackages_13;
+  llvmPackages = llvmPackages_10;
 
   stdenv = llvmPackages.stdenv; # gcc -> clang
 
