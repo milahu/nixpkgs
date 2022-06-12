@@ -8929,7 +8929,9 @@ in {
 
   qiskit-terra = callPackage ../development/python-modules/qiskit-terra { };
 
-  qnap-qsw = callPackage ../development/python-modules/qnap-qsw{ };
+  qmake2cmake = callPackage ../development/python-modules/qmake2cmake { };
+
+  qnap-qsw = callPackage ../development/python-modules/qnap-qsw { };
 
   qnapstats = callPackage ../development/python-modules/qnapstats { };
 
