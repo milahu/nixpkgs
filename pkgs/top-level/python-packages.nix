@@ -7830,6 +7830,9 @@ in {
   pyqt5 = callPackage ../development/python-modules/pyqt/5.x.nix { };
 
   pyqt6 = callPackage ../development/python-modules/pyqt/6.x.nix { };
+  pyqt6_test = callPackage ../development/python-modules/pyqt/test/pyqt6-test.nix {
+    inherit (pkgs.qt6Packages) wrapQtAppsHook;
+  };
 
   pyqt6_with_qtmultimedia = self.pyqt6.override {
     withMultimedia = true;
