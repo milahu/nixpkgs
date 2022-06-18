@@ -1,4 +1,5 @@
 { qtModule
+, fetchFromGitHub
 , qtdeclarative
 , qtwebchannel
 , qtpositioning
@@ -8,7 +9,7 @@
 , flex
 , git
 , gperf
-, ninja
+, ninja-tokenpool
 , pkg-config
 , python3
 , which
@@ -49,7 +50,6 @@
 , pciutils
 , systemd
 , pipewire
-, gn
 , cups
 , openbsm
 , runCommand
@@ -67,6 +67,27 @@
 , enableProprietaryCodecs ? true
 }:
 
+let
+  # add jobclients to limit cpu usage to NIX_BUILD_CORES
+  # jest-worker with jobclient
+  # call stack: devtools-frontend -> rollup -> terser -> jest-worker
+  jest-worker = fetchFromGitHub {
+    # requires gnumake-tokenpool
+    # https://github.com/milahu/jest-worker/tree/26.6.2
+    # https://github.com/facebook/jest/pull/12968
+    owner = "milahu";
+    repo = "jest-worker";
+    rev = "a846fbb511d72ff2439123b3e9a6104524e1d7d2";
+    sha256 = "Gon76s+F/REm2/5ZvuhaeDVRILKf8xVtvyh1jmLxlWE=";
+  };
+  gnumake-tokenpool = fetchFromGitHub {
+    owner = "milahu";
+    repo = "gnumake-tokenpool";
+    rev = "4eb559ae323bef153cbe1d0a5e3496b377fb7856";
+    sha256 = "v3UqPi4fCnN86xmp4eOSz8IXNH70E8Kvvq6HVOiCiwk=";
+  };
+in
+
 qtModule rec {
   pname = "qtwebengine";
   qtInputs = [ qtdeclarative qtwebchannel qtwebsockets qtpositioning ];
@@ -76,23 +97,69 @@ qtModule rec {
     flex
     git
     gperf
-    ninja
+    ninja-tokenpool
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
-    gn
     nodejs
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
 
-  dontUseGnConfigure = true;
-
   # ninja builds some components with -Wno-format,
   # which cannot be set at the same time as -Wformat-security
   hardeningDisable = [ "format" ];
 
+  patches = [
+    ./patches/qtwebengine/0001-task_queue.py-add-jobclient.patch
+    ./patches/qtwebengine/0002-build_inspector_overlay.py-fix-inherit-fds.patch
+    ./patches/qtwebengine/0003-gn-add-jobclient.patch
+    ./patches/qtwebengine/0004-node.py-add-debug.patch
+    ./patches/qtwebengine/0005-mojom_parser.py-add-jobclient.patch
+  ];
+
+  /*
+  # debug jobclient patches
+  DEBUG_JOBCLIENT = "1"; # gnumake-tokenpool
+  DEBUG_JEST_WORKER = "1"; # src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/jest-worker/build/index.js
+  DEBUG_CHROMIUM_NODE_PY = "1"; # src/3rdparty/chromium/third_party/node/node.py
+  DEBUG_MOJOM_PARSER = "1"; # src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+  */
+
   postPatch = ''
+    # Add jobclient to javascript build tools
+    (
+      cd src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules
+
+      mv jest-worker/node_modules jest-worker.node_modules
+      rm -rf jest-worker
+      cp -r ${jest-worker} jest-worker
+      chmod -R +w jest-worker
+      mv jest-worker.node_modules jest-worker/node_modules
+
+      cp -r ${gnumake-tokenpool}/js/src/gnumake-tokenpool .
+      chmod -R +w gnumake-tokenpool
+    )
+
+    # Add jobclient to python build tools
+    for dst in \
+      src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen \
+      src/3rdparty/chromium/mojo/public/tools/mojom
+    do
+      (
+        cd "$dst"
+        cp -r ${gnumake-tokenpool}/py/src/gnumake_tokenpool .
+        chmod -R +w gnumake_tokenpool
+      )
+    done
+
+    # Add jobclient to C++ build tools
+    (
+      cd src/3rdparty/gn/src/util
+      cp -r ${gnumake-tokenpool}/cc/src/* .
+      chmod -R +w *
+    )
+
     # Patch Chromium build tools
     (
       cd src/3rdparty/chromium;
