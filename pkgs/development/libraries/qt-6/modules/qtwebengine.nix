@@ -216,6 +216,45 @@ qtModule rec {
 
   requiredSystemFeatures = [ "big-parallel" ];
 
+  # NOTE buildPhase ignores NIX_BUILD_CORES
+  # and uses all available cpu cores
+  #
+  # limiting cores by
+  #   export NINJAFLAGS="-j32 -l32"
+  # causes the build error
+  #   internal compiler error: Segmentation fault
+  #
+  # https://bugreports.qt.io/browse/QTBUG-103573
+  #
+  # honor NIX_BUILD_CORES in recursive ninja calls
+  # https://bugreports.qt.io/browse/QTBUG-95176
+  #
+  # based on ninjaBuildPhase in
+  # pkgs/development/tools/build-managers/ninja/setup-hook.sh
+  #
+  # this must run before cmake
+  # to set NINJAFLAGS for qtwebengine/cmake/Functions.cmake
+  #
+  /*
+  preConfigure = ''
+    local buildCores=1
+
+    # Parallel building is enabled by default.
+    if [ "''${enableParallelBuilding-1}" ]; then
+        buildCores="$NIX_BUILD_CORES"
+    fi
+
+    local flagsArray=(
+        -j$buildCores -l$NIX_BUILD_CORES
+        $ninjaFlags "''${ninjaFlagsArray[@]}"
+    )
+
+    # honor NIX_BUILD_CORES in recursive ninja calls
+    export NINJAFLAGS="''${flagsArray[@]}"
+    echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
+  '';
+  */
+
   postInstall = ''
     # This is required at runtime
     mkdir $out/libexec
