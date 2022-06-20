@@ -220,7 +220,6 @@ qtModule rec {
   # obj/third_party/blink/renderer/core/core/core_jumbo_*.o
   # -> internal compiler error: Segmentation fault
   # https://bugreports.qt.io/browse/QTBUG-103573
-  /*
   # honor NIX_BUILD_CORES in recursive ninja calls
   # https://bugreports.qt.io/browse/QTBUG-95176
   # based on ninjaBuildPhase in
@@ -241,10 +240,10 @@ qtModule rec {
     )
 
     # honor NIX_BUILD_CORES in recursive ninja calls
-    export NINJAFLAGS="''${flagsArray[@]}"
+    #export NINJAFLAGS="''${flagsArray[@]}"
+    export NINJAFLAGS="-j64 -l64"
     echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
   '';
-  */
 
   postInstall = ''
     # This is required at runtime
