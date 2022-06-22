@@ -7858,6 +7858,10 @@ in {
     pythonPackages = self;
   };
 
+  pyqt6-webengine = pkgs.qt6Packages.callPackage ../development/python-modules/pyqtwebengine/6.x.nix {
+    pythonPackages = self;
+  };
+
   pyquery = callPackage ../development/python-modules/pyquery { };
 
   pyquaternion = callPackage ../development/python-modules/pyquaternion { };
