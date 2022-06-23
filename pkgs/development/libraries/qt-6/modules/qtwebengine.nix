@@ -82,6 +82,7 @@ qtModule rec {
     which
     gn
     nodejs
+    python3.pkgs.nix-build-profiler # debug
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
@@ -235,7 +236,6 @@ qtModule rec {
   # this must run before cmake
   # to set NINJAFLAGS for qtwebengine/cmake/Functions.cmake
   #
-  /*
   preConfigure = ''
     local buildCores=1
 
@@ -253,7 +253,10 @@ qtModule rec {
     export NINJAFLAGS="''${flagsArray[@]}"
     echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
   '';
-  */
+
+  preBuild = ''
+    nix-build-profiler &
+  '';
 
   postInstall = ''
     # This is required at runtime
