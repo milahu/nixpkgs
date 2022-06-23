@@ -5860,6 +5860,8 @@ in {
 
   nix-prefetch-github = callPackage ../development/python-modules/nix-prefetch-github { };
 
+  nix-build-profiler = callPackage ../development/python-modules/nix-build-profiler { };
+
   nkdfu = callPackage ../development/python-modules/nkdfu { };
 
   nltk = callPackage ../development/python-modules/nltk { };
