@@ -13,6 +13,7 @@ from prefixed import Float
 
 import time
 import sys
+import os
 import shlex
 
 config_interval = 1
@@ -38,6 +39,7 @@ def find_root_process(name):
   ls = find_procs_by_name(name)
   if len(ls) == 0:
     # return the first process
+    # inside the nix-build sandbox, this is bash
     for p in psutil.process_iter():
       return p
   if len(ls) != 1:
@@ -138,6 +140,10 @@ def get_process_info(root_process):
     if found_root_process == False:
       continue
 
+    # exclude self
+    if pid == os.getpid():
+      continue
+
     # find children of tree
     ppid = process.info["ppid"]
     if ppid in process_info:
@@ -201,7 +207,10 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
   exe = info["exe"] # always None
   cwd = info["cwd"] # always None
   environ = info["environ"] # always None
-  log_info = {"exe": exe, "cmdline": cmdline, "cwd": cwd, "environ": environ}
+  child_procs = len(info["child_pids"])
+  log_info = {"child_procs": child_procs, "cmdline": cmdline, "cwd": cwd, "exe": exe}
+  #if depth == 0:
+  #  log_info["environ"] = environ # spammy
   print(f"{sum_cpu:{cpu_width}.1f} {sum_mem:3.0f} {Float(sum_rss):4.0h} {depth*indent}{name} info={repr(log_info)}", file=file)
   for child_pid in process_info[root_pid]["child_pids"]:
     print_process_info(process_info, child_pid, file, depth + 1)
