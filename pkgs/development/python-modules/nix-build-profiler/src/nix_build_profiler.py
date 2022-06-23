@@ -209,7 +209,8 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
   cwd = info["cwd"] # always None
   environ = info["environ"] # always None
   child_procs = len(info["child_pids"])
-  cmdline[0] = os.path.basename(cmdline[0]) # full path is in info["exe"]
+  if len(cmdline) > 0:
+    cmdline[0] = os.path.basename(cmdline[0]) # full path is in info["exe"]
   #if cmdline[0] in {"g++", "gcc"}:
   if cmdline[0] in {"g++", "gcc", "cc1plus", "as"}:
     # make gcc less verbose
