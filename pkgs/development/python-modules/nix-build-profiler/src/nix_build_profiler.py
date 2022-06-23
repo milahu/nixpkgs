@@ -37,7 +37,9 @@ def find_procs_by_name(name):
 def find_root_process(name):
   ls = find_procs_by_name(name)
   if len(ls) == 0:
-    raise Exception("find_root_process: not found root proc")
+    # return the first process
+    for p in psutil.process_iter():
+      return p
   if len(ls) != 1:
     print(f"find_root_process: found multiple root procs:")
     for p in ls:
