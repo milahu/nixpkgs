@@ -15,6 +15,7 @@ import time
 import sys
 import os
 import shlex
+import io
 
 config_interval = 1
 config_root_process_name = 'nix-daemon'
@@ -208,6 +209,32 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
   cwd = info["cwd"] # always None
   environ = info["environ"] # always None
   child_procs = len(info["child_pids"])
+  cmdline[0] = os.path.basename(cmdline[0]) # full path is in info["exe"]
+  #if cmdline[0] in {"g++", "gcc"}:
+  if cmdline[0] in {"g++", "gcc", "cc1plus", "as"}:
+    # make gcc less verbose
+    cmdline_short = []
+    skip_value = False
+    for arg in cmdline:
+        if skip_value:
+            skip_value = False
+            continue
+        if arg in {"-isystem", "-idirafter", "-D", "-I", "-MF", "-MMD"}:
+            # -isystem is the most frequent
+            skip_value = True
+            continue
+        if arg in {"-quiet", "-MQ"}:
+            continue
+        if arg[0:2] in {"-D", "-m", "-O", "-W", "-f"}:
+            continue
+        if arg.startswith("-std"):
+            continue
+        if arg.startswith("--param"):
+            continue
+        cmdline_short.append(arg)
+    cmdline = cmdline_short
+
+    #process_info[root_pid]["child_pids"] = [] # hide gcc child procs: cc1plus, as, ...
   log_info = {"child_procs": child_procs, "cmdline": cmdline, "cwd": cwd, "exe": exe}
   #if depth == 0:
   #  log_info["environ"] = environ # spammy
@@ -228,7 +255,9 @@ def main():
 
       cumulate_process_info(process_info, root_process.pid)
 
-      print_process_info(process_info, root_process.pid)
+      string_file = io.StringIO()
+      print_process_info(process_info, root_process.pid, file=string_file)
+      print(string_file.getvalue(), end="") # one flush
 
       time.sleep(config_interval)
 
