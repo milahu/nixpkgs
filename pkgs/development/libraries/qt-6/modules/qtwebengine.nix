@@ -70,48 +70,6 @@
 , nix-build-profiler # debug
 }:
 
-let
-  # build this in a separate derivation to limit job count
-  # pkgs/development/tools/build-managers/gn/default.nix
-  gn' = gn.overrideAttrs (old: {
-    version = "qt-${srcs.qtwebengine.version}";
-    src = srcs.qtwebengine.src;
-    #sourceRoot = "qtwebengine-everywhere-src-${srcs.qtwebengine.version}/src/gn";
-    /*
-    postPatch = ''
-      # limit job count
-      substituteInPlace CMakeLists.txt \
-        --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ninjaFlags '
-    '';
-    */
-    preConfigure = ''
-      cd src/3rdparty/gn
-    '';
-
-    /*
-        --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $NINJAFLAGS '
-
-    preConfigure = ''
-      local buildCores=1
-
-      # Parallel building is enabled by default.
-      if [ "''${enableParallelBuilding-1}" ]; then
-          buildCores="$NIX_BUILD_CORES"
-      fi
-
-      local flagsArray=(
-          -j$buildCores -l$NIX_BUILD_CORES
-          $ninjaFlags "''${ninjaFlagsArray[@]}"
-      )
-
-      # honor NIX_BUILD_CORES in recursive ninja calls
-      export NINJAFLAGS="''${flagsArray[@]}"
-      echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
-    '';
-    */
-  });
-in
-
 qtModule rec {
   pname = "qtwebengine";
   qtInputs = [ qtdeclarative qtwebchannel qtwebsockets qtpositioning ];
@@ -134,7 +92,7 @@ qtModule rec {
   doCheck = true;
   outputs = [ "out" "dev" ];
 
-  dontUseGnConfigure = true;
+  #dontUseGnConfigure = true;
 
   # ninja builds some components with -Wno-format,
   # which cannot be set at the same time as -Wformat-security
