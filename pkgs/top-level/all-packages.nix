@@ -29327,6 +29327,8 @@ with pkgs;
 
   qutebrowser = libsForQt5.callPackage ../applications/networking/browsers/qutebrowser { };
 
+  qutebrowser-qt6 = qt6Packages.callPackage ../applications/networking/browsers/qutebrowser/qutebrowser-qt6.nix { };
+
   qxw = callPackage ../applications/editors/qxw {};
 
   rabbitvcs = callPackage ../applications/version-management/rabbitvcs {};
