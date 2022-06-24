@@ -97,6 +97,10 @@ qtModule rec {
   # which cannot be set at the same time as -Wformat-security
   hardeningDisable = [ "format" ];
 
+  patches = [
+    ./patches/qtwebengine-devtools-frontend-limit-jobs.patch
+  ];
+
   postPatch = ''
     # Patch Chromium build tools
     (
