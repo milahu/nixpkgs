@@ -9,6 +9,7 @@
 , git
 , gperf
 , ninja
+, samurai # debug
 , pkg-config
 , python3
 , which
@@ -77,7 +78,8 @@ qtModule rec {
     flex
     git
     gperf
-    ninja
+    #ninja
+    samurai
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
@@ -252,6 +254,7 @@ qtModule rec {
 
     # honor NIX_BUILD_CORES in recursive ninja calls
     export NINJAFLAGS="''${flagsArray[@]}"
+    export SAMUFLAGS="$NINJAFLAGS"
     echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
   '';
 
