@@ -7823,6 +7823,8 @@ in {
 
   pyqt-builder = callPackage ../development/python-modules/pyqt-builder { };
 
+  pyqt6-builder = callPackage ../development/python-modules/pyqt-builder/6.x.nix { };
+
   pyqt4 = callPackage ../development/python-modules/pyqt/4.x.nix { };
 
   pyqt5 = callPackage ../development/python-modules/pyqt/5.x.nix { };
