@@ -1,0 +1,12 @@
+--- src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py.bak	2022-06-24 22:52:22.850150701 +0200
++++ src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py	2022-06-24 22:53:49.401545884 +0200
+@@ -30,6 +30,9 @@
+         else:
+             self._single_process = False
+             self._pool_size = multiprocessing.cpu_count()
++            # nix
++            if os.environ.get("NIX_BUILD_CORES"):
++                self._pool_size = int(os.environ.get("NIX_BUILD_CORES"))
+             if sys.platform == 'win32':
+                 # TODO(crbug.com/1190269) - we can't use more than 56
+                 # cores on Windows or Python3 may hang.

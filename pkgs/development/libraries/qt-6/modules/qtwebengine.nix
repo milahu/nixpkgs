@@ -99,6 +99,7 @@ qtModule rec {
 
   patches = [
     ./patches/qtwebengine-devtools-frontend-limit-jobs.patch
+    ./patches/qtwebengine-blink-bindgen-limit-jobs.patch
   ];
 
   postPatch = ''
