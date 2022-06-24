@@ -127,8 +127,12 @@ qtModule rec {
 
     # limit job count
     substituteInPlace src/gn/CMakeLists.txt \
-      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ENV{NINJAFLAGS} '
+      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja -j$ENV{NIX_BUILD_CORES} -l$ENV{NIX_BUILD_CORES} '
   '';
+
+  # --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ENV{NINJAFLAGS} '
+  # error: $NINJAFLAGS is not unpacked -> passed as "-j32 -l32" not as -j32 -l32
+  # ninja: fatal: invalid -j parameter
 
   cmakeFlags = [
     "-DQT_FEATURE_qtpdf_build=ON"
