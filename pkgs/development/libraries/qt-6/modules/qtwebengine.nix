@@ -65,6 +65,7 @@
 , libkrb5
 , xkeyboard_config
 , enableProprietaryCodecs ? true
+, nix-build-profiler # debug
 }:
 
 qtModule rec {
@@ -82,7 +83,7 @@ qtModule rec {
     which
     gn
     nodejs
-    python3.pkgs.nix-build-profiler # debug
+    nix-build-profiler # debug
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
@@ -252,10 +253,6 @@ qtModule rec {
     # honor NIX_BUILD_CORES in recursive ninja calls
     export NINJAFLAGS="''${flagsArray[@]}"
     echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
-  '';
-
-  preBuild = ''
-    nix-build-profiler &
   '';
 
   postInstall = ''
