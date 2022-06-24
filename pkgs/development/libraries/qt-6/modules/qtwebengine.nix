@@ -254,7 +254,8 @@ qtModule rec {
 
     # honor NIX_BUILD_CORES in recursive ninja calls
     export NINJAFLAGS="''${flagsArray[@]}"
-    export SAMUFLAGS="$NINJAFLAGS"
+    #export SAMUFLAGS="$NINJAFLAGS" # error: invalid option -l
+    export SAMUFLAGS="-j$buildCores"
     echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
   '';
 
