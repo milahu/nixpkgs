@@ -1,5 +1,5 @@
---- src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py.bak	2022-06-24 22:52:22.850150701 +0200
-+++ src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py	2022-06-24 22:53:49.401545884 +0200
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
 @@ -30,6 +30,9 @@
          else:
              self._single_process = False
