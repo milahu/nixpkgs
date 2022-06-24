@@ -76,7 +76,7 @@ let
   gn' = gn.overrideAttrs (old: {
     version = "qt-${srcs.qtwebengine.version}";
     src = srcs.qtwebengine.src;
-    sourceRoot = "src/gn";
+    sourceRoot = "qtwebengine-everywhere-src-${srcs.qtwebengine.version}/src/gn";
     postPatch = ''
       # limit job count
       substituteInPlace CMakeLists.txt \
