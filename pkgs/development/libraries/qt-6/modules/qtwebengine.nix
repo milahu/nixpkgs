@@ -85,7 +85,6 @@ qtModule rec {
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
     #gn # not used?
-    gn'
     nodejs
     nix-build-profiler # debug
   ];
