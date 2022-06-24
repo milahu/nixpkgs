@@ -34754,7 +34754,7 @@ with pkgs;
 
   nix-simple-deploy = callPackage ../tools/package-management/nix-simple-deploy { };
 
-  nix-build-profiler = ../development/python-modules/nix-build-profiler { };
+  nix-build-profiler = callPackage ../development/python-modules/nix-build-profiler { };
 
   alejandra = callPackage ../tools/nix/alejandra { };
 
