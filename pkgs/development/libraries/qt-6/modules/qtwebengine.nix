@@ -15,6 +15,7 @@
 , which
 , nodejs
 , qtbase
+, srcs # TODO test
 , perl
 , xorg
 , libXcursor
@@ -69,6 +70,43 @@
 , nix-build-profiler # debug
 }:
 
+let
+  # build this in a separate derivation to limit job count
+  # pkgs/development/tools/build-managers/gn/default.nix
+  gn' = gn.overrideAttrs (old: {
+    version = "qt-${srcs.qtwebengine.version}";
+    src = srcs.qtwebengine.src;
+    sourceRoot = "src/gn";
+    postPatch = ''
+      # limit job count
+      substituteInPlace CMakeLists.txt \
+        --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ninjaFlags '
+    '';
+
+    /*
+        --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $NINJAFLAGS '
+
+    preConfigure = ''
+      local buildCores=1
+
+      # Parallel building is enabled by default.
+      if [ "''${enableParallelBuilding-1}" ]; then
+          buildCores="$NIX_BUILD_CORES"
+      fi
+
+      local flagsArray=(
+          -j$buildCores -l$NIX_BUILD_CORES
+          $ninjaFlags "''${ninjaFlagsArray[@]}"
+      )
+
+      # honor NIX_BUILD_CORES in recursive ninja calls
+      export NINJAFLAGS="''${flagsArray[@]}"
+      echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
+    '';
+    */
+  });
+in
+
 qtModule rec {
   pname = "qtwebengine";
   qtInputs = [ qtdeclarative qtwebchannel qtwebsockets qtpositioning ];
@@ -78,12 +116,13 @@ qtModule rec {
     flex
     git
     gperf
-    #ninja
+    #ninja # ninja is still found by cmake. why??
     samurai
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
-    gn
+    #gn # not used?
+    gn'
     nodejs
     nix-build-profiler # debug
   ];
@@ -123,6 +162,10 @@ qtModule rec {
       --replace "QLibraryInfo::path(QLibraryInfo::DataPath)" "\"$out\"" \
       --replace "QLibraryInfo::path(QLibraryInfo::TranslationsPath)" "\"$out/translations\"" \
       --replace "QLibraryInfo::path(QLibraryInfo::LibraryExecutablesPath)" "\"$out/libexec\""
+
+    # limit job count
+    substituteInPlace src/gn/CMakeLists.txt \
+      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $NINJAFLAGS '
   '';
 
   cmakeFlags = [
