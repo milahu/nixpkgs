@@ -76,11 +76,16 @@ let
   gn' = gn.overrideAttrs (old: {
     version = "qt-${srcs.qtwebengine.version}";
     src = srcs.qtwebengine.src;
-    sourceRoot = "qtwebengine-everywhere-src-${srcs.qtwebengine.version}/src/gn";
+    #sourceRoot = "qtwebengine-everywhere-src-${srcs.qtwebengine.version}/src/gn";
+    /*
     postPatch = ''
       # limit job count
       substituteInPlace CMakeLists.txt \
         --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ninjaFlags '
+    '';
+    */
+    preConfigure = ''
+      cd src/3rdparty/gn
     '';
 
     /*
