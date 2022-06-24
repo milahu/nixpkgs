@@ -127,8 +127,10 @@ qtModule rec {
 
     # limit job count
     substituteInPlace src/gn/CMakeLists.txt \
-      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $NINJAFLAGS '
+      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja "$NINJAFLAGS" ' # ninja: error: unknown target '$NINJAFLAGS'
+
   '';
+#      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $NINJAFLAGS ' # ninja: error: unknown target '$NINJAFLAGS'
 
   cmakeFlags = [
     "-DQT_FEATURE_qtpdf_build=ON"
