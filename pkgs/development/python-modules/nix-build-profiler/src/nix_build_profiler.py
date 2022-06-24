@@ -186,6 +186,13 @@ def main():
 
   root_process = find_root_process(config_root_process_name)
 
+  max_load = os.enrivon.get("NIX_BUILD_CORES", 0)
+  total_cores = os.cpu_count()
+  check_load = 0 < max_load and max_load < total_cores
+  #max_load_tolerance = 0.25 # 25%
+  max_load_tolerance = 0
+  tolerant_max_load = max_load * (1 - max_load_tolerance)
+
   try:
 
     while True:
@@ -193,6 +200,11 @@ def main():
       process_info = get_process_info(root_process)
 
       cumulate_process_info(process_info, root_process.pid)
+
+      if check_load:
+        if process_info[root_process.pid]["sum_cpu"] < tolerant_max_load:
+          # load is not exceeded -> dont print
+          continue
 
       string_file = io.StringIO()
       print_process_info(process_info, root_process.pid, file=string_file)
