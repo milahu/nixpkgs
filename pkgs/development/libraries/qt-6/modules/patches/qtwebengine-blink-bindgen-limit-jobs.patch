@@ -1,6 +1,14 @@
 --- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
 +++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
-@@ -30,6 +30,9 @@
+@@ -5,6 +5,7 @@
+ import functools
+ import multiprocessing
+ import sys
++import os
+ 
+ from .package_initializer import package_initializer
+ 
+@@ -30,6 +31,9 @@
          else:
              self._single_process = False
              self._pool_size = multiprocessing.cpu_count()
