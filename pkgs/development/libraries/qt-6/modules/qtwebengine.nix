@@ -133,10 +133,6 @@ qtModule rec {
       --replace "QLibraryInfo::path(QLibraryInfo::DataPath)" "\"$out\"" \
       --replace "QLibraryInfo::path(QLibraryInfo::TranslationsPath)" "\"$out/translations\"" \
       --replace "QLibraryInfo::path(QLibraryInfo::LibraryExecutablesPath)" "\"$out/libexec\""
-
-    # limit job count
-    substituteInPlace src/gn/CMakeLists.txt \
-      --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja -j$ENV{NIX_BUILD_CORES} -l$ENV{NIX_BUILD_CORES} '
   '';
 
   # --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ENV{NINJAFLAGS} '
