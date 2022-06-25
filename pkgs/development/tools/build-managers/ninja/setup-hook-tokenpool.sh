@@ -1,3 +1,7 @@
+# wrong phase names
+# pkgs/development/tools/build-managers/cmake/setup-hook.sh
+# expects "ninjaBuildPhase"
+
 ninjaTokenpoolBuildPhase() {
     runHook preBuild
 
