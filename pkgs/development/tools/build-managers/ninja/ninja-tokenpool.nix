@@ -14,7 +14,7 @@
     sha256 = "sha256-cxtmBptmqxFyEXpgFNs7extyDfZBrJKMy1hsIqzruIc=";
   };
 
-  setupHook = ./setup-hook-tokenpool.sh;
+  #setupHook = ./setup-hook-tokenpool.sh;
 
   meta = with lib; {
     description = "ninja build system with jobserver and jobclient";
