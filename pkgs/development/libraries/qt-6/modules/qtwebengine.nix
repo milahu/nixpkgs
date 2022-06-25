@@ -98,8 +98,8 @@ qtModule rec {
   hardeningDisable = [ "format" ];
 
   patches = [
-    ./patches/qtwebengine-devtools-frontend-limit-jobs.patch
     ./patches/qtwebengine-blink-bindgen-limit-jobs.patch
+    ./patches/qtwebengine-limit-jobs-rollup-plugin-terser.patch
   ];
 
   postPatch = ''
