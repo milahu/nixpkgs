@@ -224,7 +224,7 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
   # debug: print env of every proc. verbose!
   for k in info["environ"]:
     v = info["environ"][k]
-    print(f"                   {depth*indent} {k}: {v}")
+    print(f"                   {depth*indent} {k}: {repr(v)}")
 
   for child_pid in process_info[root_pid]["child_pids"]:
     print_process_info(process_info, child_pid, file, depth + 1)
