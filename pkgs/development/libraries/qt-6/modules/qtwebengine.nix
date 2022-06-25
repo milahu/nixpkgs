@@ -79,8 +79,8 @@ qtModule rec {
     flex
     git
     gperf
-    #ninja # ninja is still found by cmake. why??
-    samurai
+    ninja
+    #samurai
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
