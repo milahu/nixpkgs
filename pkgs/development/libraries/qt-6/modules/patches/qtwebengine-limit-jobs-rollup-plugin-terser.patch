@@ -1,0 +1,20 @@
+--- src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js.bak	2022-06-25 10:30:31.375956845 +0200
++++ src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js	2022-06-25 10:32:32.124944446 +0200
+@@ -3,6 +3,17 @@
+ const serialize = require("serialize-javascript");
+ 
+ function terser(userOptions = {}) {
++
++// nix: limit job count
++// default: $nproc
++// https://github.com/TrySound/rollup-plugin-terser
++var numWorkers = 0;
++if ('NIX_BUILD_CORES' in process.env) {
++  numWorkers = parseInt(process.env.NIX_BUILD_CORES) - 1;
++  console.log(`rollup-plugin-terser: numWorkers = ${numWorkers}`);
++  userOptions.numWorkers = numWorkers;
++}
++
+   if (userOptions.sourceMap != null) {
+     throw Error(
+       "sourceMap option is removed. Now it is inferred from rollup options."
