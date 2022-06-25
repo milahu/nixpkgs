@@ -13,6 +13,14 @@ ninjaBuildPhase() {
         $ninjaFlags "${ninjaFlagsArray[@]}"
     )
 
+    # debug
+    (
+        set +e
+        set -x
+        stat build.ninja
+        ls -l
+    )
+
     echoCmd 'build flags' "${flagsArray[@]}"
     (
         set -x
