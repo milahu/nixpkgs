@@ -1,5 +1,5 @@
---- src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js.bak	2022-06-25 10:30:31.375956845 +0200
-+++ src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js	2022-06-25 10:32:32.124944446 +0200
+--- a/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js
++++ b/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js
 @@ -3,6 +3,17 @@
  const serialize = require("serialize-javascript");
  
