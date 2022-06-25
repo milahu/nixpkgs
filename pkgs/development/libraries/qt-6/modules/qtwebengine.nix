@@ -10,6 +10,7 @@
 , gperf
 , ninja
 , samurai # debug
+, ninja-kitware # debug
 , pkg-config
 , python3
 , which
@@ -79,8 +80,9 @@ qtModule rec {
     flex
     git
     gperf
-    ninja
+    #ninja
     #samurai
+    ninja-kitware # debug
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
