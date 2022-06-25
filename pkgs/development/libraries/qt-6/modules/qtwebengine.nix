@@ -11,6 +11,7 @@
 , ninja
 , samurai # debug
 , ninja-kitware # debug
+, ninja-tokenpool # debug
 , pkg-config
 , python3
 , which
@@ -82,7 +83,8 @@ qtModule rec {
     gperf
     #ninja
     #samurai
-    ninja-kitware # debug
+    #ninja-kitware # debug
+    ninja-tokenpool # debug
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
@@ -255,6 +257,7 @@ qtModule rec {
   # this must run before cmake
   # to set NINJAFLAGS for qtwebengine/cmake/Functions.cmake
   #
+  /*
   preConfigure = ''
     local buildCores=1
 
@@ -274,6 +277,7 @@ qtModule rec {
     export SAMUFLAGS="-j$buildCores"
     echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
   '';
+  */
 
   postInstall = ''
     # This is required at runtime
