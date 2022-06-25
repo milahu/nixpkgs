@@ -15907,6 +15907,8 @@ with pkgs;
 
   ninja = callPackage ../development/tools/build-managers/ninja { };
 
+  ninja-kitware = callPackage ../development/tools/build-managers/ninja/ninja-kitware.nix { };
+
   nimbo = with python3Packages; callPackage ../applications/misc/nimbo { };
 
   gn = callPackage ../development/tools/build-managers/gn { };
