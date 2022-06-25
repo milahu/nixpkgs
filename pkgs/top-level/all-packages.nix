@@ -15907,7 +15907,11 @@ with pkgs;
 
   ninja = callPackage ../development/tools/build-managers/ninja { };
 
+  # only jobclient, no jobserver
   ninja-kitware = callPackage ../development/tools/build-managers/ninja/ninja-kitware.nix { };
+
+  # jobclient + jobserver
+  ninja-tokenpool = callPackage ../development/tools/build-managers/ninja/ninja-tokenpool.nix { };
 
   nimbo = with python3Packages; callPackage ../applications/misc/nimbo { };
 
