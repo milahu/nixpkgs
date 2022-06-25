@@ -14,7 +14,10 @@ ninjaTokenpoolBuildPhase() {
     )
 
     echoCmd 'build flags' "${flagsArray[@]}"
-    TERM=dumb ninja --tokenpool-master "${flagsArray[@]}"
+    (
+        set -x
+        TERM=dumb ninja --tokenpool-master "${flagsArray[@]}"
+    )
 
     runHook postBuild
 }
@@ -33,7 +36,10 @@ ninjaTokenpoolInstallPhase() {
     )
 
     echoCmd 'install flags' "${flagsArray[@]}"
-    TERM=dumb ninja --tokenpool-master "${flagsArray[@]}"
+    (
+        set -x
+        TERM=dumb ninja --tokenpool-master "${flagsArray[@]}"
+    )
 
     runHook postInstall
 }
@@ -67,7 +73,10 @@ ninjaTokenpoolCheckPhase() {
         )
 
         echoCmd 'check flags' "${flagsArray[@]}"
-        TERM=dumb ninja --tokenpool-master "${flagsArray[@]}"
+        (
+            set -x
+            TERM=dumb ninja --tokenpool-master "${flagsArray[@]}"
+        )
     fi
 
     runHook postCheck
