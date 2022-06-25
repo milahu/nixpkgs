@@ -1,5 +1,5 @@
 enableNinjaTokenpool() {
-    echoCmd 'enableNinjaTokenpool: adding to ninjaFlags: --tokenpool-master'
+    echoCmd 'enableNinjaTokenpool: adding to ninjaFlags' '--tokenpool-master'
     ninjaFlags+=' --tokenpool-master'
 }
 
