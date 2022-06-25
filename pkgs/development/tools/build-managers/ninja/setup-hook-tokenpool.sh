@@ -1,4 +1,4 @@
-ninjaBuildPhase() {
+ninjaTokenpoolBuildPhase() {
     runHook preBuild
 
     local buildCores=1
@@ -20,10 +20,10 @@ ninjaBuildPhase() {
 }
 
 if [ -z "${dontUseNinjaBuild-}" -a -z "${buildPhase-}" ]; then
-    buildPhase=ninjaBuildPhase
+    buildPhase=ninjaTokenpoolBuildPhase
 fi
 
-ninjaInstallPhase() {
+ninjaTokenpoolInstallPhase() {
     runHook preInstall
 
     # shellcheck disable=SC2086
@@ -39,10 +39,10 @@ ninjaInstallPhase() {
 }
 
 if [ -z "${dontUseNinjaInstall-}" -a -z "${installPhase-}" ]; then
-    installPhase=ninjaInstallPhase
+    installPhase=ninjaTokenpoolInstallPhase
 fi
 
-ninjaCheckPhase() {
+ninjaTokenpoolCheckPhase() {
     runHook preCheck
 
     if [ -z "${checkTarget:-}" ]; then
@@ -74,5 +74,5 @@ ninjaCheckPhase() {
 }
 
 if [ -z "${dontUseNinjaCheck-}" -a -z "${checkPhase-}" ]; then
-    checkPhase=ninjaCheckPhase
+    checkPhase=ninjaTokenpoolCheckPhase
 fi
