@@ -137,10 +137,14 @@ qtModule rec {
     # Limit jobs in build of devtools-frontend
     (
       cd src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules
+
       rm -rf jest-worker
       cp -r ${jest-worker} jest-worker
+      chmod -R +w jest-worker
+
       mkdir @milahu
       cp -r ${gnumake-jobclient-js} @milahu/gnumake-jobclient
+      chmod -R +w @milahu/gnumake-jobclient
     )
 
     # Patch Chromium build tools
