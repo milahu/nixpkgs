@@ -105,6 +105,7 @@ qtModule rec {
     ./patches/qtwebengine/0001-blink-bindgen-limit-jobs.patch
     #./patches/qtwebengine/0002-rollup-plugin-terser-limit-jobs.patch
     #./patches/qtwebengine/0003-rollup-plugin-terser-debug-print-env.patch
+    # devtools-frontend -> rollup -> terser -> jest-worker
     ./patches/qtwebengine/0004-devtools-frontend-use-jest-worker-with-jobclient.patch
   ];
 
