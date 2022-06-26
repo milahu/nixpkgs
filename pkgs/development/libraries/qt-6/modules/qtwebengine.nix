@@ -78,13 +78,13 @@ let
   # use jest-worker with jobclient
   # call stack: devtools-frontend -> rollup -> terser -> jest-worker
   jest-worker = fetchFromGitHub {
-    # https://github.com/milahu/jest-worker
+    # https://github.com/milahu/jest-worker/tree/26.6.2
     # https://github.com/facebook/jest/pull/12968
-    # nix-prefetch-github milahu jest-worker
+    # nix-prefetch-github milahu jest-worker --rev xxx
     owner = "milahu";
     repo = "jest-worker";
-    rev = "d767007376f59bb749663e1e45f1f7eb644ac449";
-    sha256 = "2GzrZVw1iovXdQvlaLJoTxG06KCbE9mg3zgjzmKkZEI=";
+    rev = "ed0c6a70c7dce1e6d4ed8cfb4ab5667220b704f3";
+    sha256 = "IIXRgAAQAPv2auKW25QbzBAcMQa/xlepVDDMDJuqX+0=";
   };
 in
 
