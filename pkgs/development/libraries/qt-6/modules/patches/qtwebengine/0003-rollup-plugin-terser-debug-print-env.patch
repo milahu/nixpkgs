@@ -1,0 +1,35 @@
+From 5cf88851fcde68444661ee923d311e4695d4480e Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Sat, 25 Jun 2022 18:49:15 +0200
+Subject: [PATCH 3/4] rollup-plugin-terser: debug: print env
+
+---
+ .../rollup-plugin-terser/rollup-plugin-terser.js     | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js b/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js
+index 1290cc584..177c3f182 100644
+--- a/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js
++++ b/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js
+@@ -14,6 +14,18 @@ if ('NIX_BUILD_CORES' in process.env) {
+   userOptions.numWorkers = numWorkers;
+ }
+ 
++// TODO parse MAKEFLAGS -> jobserver fd numbers
++// set userOptions.numWorkers = "?jobserverAuth=3,4"
++// -> jest-worker should negotiate jobs
++// every node process costs 24 MB of ram with mostly zero load
++// 24 MB * 128 cores = 3072 MB
++// 24 MB * 32 jobs = 768 MB ... for nothing
++console.dir({
++  loc: "qtwebengine-everywhere-src-6.3.1/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup-plugin-terser/rollup-plugin-terser.js",
++  env: process.env,
++});
++process.exit(1); // debug
++
+   if (userOptions.sourceMap != null) {
+     throw Error(
+       "sourceMap option is removed. Now it is inferred from rollup options."
+-- 
+2.36.1
+

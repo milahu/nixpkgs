@@ -1,7 +1,7 @@
 From bc72bf4ad936b4894356879c3dd4f50a53dd19e7 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Sat, 25 Jun 2022 18:48:31 +0200
-Subject: [PATCH 2/3] rollup-plugin-terser: limit jobs
+Subject: [PATCH 2/4] rollup-plugin-terser: limit jobs
 
 ---
  .../rollup-plugin-terser/rollup-plugin-terser.js      | 11 +++++++++++
