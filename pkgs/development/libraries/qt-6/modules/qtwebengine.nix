@@ -70,7 +70,23 @@
 , xkeyboard_config
 , enableProprietaryCodecs ? true
 , nix-build-profiler # debug
+, fetchFromGitHub
 }:
+
+let
+  # limit jobs
+  # use jest-worker with jobclient
+  # devtools-frontend -> rollup -> terser -> jest-worker
+  devtools-frontend = fetchFromGitHub {
+    # https://github.com/ChromeDevTools/devtools-frontend
+    # https://github.com/milahu/devtools-frontend/tree/move-deps-to-package-json
+    # nix-prefetch-github milahu devtools-frontend --rev 14205f4a337e8f2e2a59cf225defd705789b117a
+    owner = "milahu";
+    repo = "devtools-frontend";
+    rev = "14205f4a337e8f2e2a59cf225defd705789b117a";
+    sha256 = "PvZzFJMXMxn1J/98map1+Euhdh/c8chM/0foaZpoq6o=";
+  };
+in
 
 qtModule rec {
   pname = "qtwebengine";
@@ -103,10 +119,6 @@ qtModule rec {
 
   patches = [
     ./patches/qtwebengine/0001-blink-bindgen-limit-jobs.patch
-    #./patches/qtwebengine/0002-rollup-plugin-terser-limit-jobs.patch
-    #./patches/qtwebengine/0003-rollup-plugin-terser-debug-print-env.patch
-    # devtools-frontend -> rollup -> terser -> jest-worker
-    ./patches/qtwebengine/0004-devtools-frontend-use-jest-worker-with-jobclient.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
@@ -114,6 +126,11 @@ qtModule rec {
   ninjaFlags = "-v -d explain";
 
   postPatch = ''
+    # update devtools-frontend
+    rm -rf src/3rdparty/chromium/third_party/devtools-frontend
+    cp -r ${devtools-frontend} src/3rdparty/chromium/third_party/devtools-frontend
+    chmod -R +w src/3rdparty/chromium/third_party/devtools-frontend
+
     # Patch Chromium build tools
     (
       cd src/3rdparty/chromium;
