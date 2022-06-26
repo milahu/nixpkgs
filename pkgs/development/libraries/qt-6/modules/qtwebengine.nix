@@ -109,6 +109,10 @@ qtModule rec {
     ./patches/qtwebengine/0004-devtools-frontend-use-jest-worker-with-jobclient.patch
   ];
 
+  DEBUG_JEST_WORKER = "1";
+  DEBUG_JOBCLIENT = "1";
+  ninjaFlags = "-v -d explain";
+
   postPatch = ''
     # Patch Chromium build tools
     (
