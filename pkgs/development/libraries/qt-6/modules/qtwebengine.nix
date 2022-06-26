@@ -77,7 +77,7 @@ let
   # limit jobs
   # use jest-worker with jobclient
   # devtools-frontend -> rollup -> terser -> jest-worker
-  devtools-frontend = fetchFromGitHub {
+  devtools-frontend-src = fetchFromGitHub {
     # https://github.com/ChromeDevTools/devtools-frontend
     # https://github.com/milahu/devtools-frontend/tree/move-deps-to-package-json
     # nix-prefetch-github milahu devtools-frontend --rev 14205f4a337e8f2e2a59cf225defd705789b117a
@@ -127,9 +127,9 @@ qtModule rec {
 
   postPatch = ''
     # update devtools-frontend
-    rm -rf src/3rdparty/chromium/third_party/devtools-frontend
-    cp -r ${devtools-frontend} src/3rdparty/chromium/third_party/devtools-frontend
-    chmod -R +w src/3rdparty/chromium/third_party/devtools-frontend
+    rm -rf src/3rdparty/chromium/third_party/devtools-frontend/src
+    cp -r ${devtools-frontend-src} src/3rdparty/chromium/third_party/devtools-frontend/src
+    chmod -R +w src/3rdparty/chromium/third_party/devtools-frontend/src
 
     # Patch Chromium build tools
     (
