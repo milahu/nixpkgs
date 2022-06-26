@@ -123,7 +123,7 @@ qtModule rec {
 
   DEBUG_JEST_WORKER = "1";
   DEBUG_JOBCLIENT = "1";
-  ninjaFlags = "-v -d explain";
+  #ninjaFlags = "-v -d explain";
 
   postPatch = ''
     # update devtools-frontend
