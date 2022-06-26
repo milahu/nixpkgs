@@ -127,9 +127,16 @@ qtModule rec {
 
   postPatch = ''
     # update devtools-frontend
-    rm -rf src/3rdparty/chromium/third_party/devtools-frontend/src
-    cp -r ${devtools-frontend-src} src/3rdparty/chromium/third_party/devtools-frontend/src
-    chmod -R +w src/3rdparty/chromium/third_party/devtools-frontend/src
+    (
+      cd src/3rdparty/chromium/third_party/devtools-frontend
+      mv src src.bak
+      cp -r ${devtools-frontend-src} src
+      chmod -R +w src
+      cd src
+      # fix: ninja: error: 'third_party/esbuild/esbuild' missing
+      mkdir -v third_party/esbuild
+      ln -srv node_modules/esbuild third_party/esbuild/esbuild
+    )
 
     # Patch Chromium build tools
     (
