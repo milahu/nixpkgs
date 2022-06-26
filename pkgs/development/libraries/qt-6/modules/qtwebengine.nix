@@ -71,6 +71,7 @@
 , enableProprietaryCodecs ? true
 , nix-build-profiler # debug
 , fetchFromGitHub
+, rsync
 }:
 
 let
@@ -107,6 +108,7 @@ qtModule rec {
     #gn # not used?
     nodejs
     nix-build-profiler # debug
+    rsync
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
@@ -129,13 +131,8 @@ qtModule rec {
     # update devtools-frontend
     (
       cd src/3rdparty/chromium/third_party/devtools-frontend
-      mv src src.bak
-      cp -r ${devtools-frontend-src} src
-      chmod -R +w src
-      cd src
-      # fix: ninja: error: 'third_party/esbuild/esbuild' missing
-      mkdir -v third_party/esbuild
-      ln -srv node_modules/esbuild third_party/esbuild/esbuild
+      # keep missing files
+      rsync -r ${devtools-frontend-src}/ src/
     )
 
     # Patch Chromium build tools
