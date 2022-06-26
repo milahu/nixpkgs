@@ -71,21 +71,20 @@
 , enableProprietaryCodecs ? true
 , nix-build-profiler # debug
 , fetchFromGitHub
-, rsync
 }:
 
 let
   # limit jobs
   # use jest-worker with jobclient
-  # devtools-frontend -> rollup -> terser -> jest-worker
-  devtools-frontend-src = fetchFromGitHub {
-    # https://github.com/ChromeDevTools/devtools-frontend
-    # https://github.com/milahu/devtools-frontend/tree/move-deps-to-package-json
-    # nix-prefetch-github milahu devtools-frontend --rev 14205f4a337e8f2e2a59cf225defd705789b117a
+  # call stack: devtools-frontend -> rollup -> terser -> jest-worker
+  jest-worker = fetchFromGitHub {
+    # https://github.com/milahu/jest-worker
+    # https://github.com/facebook/jest/pull/12968
+    # nix-prefetch-github milahu jest-worker
     owner = "milahu";
-    repo = "devtools-frontend";
-    rev = "14205f4a337e8f2e2a59cf225defd705789b117a";
-    sha256 = "PvZzFJMXMxn1J/98map1+Euhdh/c8chM/0foaZpoq6o=";
+    repo = "jest-worker";
+    rev = "d767007376f59bb749663e1e45f1f7eb644ac449";
+    sha256 = "2GzrZVw1iovXdQvlaLJoTxG06KCbE9mg3zgjzmKkZEI=";
   };
 in
 
@@ -108,7 +107,6 @@ qtModule rec {
     #gn # not used?
     nodejs
     nix-build-profiler # debug
-    rsync
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
@@ -128,11 +126,12 @@ qtModule rec {
   #ninjaFlags = "-v -d explain";
 
   postPatch = ''
-    # update devtools-frontend
+    # Limit jobs in build of devtools-frontend
     (
-      cd src/3rdparty/chromium/third_party/devtools-frontend
-      # keep missing files
-      rsync -r --chmod=+w ${devtools-frontend-src}/ src/
+      cd src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules
+      rm -rf jest-worker
+      cp -r ${jest-worker} jest-worker
+      chmod -R +w jest-worker
     )
 
     # Patch Chromium build tools
