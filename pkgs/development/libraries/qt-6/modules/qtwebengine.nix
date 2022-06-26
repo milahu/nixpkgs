@@ -132,7 +132,7 @@ qtModule rec {
     (
       cd src/3rdparty/chromium/third_party/devtools-frontend
       # keep missing files
-      rsync -r ${devtools-frontend-src}/ src/
+      rsync -r --chmod=+w ${devtools-frontend-src}/ src/
     )
 
     # Patch Chromium build tools
