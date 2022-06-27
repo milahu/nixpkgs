@@ -86,6 +86,7 @@ let
     rev = "ed0c6a70c7dce1e6d4ed8cfb4ab5667220b704f3";
     sha256 = "IIXRgAAQAPv2auKW25QbzBAcMQa/xlepVDDMDJuqX+0=";
   };
+  /*
   gnumake-jobclient-js = fetchFromGitHub {
     # https://github.com/milahu/gnumake-jobclient-js
     # nix-prefetch-github milahu gnumake-jobclient-js
@@ -94,6 +95,8 @@ let
     rev = "c4df2f1315e4f9eef6b89a350dd1937acfa2675e";
     sha256 = "WDETBCACLhVdnTou5n3Fdl9UfzeCPV2RodIJ2i7nLL0=";
   };
+  */
+  gnumake-jobclient-js = ./gnumake-jobclient-js;
 in
 
 qtModule rec {
