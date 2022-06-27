@@ -126,8 +126,8 @@ qtModule rec {
   hardeningDisable = [ "format" ];
 
   patches = [
-    ./patches/qtwebengine/0001-blink-bindgen-limit-jobs.patch
     ./patches/qtwebengine/0005-fix-node.py-for-gnumake-jobclient.patch
+    ./patches/qtwebengine/0006-blink-bindgen-limit-jobs-with-jobclient.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
