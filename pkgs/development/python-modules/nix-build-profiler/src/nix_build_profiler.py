@@ -16,6 +16,7 @@ import sys
 import os
 import shlex
 import io
+import subprocess
 
 config_interval = 1
 config_root_process_name = 'nix-daemon'
