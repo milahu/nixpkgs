@@ -83,20 +83,17 @@ let
     # nix-prefetch-github milahu jest-worker --rev xxx
     owner = "milahu";
     repo = "jest-worker";
-    rev = "ed0c6a70c7dce1e6d4ed8cfb4ab5667220b704f3";
-    sha256 = "IIXRgAAQAPv2auKW25QbzBAcMQa/xlepVDDMDJuqX+0=";
+    rev = "1f90d2e98655fe34f2bc15867218917445e160b5";
+    sha256 = "XidL8nQR+pt4Cz7dNS8BmsJVftpJqAVpdub9aKvSIg8=";
   };
-  /*
   gnumake-jobclient-js = fetchFromGitHub {
     # https://github.com/milahu/gnumake-jobclient-js
     # nix-prefetch-github milahu gnumake-jobclient-js
     owner = "milahu";
     repo = "gnumake-jobclient-js";
-    rev = "c4df2f1315e4f9eef6b89a350dd1937acfa2675e";
-    sha256 = "WDETBCACLhVdnTou5n3Fdl9UfzeCPV2RodIJ2i7nLL0=";
+    rev = "25dd247b97b1130df02be4ab773db6ceeb8b3274";
+    sha256 = "dqqsP426AxZ70fUtKJfbsncvsR8Y7QXCDl6o25g9jKc=";
   };
-  */
-  gnumake-jobclient-js = ./gnumake-jobclient-js;
 in
 
 qtModule rec {
@@ -141,9 +138,11 @@ qtModule rec {
     (
       cd src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules
 
+      mv jest-worker/node_modules jest-worker.node_modules
       rm -rf jest-worker
       cp -r ${jest-worker} jest-worker
       chmod -R +w jest-worker
+      mv jest-worker.node_modules jest-worker/node_modules
 
       mkdir @milahu
       cp -r ${gnumake-jobclient-js} @milahu/gnumake-jobclient
