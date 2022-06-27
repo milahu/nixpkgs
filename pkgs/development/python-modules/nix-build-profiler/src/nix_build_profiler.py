@@ -247,9 +247,9 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
     while _pid:
       _info = process_info[_pid]
       _cmdline_str = shlex.join(_info["cmdline"])
-      print("")
-      print(f"proc {_pid}: {_cmdline_str}")
-      print(f"env:")
+      print("", file=file)
+      print(f"proc {_pid}: {_cmdline_str}", file=file)
+      print(f"env:", file=file)
       #for k in ["MAKEFLAGS", "DEBUG_JEST_WORKER", "DEBUG_JOBCLIENT"]:
       for k in ["MAKEFLAGS"]:
         v = _info["environ"].get(k)
