@@ -127,6 +127,7 @@ qtModule rec {
 
   patches = [
     ./patches/qtwebengine/0001-blink-bindgen-limit-jobs.patch
+    ./patches/qtwebengine/0005-fix-node.py-for-gnumake-jobclient.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
