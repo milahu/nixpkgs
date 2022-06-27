@@ -137,6 +137,8 @@ def cumulate_process_info(process_info, parent_pid):
 
 def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
 
+  # TODO rename root_pid to pid
+
   if depth == 0:
     t = time.strftime("%F %T %z")
     #print(f"\n{'load':<{cpu_width}s} mem rss  vms  proc @ {t}", file=file)
@@ -227,9 +229,25 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
 
   if config_print_env_vars:
     for k in info["environ"]:
-        v = info["environ"][k]
-        print(f"                   {depth*indent} {k}: {repr(v)}", file=file)
+      v = info["environ"][k]
+      print(f"                   {depth*indent} {k}: {repr(v)}", file=file)
 
+  # print extra info
+  # debug jobclient in jest-worker
+  if (
+    name == "node" and len(cmdline) > 1 and
+    cmdline[1] == "../../../../../src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup"
+  ):
+    for k in ["MAKEFLAGS", "DEBUG_JEST_WORKER", "DEBUG_JOBCLIENT"]:
+      v = info["environ"].get(k)
+      print(f"                   {depth*indent} {k}: {repr(v)}", file=file)
+    # list file descriptors of process
+    cmd_str = f"ls -l /proc/{root_pid}/fd/"
+    print(f"$ {cmd_str}", file=file)
+    cmd_out = subprocess.check_output(c, shell=True, stderr=subprocess.STDOUT)
+    file.write(cmd_out)
+
+  # recursion
   for child_pid in process_info[root_pid]["child_pids"]:
     print_process_info(process_info, child_pid, file, depth + 1)
 
