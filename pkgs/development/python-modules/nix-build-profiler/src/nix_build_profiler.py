@@ -248,7 +248,7 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
     # list file descriptors of process
     cmd_str = f"ls -l /proc/{root_pid}/fd/"
     print(f"$ {cmd_str}", file=file)
-    cmd_out = subprocess.check_output(c, shell=True, stderr=subprocess.STDOUT)
+    cmd_out = subprocess.check_output(cmd_str, shell=True, stderr=subprocess.STDOUT)
     file.write(cmd_out)
 
   # recursion
