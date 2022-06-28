@@ -1,0 +1,25 @@
+From 3a508a051ecc15f7cbe5c65aaa1411669d89bc1b Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Tue, 28 Jun 2022 14:39:41 +0200
+Subject: [PATCH] fix node py for jobclient
+
+based on debug-chromium-node.py.patch
+---
+ src/3rdparty/chromium/third_party/node/node.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index d47cdcaab..4a2315d43 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -48,6 +48,7 @@ def RunNode(cmd_parts, stdout=None):
+   cmd = [GetBinaryPath()] + cmd_parts
+   process = subprocess.Popen(
+       cmd, cwd=os.getcwd(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
++      close_fds=False, # inherit fds of parent process for gnumake jobclient
+       universal_newlines=True)
+   stdout, _stderr = process.communicate()
+ 
+-- 
+2.36.1
+
