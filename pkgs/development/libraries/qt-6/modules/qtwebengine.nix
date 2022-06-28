@@ -128,10 +128,12 @@ qtModule rec {
   patches = [
     ./patches/qtwebengine/0005-fix-node.py-for-gnumake-jobclient.patch
     ./patches/qtwebengine/0006-blink-bindgen-limit-jobs-with-jobclient.patch
+    ./patches/qtwebengine/0007-debug-chromium-node.py.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
   DEBUG_JOBCLIENT = "1";
+  DEBUG_CHROMIUM_NODE_PY = "1";
   ninjaFlags = "-v -d explain";
 
   postPatch = ''
