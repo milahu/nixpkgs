@@ -7,11 +7,21 @@
   pname = "ninja-tokenpool";
   version = "unstable-2022-02-13";
 
+  /*
   src = fetchFromGitHub {
     owner = "stefanb2";
     repo = "ninja";
     rev = "15bc8f783b63e9bf91080d9b9d6c83468f012f97";
     sha256 = "sha256-cxtmBptmqxFyEXpgFNs7extyDfZBrJKMy1hsIqzruIc=";
+  };
+  */
+
+  src = fetchFromGitHub {
+    # https://github.com/milahu/ninja/tree/topic-tokenpool-master-patch-1
+    owner = "milahu";
+    repo = "ninja";
+    rev = "e54e34f14b3b56acc474e6cfd7a64673ed2ed289";
+    sha256 = "u61W036KkPuaXPsRPWO5KqnY7cKB3Hnsr8bR7QAcaP8=";
   };
 
   setupHook = ./setup-hook-tokenpool.sh;
