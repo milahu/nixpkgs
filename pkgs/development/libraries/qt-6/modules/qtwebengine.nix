@@ -131,7 +131,9 @@ qtModule rec {
     ./patches/qtwebengine/0006-blink-bindgen-limit-jobs-with-jobclient.patch
 
     ./patches/qtwebengine/0007-debug-chromium-node.py.patch
-    ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove
+    ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
+    ./patches/qtwebengine/0009-debug-node-py-print-live-output.patch # depends on 8
+
   ];
 
   DEBUG_JEST_WORKER = "1";

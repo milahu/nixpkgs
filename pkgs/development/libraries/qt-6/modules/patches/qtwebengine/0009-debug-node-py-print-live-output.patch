@@ -1,0 +1,77 @@
+From e1a16c26100be71e3d06bd0ef7c9da745009b323 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Wed, 29 Jun 2022 09:56:41 +0200
+Subject: [PATCH] debug node.py: print live output
+
+---
+ .../chromium/third_party/node/node.py         | 45 +++++++++++++------
+ 1 file changed, 31 insertions(+), 14 deletions(-)
+
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index 4a2315d43..4961e3687 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -9,6 +9,7 @@ import subprocess
+ import sys
+ import os
+ import shlex
++import io
+ 
+ def which(cmd):
+     pathenv = os.getenv('PATH')
+@@ -44,22 +45,38 @@ def GetBinaryPath():
+   }[platform.system()])
+ 
+ 
+-def RunNode(cmd_parts, stdout=None):
++def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never used?
+   cmd = [GetBinaryPath()] + cmd_parts
+-  process = subprocess.Popen(
+-      cmd, cwd=os.getcwd(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+-      close_fds=False, # inherit fds of parent process for gnumake jobclient
+-      universal_newlines=True)
+-  stdout, _stderr = process.communicate()
+-
++  is_debug = bool(os.environ.get('DEBUG_CHROMIUM_NODE_PY'))
++  options = {
++    'cwd': os.getcwd(),
++    'universal_newlines': True,
++    'close_fds': False, # inherit fds of parent process for gnumake jobclient
++    'stdout': subprocess.PIPE,
++    'stderr': subprocess.STDOUT,
++  }
++  process = subprocess.Popen(cmd, **options)
++  output = None
++  if is_debug: # print + capture output https://stackoverflow.com/questions/18421757
++    # note: we need live output to debug deadloops
++    output = io.BytesIO()
++    line_prefix = b'node.py[%i]: ' % (os.getpid(),)
++    for line in iter(process.stdout.readline, b''):
++      sys.stdout.buffer.write(line_prefix + line)
++      output.write(line)
++    output = output.getvalue()
++  else: # capture output
++    output, _stderr = process.communicate()
++  try:
++    output = output.decode('utf8')
++  except UnicodeDecodeError:
++    pass # output is formatted as "b'...'"
+   if process.returncode != 0:
+-    raise RuntimeError('Command failed: %s\n%s' % (shlex.join(cmd), stdout))
+-
+-  if os.environ.get("DEBUG_CHROMIUM_NODE_PY"):
+-    print('Command succeeded: %s\n%s' % (shlex.join(cmd), stdout))
+-
+-  return stdout
++    raise RuntimeError('Command failed: %s\n%s' % (shlex.join(cmd), output))
++  if is_debug:
++    print('Command succeeded: %s' % (shlex.join(cmd)))
++  return output
+ 
+ if __name__ == '__main__':
+-  # note: stdout is not printed
++  # note: output is not printed
+   RunNode(sys.argv[1:])
+-- 
+2.36.1
+
