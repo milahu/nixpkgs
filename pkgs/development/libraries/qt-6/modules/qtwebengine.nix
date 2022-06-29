@@ -143,7 +143,10 @@ qtModule rec {
     ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
     ./patches/qtwebengine/0009-debug-node-py-print-live-output.patch # depends on 8
 
+    # qtwebengine-everywhere-src-6.3.1 $ grep -r -F 'subprocess.Popen(' | grep -v -e test -e tools
     ./patches/qtwebengine/0010-fix-inherit-fds-devtools-frontend-build_inspector_overlay.py.patch
+
+    ./patches/qtwebengine/0011-mojom_parser.py-limit-jobs-with-jobclient.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
@@ -166,11 +169,17 @@ qtModule rec {
       cp -r ${gnumake-jobclient-js} @milahu/gnumake-jobclient
       chmod -R +w @milahu/gnumake-jobclient
     )
-    (
-      cd src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen
-      cp ${gnumake-jobclient-py}/gnumake_jobclient/jobclient.py gnumake_jobclient.py
-      chmod +w gnumake_jobclient.py
-    )
+
+    for dst in \
+      src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen \
+      src/3rdparty/chromium/mojo/public/tools/mojom
+    do
+      (
+        cd "$dst"
+        cp ${gnumake-jobclient-py}/gnumake_jobclient/jobclient.py gnumake_jobclient.py
+        chmod +w gnumake_jobclient.py
+      )
+    done
 
     # Patch Chromium build tools
     (
