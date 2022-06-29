@@ -1,14 +1,14 @@
-From e1a16c26100be71e3d06bd0ef7c9da745009b323 Mon Sep 17 00:00:00 2001
+From 18d38b56830fb0a62276f6c76ebd7f3b78d2509b Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Wed, 29 Jun 2022 09:56:41 +0200
 Subject: [PATCH] debug node.py: print live output
 
 ---
- .../chromium/third_party/node/node.py         | 45 +++++++++++++------
- 1 file changed, 31 insertions(+), 14 deletions(-)
+ .../chromium/third_party/node/node.py         | 49 +++++++++++++------
+ 1 file changed, 34 insertions(+), 15 deletions(-)
 
 diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
-index 4a2315d43..4961e3687 100755
+index 4a2315d43..0887e7ccb 100755
 --- a/src/3rdparty/chromium/third_party/node/node.py
 +++ b/src/3rdparty/chromium/third_party/node/node.py
 @@ -9,6 +9,7 @@ import subprocess
@@ -19,23 +19,26 @@ index 4a2315d43..4961e3687 100755
  
  def which(cmd):
      pathenv = os.getenv('PATH')
-@@ -44,22 +45,38 @@ def GetBinaryPath():
+@@ -44,22 +45,40 @@ def GetBinaryPath():
    }[platform.system()])
  
  
 -def RunNode(cmd_parts, stdout=None):
-+def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never used?
-   cmd = [GetBinaryPath()] + cmd_parts
+-  cmd = [GetBinaryPath()] + cmd_parts
 -  process = subprocess.Popen(
 -      cmd, cwd=os.getcwd(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
 -      close_fds=False, # inherit fds of parent process for gnumake jobclient
 -      universal_newlines=True)
 -  stdout, _stderr = process.communicate()
 -
++def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never used?
++  #cmd = [GetBinaryPath()] + cmd_parts
++  cmd = ['node'] + cmd_parts
 +  is_debug = bool(os.environ.get('DEBUG_CHROMIUM_NODE_PY'))
 +  options = {
 +    'cwd': os.getcwd(),
-+    'universal_newlines': True,
++    #'universal_newlines': True, # -> text=True
++    #'text': False, # default
 +    'close_fds': False, # inherit fds of parent process for gnumake jobclient
 +    'stdout': subprocess.PIPE,
 +    'stderr': subprocess.STDOUT,
