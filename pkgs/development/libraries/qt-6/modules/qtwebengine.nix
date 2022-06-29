@@ -78,6 +78,7 @@ let
   # use jest-worker with jobclient
   # call stack: devtools-frontend -> rollup -> terser -> jest-worker
   jest-worker = fetchFromGitHub {
+    # requires gnumake-jobclient-js
     # https://github.com/milahu/jest-worker/tree/26.6.2
     # https://github.com/facebook/jest/pull/12968
     # nix-prefetch-github milahu jest-worker --rev xxx
@@ -91,8 +92,16 @@ let
     # nix-prefetch-github milahu gnumake-jobclient-js
     owner = "milahu";
     repo = "gnumake-jobclient-js";
-    rev = "25dd247b97b1130df02be4ab773db6ceeb8b3274";
-    sha256 = "dqqsP426AxZ70fUtKJfbsncvsR8Y7QXCDl6o25g9jKc=";
+    rev = "e3c0e75dfda64878bd0c102cfcad36b2260b146a";
+    sha256 = "ONMc76x+mNCZGod1RIZB3c+LHvWhXRx6Z4ygmF+69T0=";
+  };
+  gnumake-jobclient-py = fetchFromGitHub {
+    # https://github.com/milahu/gnumake-jobclient-py
+    # nix-prefetch-github milahu gnumake-jobclient-py
+    owner = "milahu";
+    repo = "gnumake-jobclient-py";
+    rev = "8e0cf6e6f0825f809bab58ac328ba293722d4e54";
+    sha256 = "ENiHFghyYTSEFyA2DcPuJp5bJJCnRy4xwe6brNrtfCI=";
   };
 in
 
@@ -133,7 +142,6 @@ qtModule rec {
     ./patches/qtwebengine/0007-debug-chromium-node.py.patch
     ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
     ./patches/qtwebengine/0009-debug-node-py-print-live-output.patch # depends on 8
-
   ];
 
   DEBUG_JEST_WORKER = "1";
@@ -155,6 +163,11 @@ qtModule rec {
       mkdir @milahu
       cp -r ${gnumake-jobclient-js} @milahu/gnumake-jobclient
       chmod -R +w @milahu/gnumake-jobclient
+    )
+    (
+      cd src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/gnumake_jobclient.py b/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen
+      cp ${gnumake-jobclient-py}/gnumake_jobclient/jobclient.py gnumake_jobclient.py
+      chmod +w gnumake_jobclient.py
     )
 
     # Patch Chromium build tools
