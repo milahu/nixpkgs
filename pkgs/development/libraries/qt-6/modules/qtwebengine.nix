@@ -165,7 +165,7 @@ qtModule rec {
       chmod -R +w @milahu/gnumake-jobclient
     )
     (
-      cd src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/gnumake_jobclient.py b/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen
+      cd src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen
       cp ${gnumake-jobclient-py}/gnumake_jobclient/jobclient.py gnumake_jobclient.py
       chmod +w gnumake_jobclient.py
     )
