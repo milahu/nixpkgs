@@ -1,14 +1,14 @@
-From ac8039c7f4720353c055c469bed7eddcb79318d1 Mon Sep 17 00:00:00 2001
+From aa77766e5a1ee08c184679d12d22bab98d06bbc1 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Wed, 29 Jun 2022 09:56:41 +0200
 Subject: [PATCH] debug node.py: print live output
 
 ---
- .../chromium/third_party/node/node.py         | 49 +++++++++++++------
- 1 file changed, 35 insertions(+), 14 deletions(-)
+ .../chromium/third_party/node/node.py         | 53 +++++++++++++------
+ 1 file changed, 38 insertions(+), 15 deletions(-)
 
 diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
-index 4a2315d43..3f29cd0e9 100755
+index 4a2315d43..32714026a 100755
 --- a/src/3rdparty/chromium/third_party/node/node.py
 +++ b/src/3rdparty/chromium/third_party/node/node.py
 @@ -9,6 +9,7 @@ import subprocess
@@ -19,20 +19,21 @@ index 4a2315d43..3f29cd0e9 100755
  
  def which(cmd):
      pathenv = os.getenv('PATH')
-@@ -44,22 +45,42 @@ def GetBinaryPath():
+@@ -44,22 +45,44 @@ def GetBinaryPath():
    }[platform.system()])
  
  
 -def RunNode(cmd_parts, stdout=None):
-+def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never used?
-   cmd = [GetBinaryPath()] + cmd_parts
+-  cmd = [GetBinaryPath()] + cmd_parts
 -  process = subprocess.Popen(
 -      cmd, cwd=os.getcwd(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
 -      close_fds=False, # inherit fds of parent process for gnumake jobclient
 -      universal_newlines=True)
 -  stdout, _stderr = process.communicate()
 -
-+  #cmd = ['node'] + cmd_parts # debug
++def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never used?
++  #cmd = [GetBinaryPath()] + cmd_parts
++  cmd = ['node'] + cmd_parts # debug
 +  is_debug = bool(os.environ.get('DEBUG_CHROMIUM_NODE_PY'))
 +  options = {
 +    'cwd': os.getcwd(),
@@ -48,12 +49,14 @@ index 4a2315d43..3f29cd0e9 100755
 +    # note: we need live output to debug deadloops
 +    output = io.BytesIO()
 +    line_prefix = b'node.py[%i]: ' % (os.getpid(),)
-+    line = b'Running command: %s' % (shlex.join(cmd).encode('utf8'),)
++    line = b'Running command: %s\n' % (shlex.join(cmd).encode('utf8'),)
 +    sys.stdout.buffer.write(line_prefix + line)
++    line_prefix = b'node.py[%i]:   ' % (os.getpid(),)
 +    for line in iter(process.stdout.readline, b''):
 +      sys.stdout.buffer.write(line_prefix + line)
 +      output.write(line)
 +    output = output.getvalue()
++    process.wait() # set process.returncode
 +  else: # capture output
 +    output, _stderr = process.communicate()
 +  try:
@@ -67,9 +70,9 @@ index 4a2315d43..3f29cd0e9 100755
 -    print('Command succeeded: %s\n%s' % (shlex.join(cmd), stdout))
 -
 -  return stdout
-+    raise RuntimeError('Command failed: %s\n%s' % (shlex.join(cmd), output))
++    raise RuntimeError('Command failed with status %i: %s\n%s' % (process.returncode, shlex.join(cmd), output))
 +  if is_debug:
-+    print('Command succeeded: %s' % (shlex.join(cmd)))
++    print(f'node.py[{os.getpid()}]: Command succeeded: {shlex.join(cmd)}')
 +  return output
  
  if __name__ == '__main__':
