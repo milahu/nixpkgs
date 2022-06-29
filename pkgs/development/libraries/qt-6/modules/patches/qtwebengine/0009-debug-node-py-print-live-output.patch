@@ -1,4 +1,4 @@
-From a7ac37a9344ea1735aedc185347786d5b1f8e6b6 Mon Sep 17 00:00:00 2001
+From ac8039c7f4720353c055c469bed7eddcb79318d1 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Wed, 29 Jun 2022 09:56:41 +0200
 Subject: [PATCH] debug node.py: print live output
@@ -8,7 +8,7 @@ Subject: [PATCH] debug node.py: print live output
  1 file changed, 35 insertions(+), 14 deletions(-)
 
 diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
-index 4a2315d43..1e883e0fa 100755
+index 4a2315d43..3f29cd0e9 100755
 --- a/src/3rdparty/chromium/third_party/node/node.py
 +++ b/src/3rdparty/chromium/third_party/node/node.py
 @@ -9,6 +9,7 @@ import subprocess
@@ -48,7 +48,7 @@ index 4a2315d43..1e883e0fa 100755
 +    # note: we need live output to debug deadloops
 +    output = io.BytesIO()
 +    line_prefix = b'node.py[%i]: ' % (os.getpid(),)
-+    line = b'Running command: %s' % (shlex.join(cmd),)
++    line = b'Running command: %s' % (shlex.join(cmd).encode('utf8'),)
 +    sys.stdout.buffer.write(line_prefix + line)
 +    for line in iter(process.stdout.readline, b''):
 +      sys.stdout.buffer.write(line_prefix + line)
