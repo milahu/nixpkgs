@@ -1,21 +1,21 @@
-From 2d2aaef49429b02a0142ce5c47414bb692aa2172 Mon Sep 17 00:00:00 2001
+From cc4fa8f18fd5d1ebcbfd8b1c1b7687c32d433b46 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Wed, 29 Jun 2022 16:07:05 +0200
-Subject: [PATCH] mojom_parser.py: limit jobs with jobclient
+Subject: [PATCH 1/2] mojom_parser.py: limit jobs with jobclient
 
 ---
  .../mojo/public/tools/mojom/mojom_parser.py   | 49 +++++++++++++++++++
  1 file changed, 49 insertions(+)
 
 diff --git a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
-index 74beb077d..5164fa1ba 100755
+index 74beb077d..fac5d7caf 100755
 --- a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
 +++ b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
 @@ -220,6 +220,36 @@ class _FuncWrapper:
        return _ExceptionWrapper()
  
  
-+from . import gnumake_jobclient
++import gnumake_jobclient
 +
 +def _grow_pool(pool, new_size, jobclient, worker_tokens):
 +  delta = new_size - self._pool._processes
