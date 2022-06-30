@@ -148,6 +148,7 @@ qtModule rec {
 
     # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
     ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
+    ./patches/qtwebengine/0018-gn-debug-token-release.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
