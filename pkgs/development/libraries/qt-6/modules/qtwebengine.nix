@@ -149,6 +149,7 @@ qtModule rec {
     ./patches/qtwebengine/0011-mojom_parser.py-limit-jobs-with-jobclient.patch
     # FIXME mojom_parser hangs, cpu load is 1 of 32
     ./patches/qtwebengine/0013-mojom_parser.py-debug-to-stderr.patch
+    ./patches/qtwebengine/0014-mojom_parser.py-add-debug-prints.patch
 
     # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
     ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
@@ -157,7 +158,9 @@ qtModule rec {
   DEBUG_JEST_WORKER = "1";
   DEBUG_JOBCLIENT = "1";
   DEBUG_CHROMIUM_NODE_PY = "1";
-  ninjaFlags = "-v -d explain";
+
+  # FIXME ninjaFlags are not inherited to child ninjas, for example via MAKEFLAGS
+  #ninjaFlags = "-v -d explain";
 
   postPatch = ''
     # Limit jobs in build of devtools-frontend
