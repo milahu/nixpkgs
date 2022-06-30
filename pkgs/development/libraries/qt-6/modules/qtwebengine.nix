@@ -103,6 +103,14 @@ let
     rev = "8e0cf6e6f0825f809bab58ac328ba293722d4e54";
     sha256 = "ENiHFghyYTSEFyA2DcPuJp5bJJCnRy4xwe6brNrtfCI=";
   };
+  gn-with-jobclient = fetchFromGitHub {
+    # https://github.com/milahu/gn/tree/add-gnumake-jobclient
+    # nix-prefetch-github milahu gn
+    owner = "milahu";
+    repo = "gn";
+    rev = "6862a994729cb574d8c8c80335f2bf7e2c115343";
+    sha256 = "SIbNJacX9+XklSGsZoqI7FRbeLDk3gyL42WaBD2GQmA=";
+  };
 in
 
 qtModule rec {
@@ -180,6 +188,14 @@ qtModule rec {
         chmod +w gnumake_jobclient.py
       )
     done
+
+    # Limit jobs in gn
+    (
+      cd src/3rdparty
+      rm -rf gn
+      cp -r ${gn-with-jobclient} gn
+      chmod -R +w gn
+    )
 
     # Patch Chromium build tools
     (
