@@ -307,6 +307,10 @@ qtModule rec {
 
   buildInputs = [
     cups
+
+    # needed for postPatch
+    jest-worker
+    gnumake-tokenpool
   ];
 
   requiredSystemFeatures = [ "big-parallel" ];
