@@ -1,6 +1,6 @@
-From b4b3d46aaf29379a87b348f946b93e10a91ee298 Mon Sep 17 00:00:00 2001
+From a492570b0d2297fe6ea83291bd7f6e2cb4f7480d Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
-Date: Thu, 30 Jun 2022 14:53:48 +0200
+Date: Thu, 30 Jun 2022 15:05:48 +0200
 Subject: [PATCH] src/3rdparty/gn: add gnumake jobclient
 
 ---
@@ -12,8 +12,8 @@ Subject: [PATCH] src/3rdparty/gn: add gnumake jobclient
  src/3rdparty/gn/src/util/tokenpool-gnu-make.h |  48 +
  src/3rdparty/gn/src/util/tokenpool.h          |  50 +
  src/3rdparty/gn/src/util/worker_pool.cc       |  46 +
- src/3rdparty/gn/src/util/worker_pool.h        |   8 +
- 9 files changed, 1691 insertions(+)
+ src/3rdparty/gn/src/util/worker_pool.h        |   5 +
+ 9 files changed, 1688 insertions(+)
  create mode 100755 src/3rdparty/gn/build/gen.py.orig
  create mode 100644 src/3rdparty/gn/src/util/tokenpool-gnu-make-posix.cc
  create mode 100644 src/3rdparty/gn/src/util/tokenpool-gnu-make-win32.cc
@@ -1773,7 +1773,7 @@ index 9f6a47b38..dfd2210ea 100644
  
  void WorkerPool::PostTask(std::function<void()> work) {
 diff --git a/src/3rdparty/gn/src/util/worker_pool.h b/src/3rdparty/gn/src/util/worker_pool.h
-index 7284ebe72..bc2aae542 100644
+index 7284ebe72..fb31ca850 100644
 --- a/src/3rdparty/gn/src/util/worker_pool.h
 +++ b/src/3rdparty/gn/src/util/worker_pool.h
 @@ -14,6 +14,8 @@
@@ -1785,19 +1785,16 @@ index 7284ebe72..bc2aae542 100644
  class WorkerPool {
   public:
    WorkerPool();
-@@ -32,6 +34,12 @@ class WorkerPool {
+@@ -31,6 +33,9 @@ class WorkerPool {
+   std::condition_variable_any pool_notifier_;
    bool should_stop_processing_;
  
-   DISALLOW_COPY_AND_ASSIGN(WorkerPool);
-+
 +  TokenPool* tokenpool_;
 +  std::vector<int> tokens_;
 +
-+  WorkerPool(const WorkerPool&) = delete;
-+  WorkerPool& operator=(const WorkerPool&) = delete;
+   DISALLOW_COPY_AND_ASSIGN(WorkerPool);
  };
  
- #endif  // UTIL_WORKER_POOL_H_
 -- 
 2.36.1
 
