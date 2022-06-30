@@ -92,8 +92,8 @@ let
     # nix-prefetch-github milahu gnumake-tokenpool
     owner = "milahu";
     repo = "gnumake-tokenpool";
-    rev = "1e726c1fbf15e1d744c144be9cdb1a9f3930a52b";
-    sha256 = "8cJ99EPA4fkNazoJbYfW1tQZJlF7f4Ki+ylaWLPeAmM=";
+    rev = "c85ddf72c69ccea41f840e5fcfa58ee6719aa038";
+    sha256 = "/sAKfMWhjqSJoGDYBS0ixrQtKjfrRp8YauOhCR/jo+o=";
   };
 in
 
