@@ -1,0 +1,1803 @@
+From b4b3d46aaf29379a87b348f946b93e10a91ee298 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Thu, 30 Jun 2022 14:53:48 +0200
+Subject: [PATCH] src/3rdparty/gn: add gnumake jobclient
+
+---
+ src/3rdparty/gn/build/gen.py                  |   6 +
+ src/3rdparty/gn/build/gen.py.orig             | 871 ++++++++++++++++++
+ .../gn/src/util/tokenpool-gnu-make-posix.cc   | 239 +++++
+ .../gn/src/util/tokenpool-gnu-make-win32.cc   | 263 ++++++
+ .../gn/src/util/tokenpool-gnu-make.cc         | 160 ++++
+ src/3rdparty/gn/src/util/tokenpool-gnu-make.h |  48 +
+ src/3rdparty/gn/src/util/tokenpool.h          |  50 +
+ src/3rdparty/gn/src/util/worker_pool.cc       |  46 +
+ src/3rdparty/gn/src/util/worker_pool.h        |   8 +
+ 9 files changed, 1691 insertions(+)
+ create mode 100755 src/3rdparty/gn/build/gen.py.orig
+ create mode 100644 src/3rdparty/gn/src/util/tokenpool-gnu-make-posix.cc
+ create mode 100644 src/3rdparty/gn/src/util/tokenpool-gnu-make-win32.cc
+ create mode 100644 src/3rdparty/gn/src/util/tokenpool-gnu-make.cc
+ create mode 100644 src/3rdparty/gn/src/util/tokenpool-gnu-make.h
+ create mode 100644 src/3rdparty/gn/src/util/tokenpool.h
+
+diff --git a/src/3rdparty/gn/build/gen.py b/src/3rdparty/gn/build/gen.py
+index 15a177a25..7befe8d57 100755
+--- a/src/3rdparty/gn/build/gen.py
++++ b/src/3rdparty/gn/build/gen.py
+@@ -687,9 +687,15 @@ def WriteGNNinja(path, platform, host, options):
+         'src/util/sys_info.cc',
+         'src/util/ticks.cc',
+         'src/util/worker_pool.cc',
++        'src/util/tokenpool-gnu-make.cc',
+       ]},
+   }
+ 
++  if platform.is_windows():
++    static_libraries['gn_lib']['sources'].append('src/util/tokenpool-gnu-make-win32.cc')
++  else:
++    static_libraries['gn_lib']['sources'].append('src/util/tokenpool-gnu-make-posix.cc')
++
+   executables = {
+       'gn': {'sources': [ 'src/gn/gn_main.cc' ], 'libs': []},
+ 
+diff --git a/src/3rdparty/gn/build/gen.py.orig b/src/3rdparty/gn/build/gen.py.orig
+new file mode 100755
+index 000000000..15a177a25
+--- /dev/null
++++ b/src/3rdparty/gn/build/gen.py.orig
+@@ -0,0 +1,871 @@
++#!/usr/bin/env python
++# Copyright 2014 The Chromium Authors. All rights reserved.
++# Use of this source code is governed by a BSD-style license that can be
++# found in the LICENSE file.
++
++"""Generates build.ninja that will build GN."""
++
++import contextlib
++import errno
++import optparse
++import os
++import platform
++import re
++import subprocess
++import sys
++import tempfile
++
++try:  # py3
++    from shlex import quote as shell_quote
++except ImportError:  # py2
++    from pipes import quote as shell_quote
++
++SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
++REPO_ROOT = os.path.dirname(SCRIPT_DIR)
++
++
++class Platform(object):
++  """Represents a host/target platform."""
++  def __init__(self, platform):
++    self._platform = platform
++    if self._platform is not None:
++      return
++    self._platform = sys.platform
++    if self._platform.startswith('linux'):
++      self._platform = 'linux'
++    elif self._platform.startswith('darwin'):
++      self._platform = 'darwin'
++    elif self._platform.startswith('mingw'):
++      self._platform = 'mingw'
++    elif self._platform.startswith('msys'):
++      self._platform = 'msys'
++    elif self._platform.startswith('win'):
++      self._platform = 'msvc'
++    elif self._platform.startswith('aix'):
++      self._platform = 'aix'
++    elif self._platform.startswith('fuchsia'):
++      self._platform = 'fuchsia'
++    elif self._platform.startswith('freebsd'):
++      self._platform = 'freebsd'
++    elif self._platform.startswith('netbsd'):
++      self._platform = 'netbsd'
++    elif self._platform.startswith('openbsd'):
++      self._platform = 'openbsd'
++    elif self._platform.startswith('haiku'):
++      self._platform = 'haiku'
++    elif self._platform.startswith('sunos'):
++      self._platform = 'solaris'
++
++  @staticmethod
++  def known_platforms():
++    return ['linux', 'darwin', 'mingw', 'msys', 'msvc', 'aix', 'fuchsia', 'freebsd', 'netbsd', 'openbsd', 'haiku', 'solaris']
++
++  def platform(self):
++    return self._platform
++
++  def is_linux(self):
++    return self._platform == 'linux'
++
++  def is_mingw(self):
++    return self._platform == 'mingw'
++
++  def is_msys(self):
++    return self._platform == 'msys'
++
++  def is_msvc(self):
++    return self._platform == 'msvc'
++
++  def is_windows(self):
++    return self.is_mingw() or self.is_msvc()
++
++  def is_darwin(self):
++    return self._platform == 'darwin'
++
++  def is_aix(self):
++    return self._platform == 'aix'
++
++  def is_haiku(self):
++    return self._platform == 'haiku'
++
++  def is_solaris(self):
++    return self._platform == 'solaris'
++
++  def is_posix(self):
++    return self._platform in ['linux', 'freebsd', 'darwin', 'aix', 'openbsd', 'haiku', 'solaris', 'msys', 'netbsd']
++
++
++def main(argv):
++  parser = optparse.OptionParser(description=sys.modules[__name__].__doc__)
++  parser.add_option('-d', '--debug', action='store_true',
++                    help='Do a debug build. Defaults to release build.')
++  parser.add_option('--platform',
++                    help='target platform (' +
++                         '/'.join(Platform.known_platforms()) + ')',
++                    choices=Platform.known_platforms())
++  parser.add_option('--host',
++                    help='host platform (' +
++                         '/'.join(Platform.known_platforms()) + ')',
++                    choices=Platform.known_platforms())
++  parser.add_option('--use-lto', action='store_true',
++                    help='Enable the use of LTO')
++  parser.add_option('--use-icf', action='store_true',
++                    help='Enable the use of Identical Code Folding')
++  parser.add_option('--no-last-commit-position', action='store_true',
++                    help='Do not generate last_commit_position.h.')
++  parser.add_option('--out-path',
++                    help='The path to generate the build files in.')
++  parser.add_option('--no-strip', action='store_true',
++                    help='Don\'t strip release build. Useful for profiling.')
++  parser.add_option('--no-static-libstdc++', action='store_true',
++                    default=False, dest='no_static_libstdcpp',
++                    help='Don\'t link libstdc++ statically')
++  parser.add_option('--link-lib',
++                    action='append',
++                    metavar='LINK_LIB',
++                    default=[],
++                    dest='link_libs',
++                    help=('Add a library to the final executable link. ' +
++                          'LINK_LIB must be the path to a static or shared ' +
++                          'library, or \'-l<name>\' on POSIX systems. Can be ' +
++                          'used multiple times. Useful to link custom malloc ' +
++                          'or cpu profiling libraries.'))
++  parser.add_option('--cc',
++                    help='The path to cc compiler.')
++  parser.add_option('--cxx',
++                    help='The path to cxx compiler.')
++  parser.add_option('--ld',
++                    help='The path to ld.')
++  parser.add_option('--ar',
++                    help='The path to ar.')
++  parser.add_option('--isysroot',
++                    help='The path to the macOS SDK sysroot to be used.')
++  parser.add_option('--qt-version',
++                    help="The qt version gn is compiled for.")
++  options, args = parser.parse_args(argv)
++
++  if args:
++    parser.error('Unrecognized command line arguments: %s.' % ', '.join(args))
++
++  platform = Platform(options.platform)
++  if options.host:
++    host = Platform(options.host)
++  else:
++    host = platform
++
++  out_dir = options.out_path or os.path.join(REPO_ROOT, 'out')
++  if not os.path.isdir(out_dir):
++    os.makedirs(out_dir)
++  if not options.no_last_commit_position:
++    GenerateLastCommitPosition(host,
++                               os.path.join(out_dir, 'last_commit_position.h'))
++  if options.qt_version:
++      generate_qt_version_header(options.qt_version, os.path.join(out_dir, 'qt_version.h'))
++
++  WriteGNNinja(os.path.join(out_dir, 'build.ninja'), platform, host, options)
++  return 0
++
++
++def GenerateLastCommitPosition(host, header):
++  ROOT_TAG = 'initial-commit'
++  describe_output = subprocess.check_output(
++      ['git', 'describe', 'HEAD', '--match', ROOT_TAG], shell=host.is_windows(),
++      cwd=REPO_ROOT)
++  mo = re.match(ROOT_TAG + '-(\d+)-g([0-9a-f]+)', describe_output.decode())
++  if not mo:
++    raise ValueError(
++        'Unexpected output from git describe when generating version header')
++
++  contents = '''// Generated by build/gen.py.
++
++#ifndef OUT_LAST_COMMIT_POSITION_H_
++#define OUT_LAST_COMMIT_POSITION_H_
++
++#define LAST_COMMIT_POSITION_NUM %s
++#define LAST_COMMIT_POSITION "%s (%s)"
++
++#endif  // OUT_LAST_COMMIT_POSITION_H_
++''' % (mo.group(1), mo.group(1), mo.group(2))
++
++  # Only write/touch this file if the commit position has changed.
++  old_contents = ''
++  if os.path.isfile(header):
++    with open(header, 'r') as f:
++      old_contents = f.read()
++
++  if old_contents != contents:
++    with open(header, 'w') as f:
++      f.write(contents)
++
++
++def WriteGenericNinja(path, static_libraries, executables,
++                      cxx, ar, ld, platform, host, options,
++                      cflags=[], ldflags=[], libflags=[],
++                      include_dirs=[], solibs=[]):
++  args = ' -d' if options.debug else ''
++  for link_lib in options.link_libs:
++    args +=  ' --link-lib=' + shell_quote(link_lib)
++
++  ninja_header_lines = [
++    'cxx = ' + cxx,
++    'ar = ' + ar,
++    'ld = ' + ld,
++    '',
++    'rule regen',
++    '  command = %s ../build/gen.py%s' % (sys.executable, args),
++    '  description = Regenerating ninja files',
++    '',
++    'build build.ninja: regen',
++    '  generator = 1',
++    '  depfile = build.ninja.d',
++    '',
++  ]
++
++
++  template_filename = os.path.join(SCRIPT_DIR, {
++      'msvc': 'build_win.ninja.template',
++      'mingw': 'build_linux.ninja.template',
++      'msys': 'build_linux.ninja.template',
++      'darwin': 'build_mac.ninja.template',
++      'linux': 'build_linux.ninja.template',
++      'freebsd': 'build_linux.ninja.template',
++      'aix': 'build_aix.ninja.template',
++      'openbsd': 'build_openbsd.ninja.template',
++      'haiku': 'build_haiku.ninja.template',
++      'solaris': 'build_linux.ninja.template',
++      'netbsd': 'build_linux.ninja.template',
++  }[platform.platform()])
++
++  with open(template_filename) as f:
++    ninja_template = f.read()
++
++  if platform.is_windows():
++    executable_ext = '.exe'
++    library_ext = '.lib'
++    object_ext = '.obj'
++  else:
++    executable_ext = ''
++    library_ext = '.a'
++    object_ext = '.o'
++
++  def escape_path_ninja(path):
++      return path.replace('$ ', '$$ ').replace(' ', '$ ').replace(':', '$:')
++
++  def src_to_obj(path):
++    return escape_path_ninja('%s' % os.path.splitext(path)[0] + object_ext)
++
++  def library_to_a(library):
++    return '%s%s' % (library, library_ext)
++
++  ninja_lines = []
++  def build_source(src_file, settings):
++    ninja_lines.extend([
++        'build %s: cxx %s' % (src_to_obj(src_file),
++                              escape_path_ninja(
++                                  os.path.relpath(
++                                      os.path.join(REPO_ROOT, src_file),
++                                      os.path.dirname(path)))),
++        '  includes = %s' % ' '.join(
++            ['-I' + escape_path_ninja(dirname) for dirname in include_dirs]),
++        '  cflags = %s' % ' '.join(cflags),
++    ])
++
++  for library, settings in static_libraries.items():
++    for src_file in settings['sources']:
++      build_source(src_file, settings)
++
++    ninja_lines.append('build %s: alink_thin %s' % (
++        library_to_a(library),
++        ' '.join([src_to_obj(src_file) for src_file in settings['sources']])))
++    ninja_lines.append('  libflags = %s' % ' '.join(libflags))
++
++
++  for executable, settings in executables.items():
++    for src_file in settings['sources']:
++      build_source(src_file, settings)
++
++    ninja_lines.extend([
++      'build %s%s: link %s | %s' % (
++          executable, executable_ext,
++          ' '.join([src_to_obj(src_file) for src_file in settings['sources']]),
++          ' '.join([library_to_a(library) for library in settings['libs']])),
++      '  ldflags = %s' % ' '.join(ldflags),
++      '  solibs = %s' % ' '.join(solibs),
++      '  libs = %s' % ' '.join(
++          [library_to_a(library) for library in settings['libs']]),
++    ])
++
++  ninja_lines.append('')  # Make sure the file ends with a newline.
++
++  with open(path, 'w') as f:
++    f.write('\n'.join(ninja_header_lines))
++    f.write(ninja_template)
++    f.write('\n'.join(ninja_lines))
++
++  with open(path + '.d', 'w') as f:
++    f.write('build.ninja: ' +
++            os.path.relpath(os.path.join(SCRIPT_DIR, 'gen.py'),
++                            os.path.dirname(path)) + ' ' +
++            os.path.relpath(template_filename, os.path.dirname(path)) + '\n')
++
++
++def WriteGNNinja(path, platform, host, options):
++  # QTBUG-64759
++  # if platform.is_msvc():
++  #  cxx = os.environ.get('CXX', 'cl.exe')
++  #  ld = os.environ.get('LD', 'link.exe')
++  #  ar = os.environ.get('AR', 'lib.exe')
++  #elif platform.is_aix():
++  #  cxx = os.environ.get('CXX', 'g++')
++  #  ld = os.environ.get('LD', 'g++')
++  #  ar = os.environ.get('AR', 'ar -X64')
++  #elif platform.is_msys() or platform.is_mingw():
++  #  cxx = os.environ.get('CXX', 'g++')
++  #  ld = os.environ.get('LD', 'g++')
++  #  ar = os.environ.get('AR', 'ar')
++  #else:
++  #  cxx = os.environ.get('CXX', 'c++')
++  #  ld = cxx
++  #  ar = os.environ.get('AR', 'ar')
++
++  # cflags = os.environ.get('CFLAGS', '').split()
++  # cflags += os.environ.get('CXXFLAGS', '').split()
++  # ldflags = os.environ.get('LDFLAGS', '').split()
++  # libflags = os.environ.get('LIBFLAGS', '').split()
++
++  cflags = []
++  cflags_cc = []
++  ldflags = []
++  libflags = []
++
++  cc = options.cc
++  cxx = options.cxx
++  ld = options.ld
++  ar = options.ar
++
++  if not ar:
++     if platform.is_msvc():
++        ar = os.environ.get('AR', 'lib.exe')
++     else:
++        ar = os.environ.get('AR', 'ar')
++
++  include_dirs = [
++      os.path.relpath(os.path.join(REPO_ROOT, 'src'), os.path.dirname(path)),
++      '.',
++  ]
++  libs = []
++
++  if not platform.is_msvc():
++    if options.debug:
++      cflags.extend(['-O0', '-g'])
++    else:
++      cflags.append('-DNDEBUG')
++      cflags.append('-O3')
++      if options.no_strip:
++        cflags.append('-g')
++      ldflags.append('-O3')
++      if platform.is_darwin() and options.isysroot:
++        cflags.append('-isysroot ' +  options.isysroot)
++        ldflags.append('-isysroot ' +  options.isysroot)
++
++      # Use -fdata-sections and -ffunction-sections to place each function
++      # or data item into its own section so --gc-sections can eliminate any
++      # unused functions and data items.
++      cflags.extend(['-fdata-sections', '-ffunction-sections'])
++      ldflags.extend(['-fdata-sections', '-ffunction-sections'])
++      if platform.is_darwin():
++        ldflags.append('-Wl,-dead_strip')
++      elif not platform.is_aix() and not platform.is_solaris():
++        # Garbage collection is done by default on aix.
++        ldflags.append('-Wl,--gc-sections')
++
++      # Omit all symbol information from the output file.
++      if options.no_strip is None:
++        if platform.is_darwin():
++          ldflags.append('-Wl,-S')
++        elif platform.is_aix():
++          ldflags.append('-Wl,-s')
++        elif platform.is_solaris():
++          ldflags.append('-Wl,--strip-all')
++        else:
++          ldflags.append('-Wl,-strip-all')
++
++      # Enable identical code-folding.
++      if options.use_icf and not platform.is_darwin():
++        ldflags.append('-Wl,--icf=all')
++
++      if options.use_lto:
++        cflags.extend(['-flto', '-fwhole-program-vtables'])
++        ldflags.extend(['-flto', '-fwhole-program-vtables'])
++
++    cflags.extend([
++        '-D_FILE_OFFSET_BITS=64',
++        '-D__STDC_CONSTANT_MACROS', '-D__STDC_FORMAT_MACROS',
++        '-pthread',
++        '-pipe',
++        '-fno-exceptions',
++        '-fno-rtti',
++        '-fdiagnostics-color',
++        '-Wall',
++        '-Wextra',
++        '-Wno-unused-parameter',
++        '-std=c++17'
++    ])
++
++    if platform.is_linux() or platform.is_mingw() or platform.is_msys():
++      ldflags.append('-Wl,--as-needed')
++
++      if not options.no_static_libstdcpp:
++        ldflags.append('-static-libstdc++')
++
++      cflags.remove('-std=c++17')
++      cflags.extend([
++        '-Wno-deprecated-copy',
++        '-Wno-implicit-fallthrough',
++        '-Wno-redundant-move',
++        '-Wno-unused-variable',
++        '-Wno-format',             # Use of %llx, which is supported by _UCRT, false positive
++        '-Wno-strict-aliasing',    # Dereferencing punned pointer
++        '-Wno-cast-function-type', # Casting FARPROC to RegDeleteKeyExPtr
++        '-std=gnu++17',
++      ])
++    elif platform.is_darwin():
++      min_mac_version_flag = '-mmacosx-version-min=10.9'
++      cflags.append(min_mac_version_flag)
++      ldflags.append(min_mac_version_flag)
++    elif platform.is_aix():
++      cflags.append('-maix64')
++      ldflags.append('-maix64')
++    elif platform.is_haiku():
++      cflags.append('-fPIC')
++      cflags.extend(['-D_BSD_SOURCE'])
++
++    if platform.is_posix() and not platform.is_haiku():
++      ldflags.append('-pthread')
++
++    if platform.is_mingw() or platform.is_msys():
++      cflags.extend(['-DUNICODE',
++                     '-DNOMINMAX',
++                     '-DWIN32_LEAN_AND_MEAN',
++                     '-DWINVER=0x0A00',
++                     '-D_CRT_SECURE_NO_DEPRECATE',
++                     '-D_SCL_SECURE_NO_DEPRECATE',
++                     '-D_UNICODE',
++                     '-D_WIN32_WINNT=0x0A00',
++                     '-D_HAS_EXCEPTIONS=0'
++      ])
++  elif platform.is_msvc():
++    if not options.debug:
++      cflags.extend(['/O2', '/DNDEBUG', '/Zc:inline'])
++      ldflags.extend(['/OPT:REF'])
++
++      if options.use_icf:
++        libflags.extend(['/OPT:ICF'])
++      if options.use_lto:
++        cflags.extend(['/GL'])
++        libflags.extend(['/LTCG'])
++        ldflags.extend(['/LTCG'])
++
++    cflags.extend([
++        '/DNOMINMAX',
++        '/DUNICODE',
++        '/DWIN32_LEAN_AND_MEAN',
++        '/DWINVER=0x0A00',
++        '/D_CRT_SECURE_NO_DEPRECATE',
++        '/D_SCL_SECURE_NO_DEPRECATE',
++        '/D_UNICODE',
++        '/D_WIN32_WINNT=0x0A00',
++        '/FS',
++        '/W4',
++        '/Zi',
++        '/wd4099',
++        '/wd4100',
++        '/wd4127',
++        '/wd4244',
++        '/wd4267',
++        '/wd4505',
++        '/wd4577',
++        '/wd4838',
++        '/wd4996',
++        '/std:c++17',
++        '/GR-',
++        '/D_HAS_EXCEPTIONS=0',
++    ])
++
++    target_arch = windows_target_build_arch()
++    if target_arch == 'x64':
++        ldflags.extend(['/MACHINE:x64'])
++    else:
++        ldflags.extend(['/MACHINE:x86'])
++
++  static_libraries = {
++      'base': {'sources': [
++        'src/base/command_line.cc',
++        'src/base/environment.cc',
++        'src/base/files/file.cc',
++        'src/base/files/file_enumerator.cc',
++        'src/base/files/file_path.cc',
++        'src/base/files/file_path_constants.cc',
++        'src/base/files/file_util.cc',
++        'src/base/files/scoped_file.cc',
++        'src/base/files/scoped_temp_dir.cc',
++        'src/base/json/json_parser.cc',
++        'src/base/json/json_reader.cc',
++        'src/base/json/json_writer.cc',
++        'src/base/json/string_escape.cc',
++        'src/base/logging.cc',
++        'src/base/md5.cc',
++        'src/base/memory/ref_counted.cc',
++        'src/base/memory/weak_ptr.cc',
++        'src/base/sha1.cc',
++        'src/base/strings/string_number_conversions.cc',
++        'src/base/strings/string_split.cc',
++        'src/base/strings/string_util.cc',
++        'src/base/strings/string_util_constants.cc',
++        'src/base/strings/stringprintf.cc',
++        'src/base/strings/utf_string_conversion_utils.cc',
++        'src/base/strings/utf_string_conversions.cc',
++        'src/base/third_party/icu/icu_utf.cc',
++        'src/base/timer/elapsed_timer.cc',
++        'src/base/value_iterators.cc',
++        'src/base/values.cc',
++      ]},
++      'gn_lib': {'sources': [
++        'src/gn/action_target_generator.cc',
++        'src/gn/action_values.cc',
++        'src/gn/analyzer.cc',
++        'src/gn/args.cc',
++        'src/gn/binary_target_generator.cc',
++        'src/gn/build_settings.cc',
++        'src/gn/builder.cc',
++        'src/gn/builder_record.cc',
++        'src/gn/bundle_data.cc',
++        'src/gn/bundle_data_target_generator.cc',
++        'src/gn/bundle_file_rule.cc',
++        'src/gn/c_include_iterator.cc',
++        'src/gn/c_substitution_type.cc',
++        'src/gn/c_tool.cc',
++        'src/gn/command_analyze.cc',
++        'src/gn/command_args.cc',
++        'src/gn/command_check.cc',
++        'src/gn/command_clean.cc',
++        'src/gn/command_clean_stale.cc',
++        'src/gn/command_desc.cc',
++        'src/gn/command_format.cc',
++        'src/gn/command_gen.cc',
++        'src/gn/command_help.cc',
++        'src/gn/command_ls.cc',
++        'src/gn/command_meta.cc',
++        'src/gn/command_outputs.cc',
++        'src/gn/command_path.cc',
++        'src/gn/command_refs.cc',
++        'src/gn/commands.cc',
++        'src/gn/compile_commands_writer.cc',
++        'src/gn/rust_project_writer.cc',
++        'src/gn/config.cc',
++        'src/gn/config_values.cc',
++        'src/gn/config_values_extractors.cc',
++        'src/gn/config_values_generator.cc',
++        'src/gn/copy_target_generator.cc',
++        'src/gn/create_bundle_target_generator.cc',
++        'src/gn/deps_iterator.cc',
++        'src/gn/desc_builder.cc',
++        'src/gn/eclipse_writer.cc',
++        'src/gn/err.cc',
++        'src/gn/escape.cc',
++        'src/gn/exec_process.cc',
++        'src/gn/filesystem_utils.cc',
++        'src/gn/file_writer.cc',
++        'src/gn/frameworks_utils.cc',
++        'src/gn/function_exec_script.cc',
++        'src/gn/function_filter.cc',
++        'src/gn/function_foreach.cc',
++        'src/gn/function_forward_variables_from.cc',
++        'src/gn/function_get_label_info.cc',
++        'src/gn/function_get_path_info.cc',
++        'src/gn/function_get_target_outputs.cc',
++        'src/gn/function_process_file_template.cc',
++        'src/gn/function_read_file.cc',
++        'src/gn/function_rebase_path.cc',
++        'src/gn/function_set_default_toolchain.cc',
++        'src/gn/function_set_defaults.cc',
++        'src/gn/function_template.cc',
++        'src/gn/function_toolchain.cc',
++        'src/gn/function_write_file.cc',
++        'src/gn/functions.cc',
++        'src/gn/functions_target.cc',
++        'src/gn/general_tool.cc',
++        'src/gn/generated_file_target_generator.cc',
++        'src/gn/group_target_generator.cc',
++        'src/gn/header_checker.cc',
++        'src/gn/import_manager.cc',
++        'src/gn/inherited_libraries.cc',
++        'src/gn/input_conversion.cc',
++        'src/gn/input_file.cc',
++        'src/gn/input_file_manager.cc',
++        'src/gn/item.cc',
++        'src/gn/json_project_writer.cc',
++        'src/gn/label.cc',
++        'src/gn/label_pattern.cc',
++        'src/gn/lib_file.cc',
++        'src/gn/loader.cc',
++        'src/gn/location.cc',
++        'src/gn/metadata.cc',
++        'src/gn/metadata_walk.cc',
++        'src/gn/ninja_action_target_writer.cc',
++        'src/gn/ninja_binary_target_writer.cc',
++        'src/gn/ninja_build_writer.cc',
++        'src/gn/ninja_bundle_data_target_writer.cc',
++        'src/gn/ninja_c_binary_target_writer.cc',
++        'src/gn/ninja_copy_target_writer.cc',
++        'src/gn/ninja_create_bundle_target_writer.cc',
++        'src/gn/ninja_generated_file_target_writer.cc',
++        'src/gn/ninja_group_target_writer.cc',
++        'src/gn/ninja_rust_binary_target_writer.cc',
++        'src/gn/ninja_target_command_util.cc',
++        'src/gn/ninja_target_writer.cc',
++        'src/gn/ninja_toolchain_writer.cc',
++        'src/gn/ninja_tools.cc',
++        'src/gn/ninja_utils.cc',
++        'src/gn/ninja_writer.cc',
++        'src/gn/operators.cc',
++        'src/gn/output_conversion.cc',
++        'src/gn/output_file.cc',
++        'src/gn/parse_node_value_adapter.cc',
++        'src/gn/parse_tree.cc',
++        'src/gn/parser.cc',
++        'src/gn/path_output.cc',
++        'src/gn/pattern.cc',
++        'src/gn/rsp_target_writer.cc',
++        'src/gn/pool.cc',
++        'src/gn/qt_creator_writer.cc',
++        'src/gn/runtime_deps.cc',
++        'src/gn/rust_substitution_type.cc',
++        'src/gn/rust_tool.cc',
++        'src/gn/rust_values.cc',
++        'src/gn/rust_values_generator.cc',
++        'src/gn/rust_variables.cc',
++        'src/gn/scheduler.cc',
++        'src/gn/scope.cc',
++        'src/gn/scope_per_file_provider.cc',
++        'src/gn/settings.cc',
++        'src/gn/setup.cc',
++        'src/gn/source_dir.cc',
++        'src/gn/source_file.cc',
++        'src/gn/standard_out.cc',
++        'src/gn/string_atom.cc',
++        'src/gn/string_output_buffer.cc',
++        'src/gn/string_utils.cc',
++        'src/gn/substitution_list.cc',
++        'src/gn/substitution_pattern.cc',
++        'src/gn/substitution_type.cc',
++        'src/gn/substitution_writer.cc',
++        'src/gn/swift_values.cc',
++        'src/gn/swift_values_generator.cc',
++        'src/gn/swift_variables.cc',
++        'src/gn/switches.cc',
++        'src/gn/target.cc',
++        'src/gn/target_generator.cc',
++        'src/gn/template.cc',
++        'src/gn/token.cc',
++        'src/gn/tokenizer.cc',
++        'src/gn/tool.cc',
++        'src/gn/toolchain.cc',
++        'src/gn/trace.cc',
++        'src/gn/value.cc',
++        'src/gn/value_extractors.cc',
++        'src/gn/variables.cc',
++        'src/gn/version.cc',
++        'src/gn/visibility.cc',
++        'src/gn/visual_studio_utils.cc',
++        'src/gn/visual_studio_writer.cc',
++        'src/gn/xcode_object.cc',
++        'src/gn/xcode_writer.cc',
++        'src/gn/xml_element_writer.cc',
++        'src/util/exe_path.cc',
++        'src/util/msg_loop.cc',
++        'src/util/semaphore.cc',
++        'src/util/sys_info.cc',
++        'src/util/ticks.cc',
++        'src/util/worker_pool.cc',
++      ]},
++  }
++
++  executables = {
++      'gn': {'sources': [ 'src/gn/gn_main.cc' ], 'libs': []},
++
++      'gn_unittests': { 'sources': [
++        'src/gn/action_target_generator_unittest.cc',
++        'src/gn/analyzer_unittest.cc',
++        'src/gn/args_unittest.cc',
++        'src/gn/builder_unittest.cc',
++        'src/gn/c_include_iterator_unittest.cc',
++        'src/gn/command_format_unittest.cc',
++        'src/gn/commands_unittest.cc',
++        'src/gn/compile_commands_writer_unittest.cc',
++        'src/gn/config_unittest.cc',
++        'src/gn/config_values_extractors_unittest.cc',
++        'src/gn/escape_unittest.cc',
++        'src/gn/exec_process_unittest.cc',
++        'src/gn/filesystem_utils_unittest.cc',
++        'src/gn/file_writer_unittest.cc',
++        'src/gn/frameworks_utils_unittest.cc',
++        'src/gn/function_filter_unittest.cc',
++        'src/gn/function_foreach_unittest.cc',
++        'src/gn/function_forward_variables_from_unittest.cc',
++        'src/gn/function_get_label_info_unittest.cc',
++        'src/gn/function_get_path_info_unittest.cc',
++        'src/gn/function_get_target_outputs_unittest.cc',
++        'src/gn/function_process_file_template_unittest.cc',
++        'src/gn/function_rebase_path_unittest.cc',
++        'src/gn/function_template_unittest.cc',
++        'src/gn/function_toolchain_unittest.cc',
++        'src/gn/function_write_file_unittest.cc',
++        'src/gn/functions_target_rust_unittest.cc',
++        'src/gn/functions_target_unittest.cc',
++        'src/gn/functions_unittest.cc',
++        'src/gn/hash_table_base_unittest.cc',
++        'src/gn/header_checker_unittest.cc',
++        'src/gn/inherited_libraries_unittest.cc',
++        'src/gn/input_conversion_unittest.cc',
++        'src/gn/json_project_writer_unittest.cc',
++        'src/gn/rust_project_writer_unittest.cc',
++        'src/gn/rust_project_writer_helpers_unittest.cc',
++        'src/gn/label_pattern_unittest.cc',
++        'src/gn/label_unittest.cc',
++        'src/gn/loader_unittest.cc',
++        'src/gn/metadata_unittest.cc',
++        'src/gn/metadata_walk_unittest.cc',
++        'src/gn/ninja_action_target_writer_unittest.cc',
++        'src/gn/ninja_binary_target_writer_unittest.cc',
++        'src/gn/ninja_build_writer_unittest.cc',
++        'src/gn/ninja_bundle_data_target_writer_unittest.cc',
++        'src/gn/ninja_c_binary_target_writer_unittest.cc',
++        'src/gn/ninja_copy_target_writer_unittest.cc',
++        'src/gn/ninja_create_bundle_target_writer_unittest.cc',
++        'src/gn/ninja_generated_file_target_writer_unittest.cc',
++        'src/gn/ninja_group_target_writer_unittest.cc',
++        'src/gn/ninja_rust_binary_target_writer_unittest.cc',
++        'src/gn/ninja_target_command_util_unittest.cc',
++        'src/gn/ninja_target_writer_unittest.cc',
++        'src/gn/ninja_toolchain_writer_unittest.cc',
++        'src/gn/operators_unittest.cc',
++        'src/gn/output_conversion_unittest.cc',
++        'src/gn/parse_tree_unittest.cc',
++        'src/gn/parser_unittest.cc',
++        'src/gn/path_output_unittest.cc',
++        'src/gn/pattern_unittest.cc',
++        'src/gn/rsp_target_writer_unittest.cc',
++        'src/gn/runtime_deps_unittest.cc',
++        'src/gn/scope_per_file_provider_unittest.cc',
++        'src/gn/scope_unittest.cc',
++        'src/gn/setup_unittest.cc',
++        'src/gn/source_dir_unittest.cc',
++        'src/gn/source_file_unittest.cc',
++        'src/gn/string_atom_unittest.cc',
++        'src/gn/string_output_buffer_unittest.cc',
++        'src/gn/string_utils_unittest.cc',
++        'src/gn/substitution_pattern_unittest.cc',
++        'src/gn/substitution_writer_unittest.cc',
++        'src/gn/target_unittest.cc',
++        'src/gn/template_unittest.cc',
++        'src/gn/test_with_scheduler.cc',
++        'src/gn/test_with_scope.cc',
++        'src/gn/tokenizer_unittest.cc',
++        'src/gn/unique_vector_unittest.cc',
++        'src/gn/value_unittest.cc',
++        'src/gn/vector_utils_unittest.cc',
++        'src/gn/version_unittest.cc',
++        'src/gn/visibility_unittest.cc',
++        'src/gn/visual_studio_utils_unittest.cc',
++        'src/gn/visual_studio_writer_unittest.cc',
++        'src/gn/xcode_object_unittest.cc',
++        'src/gn/xml_element_writer_unittest.cc',
++        'src/util/test/gn_test.cc',
++      ], 'libs': []},
++  }
++
++  if platform.is_posix():
++    static_libraries['base']['sources'].extend([
++        'src/base/files/file_enumerator_posix.cc',
++        'src/base/files/file_posix.cc',
++        'src/base/files/file_util_posix.cc',
++        'src/base/posix/file_descriptor_shuffle.cc',
++        'src/base/posix/safe_strerror.cc',
++    ])
++
++  if platform.is_windows():
++    static_libraries['base']['sources'].extend([
++        'src/base/files/file_enumerator_win.cc',
++        'src/base/files/file_util_win.cc',
++        'src/base/files/file_win.cc',
++        'src/base/win/registry.cc',
++        'src/base/win/scoped_handle.cc',
++        'src/base/win/scoped_process_information.cc',
++    ])
++
++    if platform.is_msvc():
++      libs.extend([
++          'advapi32.lib',
++          'dbghelp.lib',
++          'kernel32.lib',
++          'ole32.lib',
++          'shell32.lib',
++          'user32.lib',
++          'userenv.lib',
++          'version.lib',
++          'winmm.lib',
++          'ws2_32.lib',
++          'Shlwapi.lib',
++      ])
++    else:
++      libs.extend([
++          '-ladvapi32',
++          '-ldbghelp',
++          '-lkernel32',
++          '-lole32',
++          '-lshell32',
++          '-luser32',
++          '-luserenv',
++          '-lversion',
++          '-lwinmm',
++          '-lws2_32',
++          '-lshlwapi',
++      ])
++
++
++  libs.extend(options.link_libs)
++
++  # we just build static libraries that GN needs
++  executables['gn']['libs'].extend(static_libraries.keys())
++  executables['gn_unittests']['libs'].extend(static_libraries.keys())
++
++  WriteGenericNinja(path, static_libraries, executables, cxx, ar, ld,
++                    platform, host, options, cflags, ldflags,
++                    libflags, include_dirs, libs)
++
++def windows_target_build_arch():
++    target_arch = os.environ.get('Platform')
++    if target_arch in ['x64', 'x86']: return target_arch
++
++    if platform.machine().lower() in ['x86_64', 'amd64']: return 'x64'
++    return 'x86'
++
++def generate_qt_version_header(qtVersion,header):
++  contents = '''// Generated by build/gen.py.
++
++#ifndef QT_GN_VERSION
++#define QT_GN_VERSION "%s"
++#endif
++''' % (qtVersion)
++
++  old_contents = ''
++  if os.path.isfile(header):
++    with open(header, 'r') as f:
++      old_contents = f.read()
++
++  if old_contents != contents:
++    with open(header, 'w') as f:
++      f.write(contents)
++
++if __name__ == '__main__':
++  sys.exit(main(sys.argv[1:]))
+diff --git a/src/3rdparty/gn/src/util/tokenpool-gnu-make-posix.cc b/src/3rdparty/gn/src/util/tokenpool-gnu-make-posix.cc
+new file mode 100644
+index 000000000..a8b0f7687
+--- /dev/null
++++ b/src/3rdparty/gn/src/util/tokenpool-gnu-make-posix.cc
+@@ -0,0 +1,239 @@
++// Copyright 2016-2018 Google Inc. All Rights Reserved.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++#include "tokenpool-gnu-make.h"
++
++#include <errno.h>
++#include <fcntl.h>
++#include <poll.h>
++#include <unistd.h>
++#include <signal.h>
++#include <sys/time.h>
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++
++// TokenPool implementation for GNU make jobserver - POSIX implementation
++// (http://make.mad-scientist.net/papers/jobserver-implementation/)
++struct GNUmakeTokenPoolPosix : public GNUmakeTokenPool {
++  GNUmakeTokenPoolPosix();
++  virtual ~GNUmakeTokenPoolPosix();
++
++  virtual int GetMonitorFd();
++
++  virtual const char* GetEnv(const char* name) { return getenv(name); }
++  virtual bool SetEnv(const char* name, const char* value) {
++    return setenv(name, value, 1) == 0;
++  }
++  virtual bool ParseAuth(const char* jobserver);
++  virtual bool CreatePool(int parallelism, std::string* auth);
++  virtual int AcquireToken();
++  virtual bool ReleaseToken(int token);
++
++ private:
++  int rfd_;
++  int wfd_;
++
++  struct sigaction old_act_;
++  bool restore_;
++
++  static int dup_rfd_;
++  static void CloseDupRfd(int signum);
++
++  bool CheckFd(int fd);
++  bool SetAlarmHandler();
++};
++
++GNUmakeTokenPoolPosix::GNUmakeTokenPoolPosix() : rfd_(-1), wfd_(-1), restore_(false) {
++}
++
++GNUmakeTokenPoolPosix::~GNUmakeTokenPoolPosix() {
++  Clear();
++  if (restore_)
++    sigaction(SIGALRM, &old_act_, NULL);
++}
++
++bool GNUmakeTokenPoolPosix::CheckFd(int fd) {
++  if (fd < 0)
++    return false;
++  int ret = fcntl(fd, F_GETFD);
++  return ret >= 0;
++}
++
++int GNUmakeTokenPoolPosix::dup_rfd_ = -1;
++
++void GNUmakeTokenPoolPosix::CloseDupRfd(int signum) {
++  close(dup_rfd_);
++  dup_rfd_ = -1;
++}
++
++bool GNUmakeTokenPoolPosix::SetAlarmHandler() {
++  struct sigaction act;
++  memset(&act, 0, sizeof(act));
++  act.sa_handler = CloseDupRfd;
++  if (sigaction(SIGALRM, &act, &old_act_) < 0) {
++    perror("sigaction:");
++    return false;
++  }
++  restore_ = true;
++  return true;
++}
++
++bool GNUmakeTokenPoolPosix::ParseAuth(const char* jobserver) {
++  int rfd = -1;
++  int wfd = -1;
++  if ((sscanf(jobserver, "%*[^=]=%d,%d", &rfd, &wfd) == 2) &&
++      CheckFd(rfd) &&
++      CheckFd(wfd) &&
++      SetAlarmHandler()) {
++    rfd_ = rfd;
++    wfd_ = wfd;
++    printf("GNUmakeTokenPoolPosix::ParseAuth: parsed fds %i, %i\n", rfd_, wfd_);
++    return true;
++  }
++  printf("GNUmakeTokenPoolPosix::ParseAuth: failed to parse fds from jobserver arg: %s\n", jobserver);
++
++  return false;
++}
++
++bool GNUmakeTokenPoolPosix::CreatePool(int parallelism, std::string* auth) {
++  // create jobserver pipe
++  int fds[2];
++  if (pipe(fds) < 0)
++    return false;
++
++  // add N tokens to pipe
++  const char token = '+'; // see make/posixos.c
++  while (parallelism--) {
++    if (write(fds[1], &token, 1) < 1) {
++      close(fds[1]);
++      close(fds[0]);
++      return false;
++    }
++  }
++
++  // initialize file descriptors for this instance
++  rfd_ = fds[0];
++  wfd_ = fds[1];
++
++  // generate auth parameter for child processes
++  char buffer[32];
++  snprintf(buffer, sizeof(buffer), "%d,%d", rfd_, wfd_);
++  *auth = buffer;
++
++  return true;
++}
++
++int GNUmakeTokenPoolPosix::AcquireToken() {
++  //printf("GNUmakeTokenPoolPosix::AcquireToken: rfd_ = %i\n", rfd_);
++  // Please read
++  //
++  //   http://make.mad-scientist.net/papers/jobserver-implementation/
++  //
++  // for the reasoning behind the following code.
++  //
++  // Try to read one character from the pipe. Returns true on success.
++  //
++  // First check if read() would succeed without blocking.
++#ifdef USE_PPOLL
++  //printf("GNUmakeTokenPoolPosix::AcquireToken USE_PPOLL=1\n");
++  pollfd pollfds[] = {{rfd_, POLLIN, 0}};
++  int ret = poll(pollfds, 1, 0);
++#else
++  //printf("GNUmakeTokenPoolPosix::AcquireToken USE_PPOLL=0\n");
++  fd_set set;
++  struct timeval timeout = { 0, 0 };
++  FD_ZERO(&set);
++  FD_SET(rfd_, &set);
++  int ret = select(rfd_ + 1, &set, NULL, NULL, &timeout);
++#endif
++  if (ret > 0) {
++    // Handle potential race condition:
++    //  - the above check succeeded, i.e. read() should not block
++    //  - the character disappears before we call read()
++    //
++    // Create a duplicate of rfd_. The duplicate file descriptor dup_rfd_
++    // can safely be closed by signal handlers without affecting rfd_.
++    dup_rfd_ = dup(rfd_);
++
++    if (dup_rfd_ != -1) {
++      struct sigaction act, old_act;
++      int ret = 0;
++
++      // Temporarily replace SIGCHLD handler with our own
++      memset(&act, 0, sizeof(act));
++      act.sa_handler = CloseDupRfd;
++      char buf;
++      if (sigaction(SIGCHLD, &act, &old_act) == 0) {
++        struct itimerval timeout;
++
++        // install a 100ms timeout that generates SIGALARM on expiration
++        memset(&timeout, 0, sizeof(timeout));
++        timeout.it_value.tv_usec = 100 * 1000; // [ms] -> [usec]
++        if (setitimer(ITIMER_REAL, &timeout, NULL) == 0) {
++          // Now try to read() from dup_rfd_. Return values from read():
++          //
++          // 1. token read                               ->  1
++          // 2. pipe closed                              ->  0
++          // 3. alarm expires                            -> -1 (EINTR)
++          // 4. child exits                              -> -1 (EINTR)
++          // 5. alarm expired before entering read()     -> -1 (EBADF)
++          // 6. child exited before entering read()      -> -1 (EBADF)
++          // 7. child exited before handler is installed -> go to 1 - 3
++          ret = read(dup_rfd_, &buf, 1);
++
++          // disarm timer
++          memset(&timeout, 0, sizeof(timeout));
++          setitimer(ITIMER_REAL, &timeout, NULL);
++        }
++
++        sigaction(SIGCHLD, &old_act, NULL);
++      }
++
++      CloseDupRfd(0);
++
++      // Case 1 from above list
++      if (ret > 0)
++        return (int) buf; // 0 <= token <= 255
++    }
++  }
++
++  // read() would block, i.e. no token available,
++  // cases 2-6 from above list or
++  // select() / poll() / dup() / sigaction() / setitimer() failed
++  return -1; // error: no token
++}
++
++bool GNUmakeTokenPoolPosix::ReleaseToken(int token = 43) {
++  // default token is char + == int 43
++  //const char buf = '+';
++  char buf = (char) token;
++  printf("GNUmakeTokenPoolPosix::ReleaseToken: token = int %i = char %c\n", token, buf);
++  while (1) {
++    int ret = write(wfd_, &buf, 1);
++    if (ret > 0)
++      return true;
++    if ((ret != -1) || (errno != EINTR))
++      return false;
++    // write got interrupted - retry
++  }
++}
++
++int GNUmakeTokenPoolPosix::GetMonitorFd() {
++  return rfd_;
++}
++
++TokenPool* TokenPool::Get() {
++  return new GNUmakeTokenPoolPosix;
++}
+diff --git a/src/3rdparty/gn/src/util/tokenpool-gnu-make-win32.cc b/src/3rdparty/gn/src/util/tokenpool-gnu-make-win32.cc
+new file mode 100644
+index 000000000..a0d3c5dbd
+--- /dev/null
++++ b/src/3rdparty/gn/src/util/tokenpool-gnu-make-win32.cc
+@@ -0,0 +1,263 @@
++// Copyright 2018 Google Inc. All Rights Reserved.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++#include "tokenpool-gnu-make.h"
++
++// Always include this first.
++// Otherwise the other system headers don't work correctly under Win32
++#include <windows.h>
++
++#include <ctype.h>
++#include <stdlib.h>
++#include <string.h>
++#include <process.h>
++
++#include "util.h"
++
++// TokenPool implementation for GNU make jobserver - Win32 implementation
++// (https://www.gnu.org/software/make/manual/html_node/Windows-Jobserver.html)
++struct GNUmakeTokenPoolWin32 : public GNUmakeTokenPool {
++  GNUmakeTokenPoolWin32();
++  virtual ~GNUmakeTokenPoolWin32();
++
++  virtual void WaitForTokenAvailability(HANDLE ioport);
++  virtual bool TokenIsAvailable(ULONG_PTR key);
++
++  virtual const char* GetEnv(const char* name);
++  virtual bool SetEnv(const char* name, const char* value);
++  virtual bool ParseAuth(const char* jobserver);
++  virtual bool CreatePool(int parallelism, std::string* auth);
++  virtual bool AcquireToken();
++  virtual bool ReleaseToken();
++
++ private:
++  // Semaphore for GNU make jobserver protocol
++  HANDLE semaphore_jobserver_;
++  // Semaphore Child -> Parent
++  // - child releases it before entering wait on jobserver semaphore
++  // - parent blocks on it to know when child enters wait
++  HANDLE semaphore_enter_wait_;
++  // Semaphore Parent -> Child
++  // - parent releases it to allow child to restart loop
++  // - child blocks on it to know when to restart loop
++  HANDLE semaphore_restart_;
++  // set to false if child should exit loop and terminate thread
++  bool running_;
++  // child thread
++  HANDLE child_;
++  // I/O completion port from SubprocessSet
++  HANDLE ioport_;
++
++
++  DWORD SemaphoreThread();
++  void ReleaseSemaphore(HANDLE semaphore);
++  void WaitForObject(HANDLE object);
++  static DWORD WINAPI SemaphoreThreadWrapper(LPVOID param);
++  static void NoopAPCFunc(ULONG_PTR param);
++};
++
++GNUmakeTokenPoolWin32::GNUmakeTokenPoolWin32() : semaphore_jobserver_(NULL),
++                                                 semaphore_enter_wait_(NULL),
++                                                 semaphore_restart_(NULL),
++                                                 running_(false),
++                                                 child_(NULL),
++                                                 ioport_(NULL) {
++}
++
++GNUmakeTokenPoolWin32::~GNUmakeTokenPoolWin32() {
++  Clear();
++  CloseHandle(semaphore_jobserver_);
++  semaphore_jobserver_ = NULL;
++
++  if (child_) {
++    // tell child thread to exit
++    running_ = false;
++    ReleaseSemaphore(semaphore_restart_);
++
++    // wait for child thread to exit
++    WaitForObject(child_);
++    CloseHandle(child_);
++    child_ = NULL;
++  }
++
++  if (semaphore_restart_) {
++    CloseHandle(semaphore_restart_);
++    semaphore_restart_ = NULL;
++  }
++
++  if (semaphore_enter_wait_) {
++    CloseHandle(semaphore_enter_wait_);
++    semaphore_enter_wait_ = NULL;
++  }
++}
++
++const char* GNUmakeTokenPoolWin32::GetEnv(const char* name) {
++  // getenv() does not work correctly together with tokenpool_tests.cc
++  static char buffer[MAX_PATH + 1];
++  if (GetEnvironmentVariable(name, buffer, sizeof(buffer)) == 0)
++    return NULL;
++  return buffer;
++}
++
++bool GNUmakeTokenPoolWin32::SetEnv(const char* name, const char* value) {
++  return SetEnvironmentVariable(name, value) != 0;
++}
++
++bool GNUmakeTokenPoolWin32::ParseAuth(const char* jobserver) {
++  // match "--jobserver-auth=gmake_semaphore_<INTEGER>..."
++  const char* start = strchr(jobserver, '=');
++  if (start) {
++    const char* end = start;
++    unsigned int len;
++    char c, *auth;
++
++    while ((c = *++end) != '\0')
++      if (!(isalnum(c) || (c == '_')))
++        break;
++    len = end - start; // includes string terminator in count
++
++    if ((len > 1) && ((auth = (char*)malloc(len)) != NULL)) {
++      strncpy(auth, start + 1, len - 1);
++      auth[len - 1] = '\0';
++
++      if ((semaphore_jobserver_ =
++           OpenSemaphore(SEMAPHORE_ALL_ACCESS, /* Semaphore access setting */
++                         FALSE,                /* Child processes DON'T inherit */
++                         auth                  /* Semaphore name */
++                        )) != NULL) {
++        free(auth);
++        return true;
++      }
++
++      free(auth);
++    }
++  }
++
++  return false;
++}
++
++bool GNUmakeTokenPoolWin32::CreatePool(int parallelism, std::string* auth) {
++  char buffer[100];
++  snprintf(buffer, sizeof(buffer), "gmake_semaphore_%d", _getpid());
++
++  if ((semaphore_jobserver_ =
++       CreateSemaphore(NULL,        /* Use default security descriptor */
++                       parallelism, /* Initial count */
++                       parallelism, /* Maximum count */
++                       buffer       /* Semaphore name */
++                      )) != NULL) {
++    *auth = buffer;
++    return true;
++  }
++
++  return false;
++}
++
++bool GNUmakeTokenPoolWin32::AcquireToken() {
++  return WaitForSingleObject(semaphore_jobserver_, 0) == WAIT_OBJECT_0;
++}
++
++bool GNUmakeTokenPoolWin32::ReleaseToken() {
++  ReleaseSemaphore(semaphore_jobserver_);
++  return true;
++}
++
++DWORD GNUmakeTokenPoolWin32::SemaphoreThread() {
++  while (running_) {
++    // indicate to parent that we are entering wait
++    ReleaseSemaphore(semaphore_enter_wait_);
++
++    // alertable wait forever on token semaphore
++    if (WaitForSingleObjectEx(semaphore_jobserver_, INFINITE, TRUE) == WAIT_OBJECT_0) {
++      // release token again for AcquireToken()
++      ReleaseSemaphore(semaphore_jobserver_);
++
++      // indicate to parent on ioport that a token might be available
++      if (!PostQueuedCompletionStatus(ioport_, 0, (ULONG_PTR) this, NULL))
++        Win32Fatal("PostQueuedCompletionStatus");
++    }
++
++    // wait for parent to allow loop restart
++    WaitForObject(semaphore_restart_);
++    // semaphore is now in nonsignaled state again for next run...
++  }
++
++  return 0;
++}
++
++DWORD WINAPI GNUmakeTokenPoolWin32::SemaphoreThreadWrapper(LPVOID param) {
++  GNUmakeTokenPoolWin32* This = (GNUmakeTokenPoolWin32*) param;
++  return This->SemaphoreThread();
++}
++
++void GNUmakeTokenPoolWin32::NoopAPCFunc(ULONG_PTR param) {
++}
++
++void GNUmakeTokenPoolWin32::WaitForTokenAvailability(HANDLE ioport) {
++  if (child_ == NULL) {
++    // first invocation
++    //
++    // subprocess-win32.cc uses I/O completion port (IOCP) which can't be
++    // used as a waitable object. Therefore we can't use WaitMultipleObjects()
++    // to wait on the IOCP and the token semaphore at the same time. Create
++    // a child thread that waits on the semaphore and posts an I/O completion
++    ioport_ = ioport;
++
++    // create both semaphores in nonsignaled state
++    if ((semaphore_enter_wait_ = CreateSemaphore(NULL, 0, 1, NULL))
++        == NULL)
++      Win32Fatal("CreateSemaphore/enter_wait");
++    if ((semaphore_restart_ = CreateSemaphore(NULL, 0, 1, NULL))
++        == NULL)
++      Win32Fatal("CreateSemaphore/restart");
++
++    // start child thread
++    running_ = true;
++    if ((child_ = CreateThread(NULL, 0, &SemaphoreThreadWrapper, this, 0, NULL))
++        == NULL)
++      Win32Fatal("CreateThread");
++
++  } else {
++    // all further invocations - allow child thread to loop
++    ReleaseSemaphore(semaphore_restart_);
++  }
++
++  // wait for child thread to enter wait
++  WaitForObject(semaphore_enter_wait_);
++  // semaphore is now in nonsignaled state again for next run...
++
++  // now SubprocessSet::DoWork() can enter GetQueuedCompletionStatus()...
++}
++
++bool GNUmakeTokenPoolWin32::TokenIsAvailable(ULONG_PTR key) {
++  // alert child thread to break wait on token semaphore
++  QueueUserAPC((PAPCFUNC)&NoopAPCFunc, child_, (ULONG_PTR)NULL);
++
++  // return true when GetQueuedCompletionStatus() returned our key
++  return key == (ULONG_PTR) this;
++}
++
++void GNUmakeTokenPoolWin32::ReleaseSemaphore(HANDLE semaphore) {
++  if (!::ReleaseSemaphore(semaphore, 1, NULL))
++    Win32Fatal("ReleaseSemaphore");
++}
++
++void GNUmakeTokenPoolWin32::WaitForObject(HANDLE object) {
++  if (WaitForSingleObject(object, INFINITE) != WAIT_OBJECT_0)
++    Win32Fatal("WaitForSingleObject");
++}
++
++TokenPool* TokenPool::Get() {
++  return new GNUmakeTokenPoolWin32;
++}
+diff --git a/src/3rdparty/gn/src/util/tokenpool-gnu-make.cc b/src/3rdparty/gn/src/util/tokenpool-gnu-make.cc
+new file mode 100644
+index 000000000..7b6e3f2f4
+--- /dev/null
++++ b/src/3rdparty/gn/src/util/tokenpool-gnu-make.cc
+@@ -0,0 +1,160 @@
++// Copyright 2016-2018 Google Inc. All Rights Reserved.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++#include "tokenpool-gnu-make.h"
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++
++#define DEBUG(S) printf(S); // TODO varargs
++
++#if 0
++#include "line_printer.h" // ninja.cc
++#define PRINT(S) { LinePrinter printer; printer.PrintOnNewLine(S); }
++#else
++#define PRINT(S) printf(S);
++#endif
++
++using namespace std;
++
++// TokenPool implementation for GNU make jobserver - common bits
++// every instance owns an implicit token -> available_ == 1
++GNUmakeTokenPool::GNUmakeTokenPool() : available_(1), used_(0) {
++}
++
++GNUmakeTokenPool::~GNUmakeTokenPool() {
++}
++
++bool GNUmakeTokenPool::SetupClient(bool ignore,
++                                   bool verbose,
++                                   double& max_load_average) {
++  const char* value = GetEnv("MAKEFLAGS");
++  if (!value) {
++    DEBUG("GNUmakeTokenPool::SetupClient: init failed. MAKEFLAGS is empty\n");
++    return false;
++  }
++
++  // GNU make <= 4.1
++  const char* jobserver = strstr(value, "--jobserver-fds=");
++  if (!jobserver)
++    // GNU make => 4.2
++    jobserver = strstr(value, "--jobserver-auth=");
++  if (jobserver) {
++    //LinePrinter printer;
++
++    DEBUG("GNUmakeTokenPool::SetupClient: found --jobserver-fds or --jobserver-auth in MAKEFLAGS\n");
++
++    if (ignore) {
++      PRINT("ninja: warning: -jN forced on command line; ignoring GNU make jobserver.\n");
++    } else {
++      if (ParseAuth(jobserver)) {
++        const char* l_arg = strstr(value, " -l");
++        int load_limit = -1;
++
++        if (verbose) {
++          PRINT("ninja: using GNU make jobserver.\n");
++        }
++
++        // translate GNU make -lN to ninja -lN
++        if (l_arg &&
++            (sscanf(l_arg + 3, "%d ", &load_limit) == 1) &&
++            (load_limit > 0)) {
++          max_load_average = load_limit;
++        }
++
++        return true;
++      }
++    }
++  }
++
++  return false;
++}
++
++bool GNUmakeTokenPool::SetupMaster(bool verbose,
++                                   int parallelism,
++                                   double max_load_average) {
++  // no need to set up token pool for serial builds
++  if (parallelism == 1)
++    return false;
++
++  string auth;
++  if (CreatePool(parallelism, &auth)) {
++    string value = "--jobserver-auth=" + auth;
++    {
++      char buffer[32];
++      snprintf(buffer, sizeof(buffer), "%i", parallelism);
++      value += " -j";
++      value += buffer;
++    }
++    if (max_load_average > 0.0f) {
++      char buffer[32];
++      snprintf(buffer, sizeof(buffer), "%g", max_load_average);
++      value += " -l";
++      value += buffer;
++    }
++
++    if (SetEnv("MAKEFLAGS", value.c_str())) {
++      if (verbose) {
++        //LinePrinter printer;
++        PRINT("ninja: simulating GNU make jobserver.\n");
++      }
++      return true;
++    }
++  }
++
++  return false;
++}
++
++bool GNUmakeTokenPool::Acquire() {
++  printf("GNUmakeTokenPool::Acquire: available_ = %i\n", available_);
++  if (available_ > 0)
++    return true;
++
++  int token;
++  if ((token = AcquireToken()) >= 0) {
++    // token acquired
++    printf("GNUmakeTokenPool::Acquire: token acquired: %i\n", token);
++    available_++;
++    return true;
++  }
++
++  printf("GNUmakeTokenPool::Acquire: no token available\n");
++  // no token available
++  return false;
++}
++
++void GNUmakeTokenPool::Reserve() {
++  available_--;
++  used_++;
++}
++
++void GNUmakeTokenPool::Return() {
++  if (ReleaseToken())
++    available_--;
++}
++
++void GNUmakeTokenPool::Release() {
++  available_++;
++  used_--;
++  if (available_ > 1)
++    Return();
++}
++
++void GNUmakeTokenPool::Clear() {
++  while (used_ > 0)
++    Release();
++  while (available_ > 1)
++    Return();
++}
+diff --git a/src/3rdparty/gn/src/util/tokenpool-gnu-make.h b/src/3rdparty/gn/src/util/tokenpool-gnu-make.h
+new file mode 100644
+index 000000000..77fd244f7
+--- /dev/null
++++ b/src/3rdparty/gn/src/util/tokenpool-gnu-make.h
+@@ -0,0 +1,48 @@
++// Copyright 2016-2018 Google Inc. All Rights Reserved.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++#include "tokenpool.h"
++
++#include <string>
++
++// interface to GNU make token pool
++struct GNUmakeTokenPool : public TokenPool {
++  GNUmakeTokenPool();
++  ~GNUmakeTokenPool();
++
++  // token pool implementation
++  virtual bool Acquire();
++  virtual void Reserve();
++  virtual void Release();
++  virtual void Clear();
++  virtual bool SetupClient(bool ignore, bool verbose,
++                           double& max_load_average);
++  virtual bool SetupMaster(bool verbose,
++                           int parallelism,
++                           double max_load_average);
++
++  // platform specific implementation
++  virtual const char* GetEnv(const char* name) = 0;
++  virtual bool SetEnv(const char* name, const char* value) = 0;
++  virtual bool ParseAuth(const char* jobserver) = 0;
++  virtual bool CreatePool(int parallelism, std::string* auth) = 0;
++  virtual int AcquireToken() = 0;
++  virtual bool ReleaseToken(int token = 43) = 0;
++
++ private:
++  int available_;
++  int used_;
++
++  void Return();
++};
+diff --git a/src/3rdparty/gn/src/util/tokenpool.h b/src/3rdparty/gn/src/util/tokenpool.h
+new file mode 100644
+index 000000000..d3a8d458f
+--- /dev/null
++++ b/src/3rdparty/gn/src/util/tokenpool.h
+@@ -0,0 +1,50 @@
++// Copyright 2016-2018 Google Inc. All Rights Reserved.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++#ifdef _WIN32
++#include <windows.h>
++#endif
++
++// interface to token pool
++struct TokenPool {
++  virtual ~TokenPool() {}
++
++  virtual bool Acquire() = 0;
++  virtual void Reserve() = 0;
++  virtual void Release() = 0;
++  virtual void Clear() = 0;
++
++  // platform specific implementation
++  virtual int AcquireToken() = 0;
++  virtual bool ReleaseToken(int token = 43) = 0;
++
++  // returns false if token pool setup failed
++  virtual bool SetupClient(bool ignore, bool verbose,
++                           double& max_load_average) = 0;
++  virtual bool SetupMaster(bool verbose,
++                           int parallelism,
++                           double max_load_average) = 0;
++
++#ifdef _WIN32
++  virtual void WaitForTokenAvailability(HANDLE ioport) = 0;
++  // returns true if a token has become available
++  // key is result from GetQueuedCompletionStatus()
++  virtual bool TokenIsAvailable(ULONG_PTR key) = 0;
++#else
++  virtual int GetMonitorFd() = 0;
++#endif
++
++  // returns NULL if token pool is not available
++  static TokenPool* Get();
++};
+diff --git a/src/3rdparty/gn/src/util/worker_pool.cc b/src/3rdparty/gn/src/util/worker_pool.cc
+index 9f6a47b38..dfd2210ea 100644
+--- a/src/3rdparty/gn/src/util/worker_pool.cc
++++ b/src/3rdparty/gn/src/util/worker_pool.cc
+@@ -90,6 +90,36 @@ WorkerPool::WorkerPool(size_t thread_count) : should_stop_processing_(false) {
+   ProcessorGroupSetter processor_group_setter;
+ #endif
+ 
++  // dynamic pool size with gnumake jobclient
++  bool ignore_jobserver = false;
++  bool verbose_jobclient = true;
++  double load_avg_ = 0.0;
++  size_t max_thread_count = thread_count;
++
++  tokenpool_ = TokenPool::Get();
++
++  if (!tokenpool_->SetupClient(ignore_jobserver, verbose_jobclient, load_avg_)) {
++    delete tokenpool_;
++    tokenpool_ = NULL;
++    printf("gn: jobclient: init failed. jobserver off?\n");
++  }
++  printf("gn: jobclient: init ok\n");
++
++  if (tokenpool_ != NULL) {
++    thread_count = 1; // start small
++    // acquire tokens to add threads
++    int token;
++    while (thread_count < max_thread_count) {
++      token = tokenpool_->AcquireToken();
++      if (token < 0) break; // jobserver is full, try again later
++      tokens_.push_back(token);
++      thread_count++;
++    }
++    printf("gn: jobclient: acquired %li tokens -> thread_count = %li\n", tokens_.size(), thread_count);
++  }
++
++  // TODO later: try to grow pool = add more threads
++
+   threads_.reserve(thread_count);
+   for (size_t i = 0; i < thread_count; ++i) {
+     threads_.emplace_back([this]() { Worker(); });
+@@ -115,6 +145,22 @@ WorkerPool::~WorkerPool() {
+   for (auto& task_thread : threads_) {
+     task_thread.join();
+   }
++
++  if (tokenpool_ != NULL) {
++    // release tokens back to jobserver
++    printf("gn: jobclient: releasing %li tokens\n", tokens_.size());
++    int token;
++    while (tokens_.size() > 0) {
++      token = tokens_.back();
++      tokenpool_->ReleaseToken(token);
++      tokens_.pop_back();
++    }
++    printf("gn: jobclient: released all tokens\n");
++
++    // cleanup
++    delete tokenpool_;
++    tokenpool_ = NULL;
++  }
+ }
+ 
+ void WorkerPool::PostTask(std::function<void()> work) {
+diff --git a/src/3rdparty/gn/src/util/worker_pool.h b/src/3rdparty/gn/src/util/worker_pool.h
+index 7284ebe72..bc2aae542 100644
+--- a/src/3rdparty/gn/src/util/worker_pool.h
++++ b/src/3rdparty/gn/src/util/worker_pool.h
+@@ -14,6 +14,8 @@
+ #include "base/logging.h"
+ #include "base/macros.h"
+ 
++#include "tokenpool.h"
++
+ class WorkerPool {
+  public:
+   WorkerPool();
+@@ -32,6 +34,12 @@ class WorkerPool {
+   bool should_stop_processing_;
+ 
+   DISALLOW_COPY_AND_ASSIGN(WorkerPool);
++
++  TokenPool* tokenpool_;
++  std::vector<int> tokens_;
++
++  WorkerPool(const WorkerPool&) = delete;
++  WorkerPool& operator=(const WorkerPool&) = delete;
+ };
+ 
+ #endif  // UTIL_WORKER_POOL_H_
+-- 
+2.36.1
+

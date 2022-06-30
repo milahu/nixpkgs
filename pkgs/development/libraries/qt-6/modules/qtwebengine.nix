@@ -103,16 +103,6 @@ let
     rev = "8e0cf6e6f0825f809bab58ac328ba293722d4e54";
     sha256 = "ENiHFghyYTSEFyA2DcPuJp5bJJCnRy4xwe6brNrtfCI=";
   };
-  gn-with-jobclient = fetchFromGitHub {
-    # https://github.com/milahu/gn/tree/add-gnumake-jobclient
-    # https://github.com/milahu/gn/tree/add-gnumake-jobclient-rebase-dfcbc6fed0a8352696f92d67ccad54048ad182b3
-    # dfcbc6fed0a8352696f92d67ccad54048ad182b3 has smallest diff versus qtwebengine src/3rdparty/gn
-    # nix-prefetch-github milahu gn
-    owner = "milahu";
-    repo = "gn";
-    rev = "309d39ecc6824143b46d5b30bb6ac9176d71d6ab";
-    sha256 = "Nzt1CsfJEuzXpD6XRd/vGUGtDipVWVBqki2EQsmdpLI=";
-  };
 in
 
 qtModule rec {
@@ -157,6 +147,9 @@ qtModule rec {
     ./patches/qtwebengine/0010-fix-inherit-fds-devtools-frontend-build_inspector_overlay.py.patch
 
     ./patches/qtwebengine/0011-mojom_parser.py-limit-jobs-with-jobclient.patch
+
+    # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
+    ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
@@ -190,14 +183,6 @@ qtModule rec {
         chmod +w gnumake_jobclient.py
       )
     done
-
-    # Limit jobs in gn
-    (
-      cd src/3rdparty
-      rm -rf gn
-      cp -r ${gn-with-jobclient} gn
-      chmod -R +w gn
-    )
 
     # Patch Chromium build tools
     (
