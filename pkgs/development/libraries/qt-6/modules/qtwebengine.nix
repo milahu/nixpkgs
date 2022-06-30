@@ -147,6 +147,8 @@ qtModule rec {
     ./patches/qtwebengine/0010-fix-inherit-fds-devtools-frontend-build_inspector_overlay.py.patch
 
     ./patches/qtwebengine/0011-mojom_parser.py-limit-jobs-with-jobclient.patch
+    # FIXME mojom_parser hangs, cpu load is 1 of 32
+    ./patches/qtwebengine/0013-mojom_parser.py-debug-to-stderr.patch
 
     # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
     ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
