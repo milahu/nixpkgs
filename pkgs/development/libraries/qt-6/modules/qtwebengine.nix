@@ -144,6 +144,7 @@ qtModule rec {
     ./patches/qtwebengine/0013-mojom_parser.py-debug-to-stderr.patch
     ./patches/qtwebengine/0014-mojom_parser.py-add-debug-prints.patch
     ./patches/qtwebengine/0016-fixup-mojo-mojom_parser.py.patch
+    ./patches/qtwebengine/0017-fix-mojom_parser.py-def-_grow_pool.patch
 
     # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
     ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch

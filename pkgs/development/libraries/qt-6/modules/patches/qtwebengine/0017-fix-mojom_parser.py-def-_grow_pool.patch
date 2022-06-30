@@ -1,0 +1,25 @@
+From d396b184ac0114bafe64b24df44344385e82b398 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Thu, 30 Jun 2022 22:02:06 +0200
+Subject: [PATCH] fix mojom_parser.py: def _grow_pool
+
+---
+ src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+index 3f4e55dc8..6142f8a6a 100755
+--- a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
++++ b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+@@ -227,7 +227,7 @@ def debug(*a, **k):
+   print(*a, **k)
+ 
+ def _grow_pool(pool, new_size, jobclient, worker_tokens):
+-  delta = new_size - self._pool._processes
++  delta = new_size - pool._processes
+   debug(f"mojom_parser.py: grow pool: delta = {delta}")
+   if delta <= 0:
+     return
+-- 
+2.36.1
+
