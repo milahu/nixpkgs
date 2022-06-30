@@ -158,6 +158,7 @@ qtModule rec {
   DEBUG_JEST_WORKER = "1";
   DEBUG_JOBCLIENT = "1";
   DEBUG_CHROMIUM_NODE_PY = "1";
+  PYTHONUNBUFFERED = "1"; # debug mojom_parser.py jobclient
 
   # FIXME ninjaFlags are not inherited to child ninjas, for example via MAKEFLAGS
   #ninjaFlags = "-v -d explain";
