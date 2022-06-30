@@ -244,6 +244,9 @@ def print_process_info(process_info, root_pid, file=sys.stdout, depth=0):
       #and
       len(cmdline) > 1
       and cmdline[1] == "../../../../../src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup"
+      # FIXME cmdline[1] can also be absolute path
+      # /build/qtwebengine-everywhere-src-6.3.1/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup
+      # -> use cmdline[1].endswith()
     ):
       # TODO summary: print parents of this proc. only names and pids
       # aaaaa 1
