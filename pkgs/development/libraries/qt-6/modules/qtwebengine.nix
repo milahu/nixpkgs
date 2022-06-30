@@ -105,11 +105,13 @@ let
   };
   gn-with-jobclient = fetchFromGitHub {
     # https://github.com/milahu/gn/tree/add-gnumake-jobclient
+    # https://github.com/milahu/gn/tree/add-gnumake-jobclient-rebase-dfcbc6fed0a8352696f92d67ccad54048ad182b3
+    # dfcbc6fed0a8352696f92d67ccad54048ad182b3 has smallest diff versus qtwebengine src/3rdparty/gn
     # nix-prefetch-github milahu gn
     owner = "milahu";
     repo = "gn";
-    rev = "6862a994729cb574d8c8c80335f2bf7e2c115343";
-    sha256 = "SIbNJacX9+XklSGsZoqI7FRbeLDk3gyL42WaBD2GQmA=";
+    rev = "309d39ecc6824143b46d5b30bb6ac9176d71d6ab";
+    sha256 = "Nzt1CsfJEuzXpD6XRd/vGUGtDipVWVBqki2EQsmdpLI=";
   };
 in
 
