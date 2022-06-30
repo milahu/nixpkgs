@@ -78,7 +78,7 @@ let
   # use jest-worker with jobclient
   # call stack: devtools-frontend -> rollup -> terser -> jest-worker
   jest-worker = fetchFromGitHub {
-    # requires gnumake-jobclient-js
+    # requires gnumake-tokenpool (js)
     # https://github.com/milahu/jest-worker/tree/26.6.2
     # https://github.com/facebook/jest/pull/12968
     # nix-prefetch-github milahu jest-worker --rev xxx
@@ -87,21 +87,13 @@ let
     rev = "1f90d2e98655fe34f2bc15867218917445e160b5";
     sha256 = "XidL8nQR+pt4Cz7dNS8BmsJVftpJqAVpdub9aKvSIg8=";
   };
-  gnumake-jobclient-js = fetchFromGitHub {
-    # https://github.com/milahu/gnumake-jobclient-js
-    # nix-prefetch-github milahu gnumake-jobclient-js
+  gnumake-tokenpool = fetchFromGitHub {
+    # https://github.com/milahu/gnumake-tokenpool
+    # nix-prefetch-github milahu gnumake-tokenpool
     owner = "milahu";
-    repo = "gnumake-jobclient-js";
-    rev = "e3c0e75dfda64878bd0c102cfcad36b2260b146a";
-    sha256 = "ONMc76x+mNCZGod1RIZB3c+LHvWhXRx6Z4ygmF+69T0=";
-  };
-  gnumake-jobclient-py = fetchFromGitHub {
-    # https://github.com/milahu/gnumake-jobclient-py
-    # nix-prefetch-github milahu gnumake-jobclient-py
-    owner = "milahu";
-    repo = "gnumake-jobclient-py";
-    rev = "8e0cf6e6f0825f809bab58ac328ba293722d4e54";
-    sha256 = "ENiHFghyYTSEFyA2DcPuJp5bJJCnRy4xwe6brNrtfCI=";
+    repo = "gnumake-tokenpool";
+    rev = "1e726c1fbf15e1d744c144be9cdb1a9f3930a52b";
+    sha256 = "8cJ99EPA4fkNazoJbYfW1tQZJlF7f4Ki+ylaWLPeAmM=";
   };
 in
 
@@ -138,6 +130,7 @@ qtModule rec {
     #./patches/qtwebengine/0005-fix-node.py-for-gnumake-jobclient.patch # TODO restore
 
     ./patches/qtwebengine/0006-blink-bindgen-limit-jobs-with-jobclient.patch
+    ./patches/qtwebengine/0015-fixup-blink-task_queue.py.patch
 
     ./patches/qtwebengine/0007-debug-chromium-node.py.patch
     ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
@@ -150,6 +143,7 @@ qtModule rec {
     # FIXME mojom_parser hangs, cpu load is 1 of 32
     ./patches/qtwebengine/0013-mojom_parser.py-debug-to-stderr.patch
     ./patches/qtwebengine/0014-mojom_parser.py-add-debug-prints.patch
+    ./patches/qtwebengine/0016-fixup-mojo-mojom_parser.py.patch
 
     # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
     ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
@@ -175,7 +169,7 @@ qtModule rec {
       mv jest-worker.node_modules jest-worker/node_modules
 
       mkdir @milahu
-      cp -r ${gnumake-jobclient-js} @milahu/gnumake-jobclient
+      cp -r ${gnumake-tokenpool} @milahu/gnumake-jobclient
       chmod -R +w @milahu/gnumake-jobclient
     )
 
@@ -185,7 +179,7 @@ qtModule rec {
     do
       (
         cd "$dst"
-        cp ${gnumake-jobclient-py}/gnumake_jobclient/jobclient.py gnumake_jobclient.py
+        cp ${gnumake-tokenpool}/py/src/gnumake_tokenpool/jobclient.py gnumake_tokenpool.py
         chmod +w gnumake_jobclient.py
       )
     done

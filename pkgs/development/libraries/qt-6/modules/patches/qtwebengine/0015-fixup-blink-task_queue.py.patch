@@ -1,0 +1,37 @@
+From d12c6f18351f1b3513eff165fb5c4a1596a2a64a Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Thu, 30 Jun 2022 20:51:40 +0200
+Subject: [PATCH 1/2] fixup blink task_queue.py
+
+---
+ .../blink/renderer/bindings/scripts/bind_gen/task_queue.py  | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py b/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
+index 92b614e3b..9c1df3937 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen/task_queue.py
+@@ -7,7 +7,7 @@ import multiprocessing
+ import sys
+ 
+ from .package_initializer import package_initializer
+-from . import gnumake_jobclient
++from . import gnumake_tokenpool
+ 
+ 
+ class TaskQueue(object):
+@@ -44,9 +44,9 @@ class TaskQueue(object):
+             self._pool_size = multiprocessing.cpu_count()
+             self._jobclient = None
+             try:
+-                self._jobclient = gnumake_jobclient.JobClient()
++                self._jobclient = gnumake_tokenpool.JobClient()
+                 self._pool_size = 1 # start small, grow on demand
+-            except gnumake_jobclient.NoJobServer:
++            except gnumake_tokenpool.NoJobServer:
+                 pass
+             if sys.platform == 'win32':
+                 # TODO(crbug.com/1190269) - we can't use more than 56
+-- 
+2.36.1
+
