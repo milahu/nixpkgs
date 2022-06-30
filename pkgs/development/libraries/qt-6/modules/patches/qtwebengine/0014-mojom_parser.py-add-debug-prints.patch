@@ -1,0 +1,69 @@
+From 86fce0d1a72c092e744391c70b48c7f719139833 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Thu, 30 Jun 2022 17:00:08 +0200
+Subject: [PATCH] mojom_parser.py add debug prints
+
+---
+ .../chromium/mojo/public/tools/mojom/mojom_parser.py  | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+index 06d45ea1f..3b89aaa80 100755
+--- a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
++++ b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+@@ -223,17 +223,20 @@ class _FuncWrapper:
+ import gnumake_jobclient
+ 
+ def debug(*a, **k):
+-  k['file'] = sys.stderr
++  #k['file'] = sys.stderr
+   print(*a, **k)
+ 
+ def _grow_pool(pool, new_size, jobclient, worker_tokens):
+   delta = new_size - self._pool._processes
++  debug(f"mojom_parser.py: grow pool: delta = {delta}")
+   if delta <= 0:
+     return
+   debug(f"mojom_parser.py: trying to grow pool by {delta}") # debug
+   new_tokens = []
+   for i in range(delta):
++    debug(f"mojom_parser.py: grow pool: jobclient.acquire ...")
+     token = jobclient.acquire()
++    debug(f"mojom_parser.py: grow pool: jobclient.acquire ok")
+     if token == None:
+       break
+     new_tokens.append(token)
+@@ -252,7 +255,9 @@ def _release_tokens(jobclient, worker_tokens):
+   # tokens should be released when workers become idle.
+   debug(f"mojom_parser.py: releasing {len(worker_tokens)} tokens") # debug
+   for token in worker_tokens:
++    debug(f"mojom_parser.py: jobclient.release ...")
+     jobclient.release(token)
++    debug(f"mojom_parser.py: jobclient.release ok")
+ 
+ 
+ def _Shard(target_func, arg_list, processes=None):
+@@ -276,8 +281,10 @@ def _Shard(target_func, arg_list, processes=None):
+   jobclient = None
+   max_processes = None
+   worker_tokens = [] # List of int
++  debug(f"mojom_parser.py: jobclient init ...")
+   try:
+     jobclient = gnumake_jobclient.JobClient()
++    debug(f"mojom_parser.py: jobclient init ok")
+     max_processes = processes
+     processes = 1 # start small, grow on demand
+   except gnumake_jobclient.NoJobServer:
+@@ -286,7 +293,9 @@ def _Shard(target_func, arg_list, processes=None):
+   pool = multiprocessing.Pool(processes=processes)
+ 
+   if jobclient:
++    debug(f"mojom_parser.py: grow pool ...")
+     _grow_pool(pool, max_processes, jobclient, worker_tokens)
++    debug(f"mojom_parser.py: grow pool ok")
+ 
+   try:
+     wrapped_func = _FuncWrapper(target_func)
+-- 
+2.36.1
+
