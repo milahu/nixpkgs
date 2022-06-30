@@ -180,7 +180,7 @@ qtModule rec {
       (
         cd "$dst"
         cp ${gnumake-tokenpool}/py/src/gnumake_tokenpool/jobclient.py gnumake_tokenpool.py
-        chmod +w gnumake_jobclient.py
+        chmod +w gnumake_tokenpool.py
       )
     done
 
