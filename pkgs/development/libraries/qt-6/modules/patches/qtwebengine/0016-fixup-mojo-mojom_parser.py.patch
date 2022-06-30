@@ -1,0 +1,39 @@
+From 37e323f16053ee2228c6c43256454a9d6a95f37e Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Thu, 30 Jun 2022 20:52:45 +0200
+Subject: [PATCH 2/2] fixup mojo mojom_parser.py
+
+---
+ .../chromium/mojo/public/tools/mojom/mojom_parser.py        | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+index 3b89aaa80..3f4e55dc8 100755
+--- a/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
++++ b/src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+@@ -220,7 +220,7 @@ class _FuncWrapper:
+       return _ExceptionWrapper()
+ 
+ 
+-import gnumake_jobclient
++import gnumake_tokenpool
+ 
+ def debug(*a, **k):
+   #k['file'] = sys.stderr
+@@ -283,11 +283,11 @@ def _Shard(target_func, arg_list, processes=None):
+   worker_tokens = [] # List of int
+   debug(f"mojom_parser.py: jobclient init ...")
+   try:
+-    jobclient = gnumake_jobclient.JobClient()
++    jobclient = gnumake_tokenpool.JobClient()
+     debug(f"mojom_parser.py: jobclient init ok")
+     max_processes = processes
+     processes = 1 # start small, grow on demand
+-  except gnumake_jobclient.NoJobServer:
++  except gnumake_tokenpool.NoJobServer:
+     pass
+ 
+   pool = multiprocessing.Pool(processes=processes)
+-- 
+2.36.1
+
