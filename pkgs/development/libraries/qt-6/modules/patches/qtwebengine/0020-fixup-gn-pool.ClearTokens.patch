@@ -1,4 +1,4 @@
-From c5e3162bc50e5b812de854c2d4151218a2f5d6f3 Mon Sep 17 00:00:00 2001
+From cb648e6d4b97133614f5f08eb9bb30793a770849 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Fri, 1 Jul 2022 15:59:51 +0200
 Subject: [PATCH] fixup gn pool.ClearTokens
@@ -7,8 +7,8 @@ Subject: [PATCH] fixup gn pool.ClearTokens
  src/3rdparty/gn/src/gn/header_checker.cc | 4 +++-
  src/3rdparty/gn/src/gn/scheduler.cc      | 2 +-
  src/3rdparty/gn/src/util/worker_pool.cc  | 8 ++++----
- src/3rdparty/gn/src/util/worker_pool.h   | 2 +-
- 4 files changed, 9 insertions(+), 7 deletions(-)
+ src/3rdparty/gn/src/util/worker_pool.h   | 4 ++--
+ 4 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/src/3rdparty/gn/src/gn/header_checker.cc b/src/3rdparty/gn/src/gn/header_checker.cc
 index b5b6124a0..8783dc659 100644
@@ -79,10 +79,10 @@ index f2ac5f181..4356a98de 100644
    // release tokens back to jobserver
    // FIXME this is never reached?
 diff --git a/src/3rdparty/gn/src/util/worker_pool.h b/src/3rdparty/gn/src/util/worker_pool.h
-index b51de0404..b8e502013 100644
+index b51de0404..cc529e4e4 100644
 --- a/src/3rdparty/gn/src/util/worker_pool.h
 +++ b/src/3rdparty/gn/src/util/worker_pool.h
-@@ -34,7 +34,7 @@ class WorkerPool {
+@@ -34,12 +34,12 @@ class WorkerPool {
    std::condition_variable_any pool_notifier_;
    bool should_stop_processing_;
  
@@ -91,6 +91,12 @@ index b51de0404..b8e502013 100644
    void GrowPool();
    TokenPool* tokenpool_;
    std::vector<int> tokens_;
+-  size_t thread_count_;
+   size_t max_thread_count_;
++  size_t thread_count_;
+ 
+   DISALLOW_COPY_AND_ASSIGN(WorkerPool);
+ };
 -- 
 2.36.1
 
