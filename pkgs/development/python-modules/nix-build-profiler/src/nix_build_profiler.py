@@ -148,6 +148,7 @@ def print_process_info(
   ):
 
   # TODO rename root_pid to pid
+  pid = root_pid
 
   if depth == 0:
     t = time.strftime("%F %T %z")
