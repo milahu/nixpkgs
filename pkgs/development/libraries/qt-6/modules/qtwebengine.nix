@@ -84,8 +84,8 @@ let
     # nix-prefetch-github milahu jest-worker --rev xxx
     owner = "milahu";
     repo = "jest-worker";
-    rev = "1f90d2e98655fe34f2bc15867218917445e160b5";
-    sha256 = "XidL8nQR+pt4Cz7dNS8BmsJVftpJqAVpdub9aKvSIg8=";
+    rev = "dc894229df2bd16a14ce79db329fc6acf0d185e5";
+    sha256 = "GUCPij030SHylEgdSlDfiX2E3aq9ucC97rLldvTrLlY=";
   };
   gnumake-tokenpool-src = python3.pkgs.gnumake-tokenpool.src;
 in
