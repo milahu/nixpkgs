@@ -131,6 +131,7 @@ qtModule rec {
 
     ./patches/qtwebengine/0006-blink-bindgen-limit-jobs-with-jobclient.patch
     ./patches/qtwebengine/0015-fixup-blink-task_queue.py.patch
+    ./patches/qtwebengine/0021-fix-blink-task_queue.py-this-self.patch
 
     ./patches/qtwebengine/0007-debug-chromium-node.py.patch
     ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
