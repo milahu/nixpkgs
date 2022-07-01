@@ -1,4 +1,4 @@
-From c83ff2fe27d1557f580229ee359e256af569bf03 Mon Sep 17 00:00:00 2001
+From 10a36ebef675b4e6f9216b309c79ca7cb7ff0cc5 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Fri, 1 Jul 2022 15:59:51 +0200
 Subject: [PATCH] fixup gn pool.ClearTokens
@@ -6,9 +6,9 @@ Subject: [PATCH] fixup gn pool.ClearTokens
 ---
  src/3rdparty/gn/src/gn/header_checker.cc | 4 +++-
  src/3rdparty/gn/src/gn/scheduler.cc      | 2 +-
- src/3rdparty/gn/src/util/worker_pool.cc  | 4 ++--
+ src/3rdparty/gn/src/util/worker_pool.cc  | 6 +++---
  src/3rdparty/gn/src/util/worker_pool.h   | 2 +-
- 4 files changed, 7 insertions(+), 5 deletions(-)
+ 4 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/src/3rdparty/gn/src/gn/header_checker.cc b/src/3rdparty/gn/src/gn/header_checker.cc
 index b5b6124a0..8783dc659 100644
@@ -39,7 +39,7 @@ index c82e80b33..00f8e4cce 100644
  }
  
 diff --git a/src/3rdparty/gn/src/util/worker_pool.cc b/src/3rdparty/gn/src/util/worker_pool.cc
-index f2ac5f181..e9d94d138 100644
+index f2ac5f181..0702c2332 100644
 --- a/src/3rdparty/gn/src/util/worker_pool.cc
 +++ b/src/3rdparty/gn/src/util/worker_pool.cc
 @@ -94,7 +94,7 @@ WorkerPool::WorkerPool(size_t max_thread_count_)
@@ -60,6 +60,15 @@ index f2ac5f181..e9d94d138 100644
    // dynamic pool size with gnumake jobclient
    bool ignore_jobserver = false;
    bool verbose_jobclient = true;
+@@ -173,7 +173,7 @@ void WorkerPool::InitTokenPool(size_t max_thread_count) {
+   thread_count_ = 1; // start small
+ }
+ 
+-WorkerPool::GrowPool() {
++void WorkerPool::GrowPool() {
+   if (tokenpool_ == NULL) return;
+   //printf("gn: jobclient: growing pool from %li to max %li\n", thread_count_, max_thread_count_);
+   int token;
 diff --git a/src/3rdparty/gn/src/util/worker_pool.h b/src/3rdparty/gn/src/util/worker_pool.h
 index b51de0404..b8e502013 100644
 --- a/src/3rdparty/gn/src/util/worker_pool.h
