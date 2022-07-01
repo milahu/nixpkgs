@@ -87,14 +87,7 @@ let
     rev = "1f90d2e98655fe34f2bc15867218917445e160b5";
     sha256 = "XidL8nQR+pt4Cz7dNS8BmsJVftpJqAVpdub9aKvSIg8=";
   };
-  gnumake-tokenpool = fetchFromGitHub {
-    # https://github.com/milahu/gnumake-tokenpool
-    # nix-prefetch-github milahu gnumake-tokenpool
-    owner = "milahu";
-    repo = "gnumake-tokenpool";
-    rev = "5dabefe12144bb91b3bf9b8ec67004282e6f0f18";
-    sha256 = "6CfKYQgYSzR/8Nule7gWkwn0W9crqlWcgPIr39LUYsk=";
-  };
+  gnumake-tokenpool-src = python3.pkgs.gnumake-tokenpool.src;
 in
 
 qtModule rec {
@@ -174,7 +167,7 @@ qtModule rec {
       mv jest-worker.node_modules jest-worker/node_modules
 
       mkdir @milahu
-      cp -r ${gnumake-tokenpool} @milahu/gnumake-jobclient
+      cp -r ${gnumake-tokenpool-src} @milahu/gnumake-jobclient
       chmod -R +w @milahu/gnumake-jobclient
     )
 
@@ -184,7 +177,7 @@ qtModule rec {
     do
       (
         cd "$dst"
-        cp ${gnumake-tokenpool}/py/src/gnumake_tokenpool/jobclient.py gnumake_tokenpool.py
+        cp ${gnumake-tokenpool-src}/py/src/gnumake_tokenpool/jobclient.py gnumake_tokenpool.py
         chmod +w gnumake_tokenpool.py
       )
     done
@@ -315,7 +308,7 @@ qtModule rec {
 
     # needed for postPatch
     jest-worker
-    gnumake-tokenpool
+    gnumake-tokenpool-src
   ];
 
   requiredSystemFeatures = [ "big-parallel" ];
