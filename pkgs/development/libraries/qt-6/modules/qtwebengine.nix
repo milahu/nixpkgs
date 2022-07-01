@@ -150,6 +150,7 @@ qtModule rec {
     ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
     ./patches/qtwebengine/0018-gn-debug-token-release.patch
     ./patches/qtwebengine/0019-gn-try-to-fix-token-release.patch
+    ./patches/qtwebengine/0020-fixup-gn-pool.ClearTokens.patch
   ];
 
   DEBUG_JEST_WORKER = "1";

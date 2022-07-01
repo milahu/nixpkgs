@@ -1,0 +1,41 @@
+From ef7e67eebdff559d3a0922df9a1f81b125dee11e Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Fri, 1 Jul 2022 15:59:51 +0200
+Subject: [PATCH] fixup gn pool.ClearTokens
+
+---
+ src/3rdparty/gn/src/gn/header_checker.cc | 4 +++-
+ src/3rdparty/gn/src/gn/scheduler.cc      | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/gn/src/gn/header_checker.cc b/src/3rdparty/gn/src/gn/header_checker.cc
+index b5b6124a0..8783dc659 100644
+--- a/src/3rdparty/gn/src/gn/header_checker.cc
++++ b/src/3rdparty/gn/src/gn/header_checker.cc
+@@ -186,7 +186,9 @@ void HeaderChecker::RunCheckOverFiles(const FileMap& files, bool force_check) {
+   while (!task_count_.IsZero())
+     task_count_cv_.wait(auto_lock);
+ 
+-  delete pool;
++  //delete pool; // error: type 'class WorkerPool' argument given to 'delete', expected pointer
++  printf("gn: HeaderChecker::RunCheckOverFiles: done tasks. calling pool.ClearTokens\n");
++  pool.ClearTokens();
+ }
+ 
+ void HeaderChecker::DoWork(const Target* target, const SourceFile& file) {
+diff --git a/src/3rdparty/gn/src/gn/scheduler.cc b/src/3rdparty/gn/src/gn/scheduler.cc
+index c82e80b33..00f8e4cce 100644
+--- a/src/3rdparty/gn/src/gn/scheduler.cc
++++ b/src/3rdparty/gn/src/gn/scheduler.cc
+@@ -21,7 +21,7 @@ Scheduler::Scheduler()
+ 
+ Scheduler::~Scheduler() {
+   WaitForPoolTasks();
+-  delete worker_pool_;
++  //delete worker_pool_;
+   g_scheduler = nullptr;
+ }
+ 
+-- 
+2.36.1
+
