@@ -3566,6 +3566,8 @@ in {
 
   gntp = callPackage ../development/python-modules/gntp { };
 
+  gnumake-tokenpool = callPackage ../development/python-modules/gnumake-tokenpool { };
+
   gnureadline = callPackage ../development/python-modules/gnureadline { };
 
   goalzero = callPackage ../development/python-modules/goalzero { };
