@@ -2,6 +2,7 @@
 , buildPythonPackage
 , psutil
 , prefixed
+, gnumake-tokenpool
 , writeText
 }:
 
@@ -14,6 +15,7 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     psutil
     prefixed
+    gnumake-tokenpool
   ];
 
   setupHook = writeText "setup-hook.sh" ''
