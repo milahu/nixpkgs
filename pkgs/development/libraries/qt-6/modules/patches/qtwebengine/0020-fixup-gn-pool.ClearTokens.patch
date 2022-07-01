@@ -1,4 +1,4 @@
-From ef7e67eebdff559d3a0922df9a1f81b125dee11e Mon Sep 17 00:00:00 2001
+From 94930bbdbf0325e95a0c82391004b358a46bb5d5 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Fri, 1 Jul 2022 15:59:51 +0200
 Subject: [PATCH] fixup gn pool.ClearTokens
@@ -6,7 +6,8 @@ Subject: [PATCH] fixup gn pool.ClearTokens
 ---
  src/3rdparty/gn/src/gn/header_checker.cc | 4 +++-
  src/3rdparty/gn/src/gn/scheduler.cc      | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ src/3rdparty/gn/src/util/worker_pool.cc  | 4 ++--
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/src/3rdparty/gn/src/gn/header_checker.cc b/src/3rdparty/gn/src/gn/header_checker.cc
 index b5b6124a0..8783dc659 100644
@@ -36,6 +37,28 @@ index c82e80b33..00f8e4cce 100644
    g_scheduler = nullptr;
  }
  
+diff --git a/src/3rdparty/gn/src/util/worker_pool.cc b/src/3rdparty/gn/src/util/worker_pool.cc
+index f2ac5f181..e9d94d138 100644
+--- a/src/3rdparty/gn/src/util/worker_pool.cc
++++ b/src/3rdparty/gn/src/util/worker_pool.cc
+@@ -94,7 +94,7 @@ WorkerPool::WorkerPool(size_t max_thread_count_)
+   ProcessorGroupSetter processor_group_setter;
+ #endif
+ 
+-  WorkerPool::InitTokenPool(max_thread_count);
++  WorkerPool::InitTokenPool();
+   WorkerPool::GrowPool();
+   // TODO later: try to grow pool = add more threads
+   // TODO later: release all tokens
+@@ -154,7 +154,7 @@ WorkerPool::~WorkerPool() {
+   }
+ }
+ 
+-void WorkerPool::InitTokenPool(size_t max_thread_count) {
++void WorkerPool::InitTokenPool() {
+   // dynamic pool size with gnumake jobclient
+   bool ignore_jobserver = false;
+   bool verbose_jobclient = true;
 -- 
 2.36.1
 
