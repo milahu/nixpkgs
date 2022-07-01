@@ -10,8 +10,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "milahu";
     repo = "gnumake-tokenpool";
-    rev = "4604c9b5c22fee8654922cb46ff706fec379b994";
-    sha256 = "lhiRmRBvgtXbFYo6yfJ99gQdM8p7TG6MSnJAQVoSiVY=";
+    rev = "b8e2a0f2699ed602885c84d6452cb5f420e1355a";
+    sha256 = "x53sBNdR5NB/gLjhC6AgMkvZxEG/boijcOKMjcwp5vI=";
   };
 
   pythonImportsCheck = [
