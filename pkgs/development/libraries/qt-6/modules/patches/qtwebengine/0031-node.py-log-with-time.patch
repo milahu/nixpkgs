@@ -1,0 +1,58 @@
+From 13c72c734b242ce3cbdac29854b1df0d39330c8a Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Sun, 3 Jul 2022 17:37:18 +0200
+Subject: [PATCH] node.py log with time
+
+---
+ src/3rdparty/chromium/third_party/node/node.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index 32a7dd5a7..d575cc466 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -10,6 +10,7 @@ import sys
+ import os
+ import shlex
+ import io
++from datetime import datetime
+ 
+ def which(cmd):
+     pathenv = os.getenv('PATH')
+@@ -66,19 +67,21 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+   }
+ 
+   if is_debug:
+-    print(f'debug node.py {os.getpid()}: Running command: {shlex.join(cmd)}', file=sys.stderr, flush=True)
++    print(f"debug node.py {os.getpid()} {datetime.utcnow().strftime('%F %T.%f')[:-3]}: Running command: {shlex.join(cmd)}", file=sys.stderr, flush=True)
+ 
+   process = subprocess.Popen(cmd, **options)
+ 
+   if is_debug:
+-    print(f'debug node.py {os.getpid()}: Child PID: {process.pid}', file=sys.stderr, flush=True)
++    print(f"debug node.py {os.getpid()} {datetime.utcnow().strftime('%F %T.%f')[:-3]}: Child PID: {process.pid}", file=sys.stderr, flush=True)
+ 
+   output = None
+   if is_debug: # print + capture output https://stackoverflow.com/questions/18421757
+     # note: we need live output to debug deadloops
++    # note: ninja is buffering output of commands, so flush-ing here is a noop
++    # todo: how to disable ninja buffering to get live output?
+     output = io.BytesIO()
+-    line_prefix = b'debug node.py %i:   ' % (os.getpid(),)
+     for line in iter(process.stdout.readline, b''):
++      line_prefix = b'debug node.py %i %s:   ' % (os.getpid(), datetime.utcnow().strftime('%F %T.%f')[:-3])
+       sys.stderr.buffer.write(line_prefix + line)
+       sys.stderr.buffer.flush()
+       output.write(line)
+@@ -93,7 +96,7 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+   if process.returncode != 0:
+     raise RuntimeError('Command failed with status %i: %s\n%s' % (process.returncode, shlex.join(cmd), output))
+   if is_debug:
+-    print(f'debug node.py {os.getpid()}: Command succeeded: {shlex.join(cmd)}', file=sys.stderr, flush=True)
++    print(f"debug node.py {os.getpid()} {datetime.utcnow().strftime('%F %T.%f')[:-3]}: Command succeeded: {shlex.join(cmd)}", file=sys.stderr, flush=True)
+   return output
+ 
+ if __name__ == '__main__':
+-- 
+2.36.1
+

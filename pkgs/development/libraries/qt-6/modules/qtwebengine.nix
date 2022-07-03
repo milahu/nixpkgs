@@ -138,6 +138,7 @@ qtModule rec {
     ./patches/qtwebengine/0027-fix-node.py-capture-stdout-and-stderr.patch
     ./patches/qtwebengine/0029-node.py-print-pid-of-node-process.patch
     ./patches/qtwebengine/0030-node.py-fix-live-output-with-flush-true.patch
+    ./patches/qtwebengine/0031-node.py-log-with-time.patch
     # FIXME node.py / rollup / jest-worker
     # many rollup's, but zero cpu load
     # rollup fails to start the first worker? -> bug in jest-worker?
