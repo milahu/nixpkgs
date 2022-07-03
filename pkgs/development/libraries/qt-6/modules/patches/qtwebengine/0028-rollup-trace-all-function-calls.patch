@@ -1,0 +1,386 @@
+From cd8545580d9d091c56a252e2179958c117bafd7c Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Sun, 3 Jul 2022 13:57:09 +0200
+Subject: [PATCH] rollup: trace all function calls
+
+---
+ .../src/node_modules/rollup/dist/bin/rollup   | 50 ++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup b/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup
+index 45b4af04d..3ed1ceb7e 100755
+--- a/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup
++++ b/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup
+@@ -26,6 +26,7 @@ require('events');
+ require('url');
+ 
+ function _interopNamespaceDefault(e) {
++console.error('rollup _interopNamespaceDefault');
+   var n = Object.create(null);
+   if (e) {
+     Object.keys(e).forEach(function (k) {
+@@ -41,6 +42,7 @@ var path__namespace = /*#__PURE__*/_interopNamespaceDefault(path$1);
+ var help = "rollup version __VERSION__\n=====================================\n\nUsage: rollup [options] <entry file>\n\nBasic options:\n\n-c, --config <filename>     Use this config file (if argument is used but value\n                              is unspecified, defaults to rollup.config.js)\n-d, --dir <dirname>         Directory for chunks (if absent, prints to stdout)\n-e, --external <ids>        Comma-separate list of module IDs to exclude\n-f, --format <format>       Type of output (amd, cjs, es, iife, umd, system)\n-g, --globals <pairs>       Comma-separate list of `moduleID:Global` pairs\n-h, --help                  Show this help message\n-i, --input <filename>      Input (alternative to <entry file>)\n-m, --sourcemap             Generate sourcemap (`-m inline` for inline map)\n-n, --name <name>           Name for UMD export\n-o, --file <output>         Single output file (if absent, prints to stdout)\n-p, --plugin <plugin>       Use the plugin specified (may be repeated)\n-v, --version               Show version number\n-w, --watch                 Watch files in bundle and rebuild on changes\n--amd.id <id>               ID for AMD module (default is anonymous)\n--amd.autoId                Generate the AMD ID based off the chunk name\n--amd.basePath <prefix>     Path to prepend to auto generated AMD ID\n--amd.define <name>         Function to use in place of `define`\n--assetFileNames <pattern>  Name pattern for emitted assets\n--banner <text>             Code to insert at top of bundle (outside wrapper)\n--chunkFileNames <pattern>  Name pattern for emitted secondary chunks\n--compact                   Minify wrapper code\n--context <variable>        Specify top-level `this` value\n--entryFileNames <pattern>  Name pattern for emitted entry chunks\n--environment <values>      Settings passed to config file (see example)\n--no-esModule               Do not add __esModule property\n--exports <mode>            Specify export mode (auto, default, named, none)\n--extend                    Extend global variable defined by --name\n--no-externalLiveBindings   Do not generate code to support live bindings\n--failAfterWarnings         Exit with an error if the build produced warnings\n--footer <text>             Code to insert at end of bundle (outside wrapper)\n--no-freeze                 Do not freeze namespace objects\n--no-hoistTransitiveImports Do not hoist transitive imports into entry chunks\n--no-indent                 Don't indent result\n--no-interop                Do not include interop block\n--inlineDynamicImports      Create single bundle when using dynamic imports\n--intro <text>              Code to insert at top of bundle (inside wrapper)\n--minifyInternalExports     Force or disable minification of internal exports\n--namespaceToStringTag      Create proper `.toString` methods for namespaces\n--noConflict                Generate a noConflict method for UMD globals\n--outro <text>              Code to insert at end of bundle (inside wrapper)\n--preferConst               Use `const` instead of `var` for exports\n--no-preserveEntrySignatures Avoid facade chunks for entry points\n--preserveModules           Preserve module structure\n--preserveModulesRoot       Put preserved modules under this path at root level\n--preserveSymlinks          Do not follow symlinks when resolving files\n--no-sanitizeFileName       Do not replace invalid characters in file names\n--shimMissingExports        Create shim variables for missing exports\n--silent                    Don't print warnings\n--sourcemapExcludeSources   Do not include source code in source maps\n--sourcemapFile <file>      Specify bundle position for source maps\n--stdin=ext                 Specify file extension used for stdin input\n--no-stdin                  Do not read \"-\" from stdin\n--no-strict                 Don't emit `\"use strict\";` in the generated modules\n--strictDeprecations        Throw errors for deprecated features\n--systemNullSetters         Replace empty SystemJS setters with `null`\n--no-treeshake              Disable tree-shaking optimisations\n--no-treeshake.annotations  Ignore pure call annotations\n--no-treeshake.moduleSideEffects Assume modules have no side-effects\n--no-treeshake.propertyReadSideEffects Ignore property access side-effects\n--no-treeshake.tryCatchDeoptimization Do not turn off try-catch-tree-shaking\n--no-treeshake.unknownGlobalSideEffects Assume unknown globals do not throw\n--waitForBundleInput        Wait for bundle input files\n--watch.buildDelay <number> Throttle watch rebuilds\n--no-watch.clearScreen      Do not clear the screen when rebuilding\n--watch.skipWrite           Do not write files to disk when watching\n--watch.exclude <files>     Exclude files from being watched\n--watch.include <files>     Limit watching to specified files\n--validate                  Validate output\n\nExamples:\n\n# use settings in config file\nrollup -c\n\n# in config file, process.env.INCLUDE_DEPS === 'true'\n# and process.env.BUILD === 'production'\nrollup -c --environment INCLUDE_DEPS,BUILD:production\n\n# create CommonJS bundle.js from src/main.js\nrollup --format=cjs --file=bundle.js -- src/main.js\n\n# create self-executing IIFE using `window.jQuery`\n# and `window._` as external globals\nrollup -f iife --globals jquery:jQuery,lodash:_ \\\n  -i src/app.js -o build/app.js -m build/app.js.map\n\nNotes:\n\n* When piping to stdout, only inline sourcemaps are permitted\n\nFor more information visit https://rollupjs.org\n";
+ 
+ function camelCase(str) {
++console.error('rollup camelCase');
+     // Handle the case where an argument is provided as camel case, e.g., fooBar.
+     // by ensuring that the string isn't already mixed case:
+     const isCamelCase = str !== str.toLowerCase() && str !== str.toUpperCase();
+@@ -71,6 +73,7 @@ function camelCase(str) {
+     }
+ }
+ function decamelize(str, joinString) {
++console.error('rollup decamelize');
+     const lowercase = str.toLocaleLowerCase();
+     joinString = joinString || '-';
+     let notCamelcase = '';
+@@ -87,6 +90,7 @@ function decamelize(str, joinString) {
+     return notCamelcase;
+ }
+ function looksLikeNumber(x) {
++console.error('rollup looksLikeNumber');
+     if (x === null || x === undefined)
+         return false;
+     // if loaded from config, may already be a number.
+@@ -103,6 +107,7 @@ function looksLikeNumber(x) {
+ 
+ // take an un-split argv string and tokenize it.
+ function tokenizeArgString(argString) {
++console.error('rollup tokenizeArgString');
+     if (Array.isArray(argString)) {
+         return argString.map(e => typeof e !== 'string' ? e + '' : e);
+     }
+@@ -529,6 +534,7 @@ class YargsParser {
+         }
+         // Push argument into positional array, applying numeric coercion:
+         function pushPositional(arg) {
++console.error('rollup pushPositional');
+             const maybeCoercedNumber = maybeCoerceNumber('_', arg);
+             if (typeof maybeCoercedNumber === 'string' || typeof maybeCoercedNumber === 'number') {
+                 argv._.push(maybeCoercedNumber);
+@@ -537,6 +543,7 @@ class YargsParser {
+         // how many arguments should we consume, based
+         // on the nargs option?
+         function eatNargs(i, key, args, argAfterEqualSign) {
++console.error('rollup eatNargs');
+             let ii;
+             let toEat = checkAllAliases(key, flags.nargs);
+             // NaN has a special meaning for the array type, indicating that one or
+@@ -583,6 +590,7 @@ class YargsParser {
+         // following it... YUM!
+         // e.g., --foo apple banana cat becomes ["apple", "banana", "cat"]
+         function eatArray(i, key, args, argAfterEqualSign) {
++console.error('rollup eatArray');
+             let argsToSet = [];
+             let next = argAfterEqualSign || args[i + 1];
+             // If both array and nargs are configured, enforce the nargs count:
+@@ -626,6 +634,7 @@ class YargsParser {
+             return i;
+         }
+         function setArg(key, val) {
++console.error('rollup setArg');
+             if (/-/.test(key) && configuration['camel-case-expansion']) {
+                 const alias = key.split('.').map(function (prop) {
+                     return camelCase(prop);
+@@ -674,6 +683,7 @@ class YargsParser {
+             }
+         }
+         function addNewAlias(key, alias) {
++console.error('rollup addNewAlias');
+             if (!(flags.aliases[key] && flags.aliases[key].length)) {
+                 flags.aliases[key] = [alias];
+                 newAliases[alias] = true;
+@@ -683,6 +693,7 @@ class YargsParser {
+             }
+         }
+         function processValue(key, val) {
++console.error('rollup processValue');
+             // strings may be quoted, clean this up as we assign values.
+             if (typeof val === 'string' &&
+                 (val[0] === "'" || val[0] === '"') &&
+@@ -711,6 +722,7 @@ class YargsParser {
+             return value;
+         }
+         function maybeCoerceNumber(key, value) {
++console.error('rollup maybeCoerceNumber');
+             if (!configuration['parse-positional-numbers'] && key === '_')
+                 return value;
+             if (!checkAllAliases(key, flags.strings) && !checkAllAliases(key, flags.bools) && !Array.isArray(value)) {
+@@ -724,6 +736,7 @@ class YargsParser {
+         // set args from config.json file, this should be
+         // applied last so that defaults can be applied.
+         function setConfig(argv) {
++console.error('rollup setConfig');
+             const configLookup = Object.create(null);
+             // expand defaults/aliases, in-case any happen to reference
+             // the config.json file.
+@@ -766,6 +779,7 @@ class YargsParser {
+         // set args from config object.
+         // it recursively checks nested objects.
+         function setConfigObject(config, prev) {
++console.error('rollup setConfigObject');
+             Object.keys(config).forEach(function (key) {
+                 const value = config[key];
+                 const fullKey = prev ? prev + '.' + key : key;
+@@ -787,6 +801,7 @@ class YargsParser {
+         }
+         // set all config objects passed in opts
+         function setConfigObjects() {
++console.error('rollup setConfigObjects');
+             if (typeof configObjects !== 'undefined') {
+                 configObjects.forEach(function (configObject) {
+                     setConfigObject(configObject);
+@@ -794,6 +809,7 @@ class YargsParser {
+             }
+         }
+         function applyEnvVars(argv, configOnly) {
++console.error('rollup applyEnvVars');
+             if (typeof envPrefix === 'undefined')
+                 return;
+             const prefix = typeof envPrefix === 'string' ? envPrefix : '';
+@@ -814,6 +830,7 @@ class YargsParser {
+             });
+         }
+         function applyCoercions(argv) {
++console.error('rollup applyCoercions');
+             let coerce;
+             const applied = new Set();
+             Object.keys(argv).forEach(function (key) {
+@@ -835,6 +852,7 @@ class YargsParser {
+             });
+         }
+         function setPlaceholderKeys(argv) {
++console.error('rollup setPlaceholderKeys');
+             flags.keys.forEach((key) => {
+                 // don't set placeholder keys for dot notation options 'foo.bar'.
+                 if (~key.indexOf('.'))
+@@ -845,6 +863,7 @@ class YargsParser {
+             return argv;
+         }
+         function applyDefaultsAndAliases(obj, aliases, defaults, canLog = false) {
++console.error('rollup applyDefaultsAndAliases');
+             Object.keys(defaults).forEach(function (key) {
+                 if (!hasKey(obj, key.split('.'))) {
+                     setKey(obj, key.split('.'), defaults[key]);
+@@ -859,6 +878,7 @@ class YargsParser {
+             });
+         }
+         function hasKey(obj, keys) {
++console.error('rollup hasKey');
+             let o = obj;
+             if (!configuration['dot-notation'])
+                 keys = [keys.join('.')];
+@@ -872,6 +892,7 @@ class YargsParser {
+                 return key in o;
+         }
+         function setKey(obj, keys, value) {
++console.error('rollup setKey');
+             let o = obj;
+             if (!configuration['dot-notation'])
+                 keys = [keys.join('.')];
+@@ -938,6 +959,7 @@ class YargsParser {
+         }
+         // extend the aliases list with inferred aliases.
+         function extendAliases(...args) {
++console.error('rollup extendAliases');
+             args.forEach(function (obj) {
+                 Object.keys(obj || {}).forEach(function (key) {
+                     // short-circuit if we've already added a key
+@@ -975,12 +997,14 @@ class YargsParser {
+             });
+         }
+         function checkAllAliases(key, flag) {
++console.error('rollup checkAllAliases');
+             const toCheck = [].concat(flags.aliases[key] || [], key);
+             const keys = Object.keys(flag);
+             const setAlias = toCheck.find(key => keys.includes(key));
+             return setAlias ? flag[setAlias] : false;
+         }
+         function hasAnyFlag(key) {
++console.error('rollup hasAnyFlag');
+             const flagsKeys = Object.keys(flags);
+             const toCheck = [].concat(flagsKeys.map(k => flags[k]));
+             return toCheck.some(function (flag) {
+@@ -988,6 +1012,7 @@ class YargsParser {
+             });
+         }
+         function hasFlagsMatching(arg, ...patterns) {
++console.error('rollup hasFlagsMatching');
+             const toCheck = [].concat(...patterns);
+             return toCheck.some(function (pattern) {
+                 const match = arg.match(pattern);
+@@ -996,6 +1021,7 @@ class YargsParser {
+         }
+         // based on a simplified version of the short flag group parsing logic
+         function hasAllShortFlags(arg) {
++console.error('rollup hasAllShortFlags');
+             // if this is a negative number, or doesn't start with a single hyphen, it's not a short flag group
+             if (arg.match(negative) || !arg.match(/^-[^-]+/)) {
+                 return false;
+@@ -1019,9 +1045,11 @@ class YargsParser {
+             return hasAllFlags;
+         }
+         function isUnknownOptionAsArg(arg) {
++console.error('rollup isUnknownOptionAsArg');
+             return configuration['unknown-options-as-args'] && isUnknownOption(arg);
+         }
+         function isUnknownOption(arg) {
++console.error('rollup isUnknownOption');
+             // ignore negative numbers
+             if (arg.match(negative)) {
+                 return false;
+@@ -1046,6 +1074,7 @@ class YargsParser {
+         // make a best effort to pick a default value
+         // for an option based on name and type.
+         function defaultValue(key) {
++console.error('rollup defaultValue');
+             if (!checkAllAliases(key, flags.bools) &&
+                 !checkAllAliases(key, flags.counts) &&
+                 `${key}` in defaults) {
+@@ -1057,6 +1086,7 @@ class YargsParser {
+         }
+         // return a default value, given the type of a flag.,
+         function defaultForType(type) {
++console.error('rollup defaultForType');
+             const def = {
+                 boolean: true,
+                 string: '',
+@@ -1067,6 +1097,7 @@ class YargsParser {
+         }
+         // given a flag, enforce a default type.
+         function guessType(key) {
++console.error('rollup guessType');
+             let type = 'boolean';
+             if (checkAllAliases(key, flags.strings))
+                 type = 'string';
+@@ -1079,10 +1110,12 @@ class YargsParser {
+             return type;
+         }
+         function isUndefined(num) {
++console.error('rollup isUndefined');
+             return num === undefined;
+         }
+         // check user configuration settings for inconsistencies
+         function checkConfiguration() {
++console.error('rollup checkConfiguration');
+             // count keys should not be set as array/narg
+             Object.keys(flags.counts).find(key => {
+                 if (checkAllAliases(key, flags.arrays)) {
+@@ -1109,6 +1142,7 @@ class YargsParser {
+ // if any aliases reference each other, we should
+ // merge them together.
+ function combineAliases(aliases) {
++console.error('rollup combineAliases');
+     const aliasArrays = [];
+     const combined = Object.create(null);
+     let change = true;
+@@ -1152,11 +1186,13 @@ function combineAliases(aliases) {
+ // it is NOT called to set a default value
+ // thus we can start the count at 1 instead of 0
+ function increment(orig) {
++console.error('rollup increment');
+     return orig !== undefined ? orig + 1 : 1;
+ }
+ // TODO(bcoe): in the next major version of yargs, switch to
+ // Object.create(null) for dot notation:
+ function sanitizeKey(key) {
++console.error('rollup sanitizeKey');
+     if (key === '__proto__')
+         return '___proto___';
+     return key;
+@@ -1199,10 +1235,12 @@ const parser = new YargsParser({
+     }
+ });
+ const yargsParser = function Parser(args, opts) {
++console.error('rollup yargsParser = Parser');
+     const result = parser.parse(args.slice(), opts);
+     return result.argv;
+ };
+-yargsParser.detailed = function (args, opts) {
++yargsParser.detailed = function(args, opts) {
++console.error('rollup yargsParser.detailed');
+     return parser.parse(args.slice(), opts);
+ };
+ yargsParser.camelCase = camelCase;
+@@ -1479,6 +1517,7 @@ var prettyBytes = (number, options) => {
+ var prettyBytes$1 = prettyBytes;
+ 
+ function printTimings(timings) {
++console.error('rollup printTimings');
+     Object.keys(timings).forEach(label => {
+         const appliedColor = label[0] === '#' ? (label[1] !== '#' ? loadConfigFile_js.underline : loadConfigFile_js.bold) : (text) => text;
+         const [time, memory, total] = timings[label];
+@@ -1488,6 +1527,7 @@ function printTimings(timings) {
+ }
+ 
+ async function build(inputOptions, warnings, silent = false) {
++console.error('rollup build');
+     const outputOptions = inputOptions.output;
+     const useStdout = !outputOptions[0].file && !outputOptions[0].dir;
+     const start = Date.now();
+@@ -1556,6 +1596,7 @@ var Module = require$$1;
+ var modules = {};
+ 
+ var getModule = function(dir) {
++console.error('rollup getModule');
+   var rootPath = dir ? path.resolve(dir) : process.cwd();
+   var rootName = path.join(rootPath, '@root');
+   var root = modules[rootName];
+@@ -1569,11 +1610,13 @@ var getModule = function(dir) {
+ };
+ 
+ var requireRelative = function(requested, relativeTo) {
++console.error('rollup requireRelative');
+   var root = getModule(relativeTo);
+   return root.require(requested);
+ };
+ 
+ requireRelative.resolve = function(requested, relativeTo) {
++console.error('rollup requireRelative.resolve');
+   var root = getModule(relativeTo);
+   return Module._resolveFilename(requested, root);
+ };
+@@ -1584,6 +1627,7 @@ var relative = requireRelative_1;
+ 
+ const DEFAULT_CONFIG_BASE = 'rollup.config';
+ function getConfigPath(commandConfig) {
++console.error('rollup getConfigPath');
+     const cwd = process.cwd();
+     if (commandConfig === true) {
+         return path__namespace.resolve(findConfigFileNameInCwd());
+@@ -1611,6 +1655,7 @@ function getConfigPath(commandConfig) {
+     return path__namespace.resolve(commandConfig);
+ }
+ function findConfigFileNameInCwd() {
++console.error('rollup findConfigFileNameInCwd');
+     const filesInWorkingDir = new Set(fs.readdirSync(process.cwd()));
+     for (const extension of ['mjs', 'cjs', 'ts']) {
+         const fileName = `${DEFAULT_CONFIG_BASE}.${extension}`;
+@@ -1621,6 +1666,7 @@ function findConfigFileNameInCwd() {
+ }
+ 
+ function loadConfigFromCommand(command) {
++console.error('rollup loadConfigFromCommand');
+     const warnings = loadConfigFile_js.batchWarnings();
+     if (!command.input && (command.stdin || !process.stdin.isTTY)) {
+         command.input = loadConfigFile_js.stdinName;
+@@ -1631,6 +1677,7 @@ function loadConfigFromCommand(command) {
+ }
+ 
+ async function runRollup(command) {
++console.error('rollup runRollup');
+     let inputSource;
+     if (command._.length > 0) {
+         if (command.input) {
+@@ -1710,6 +1757,7 @@ async function runRollup(command) {
+     }
+ }
+ async function getConfigs(command) {
++console.error('rollup getConfigs');
+     if (command.config) {
+         const configFile = getConfigPath(command.config);
+         const { options, warnings } = await loadConfigFile_js.loadAndParseConfigFile(configFile, command);
+-- 
+2.36.1
+
