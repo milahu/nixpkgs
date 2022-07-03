@@ -1,11 +1,12 @@
-From 628814f2654f90ee631159ca66963f6faae60483 Mon Sep 17 00:00:00 2001
+From 555b42aae3d183c81fb233f3c28054380dcd8254 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Sun, 3 Jul 2022 17:41:17 +0200
 Subject: [PATCH] rollup: trace all function calls + time
 
 ---
  .../src/node_modules/rollup/dist/bin/rollup   | 96 +++++++++----------
- 1 file changed, 48 insertions(+), 48 deletions(-)
+ .../chromium/third_party/node/node.py         |  2 +-
+ 2 files changed, 49 insertions(+), 49 deletions(-)
 
 diff --git a/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup b/src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/rollup/dist/bin/rollup
 index 3ed1ceb7e..980cd050e 100755
@@ -428,6 +429,19 @@ index 3ed1ceb7e..980cd050e 100755
      if (command.config) {
          const configFile = getConfigPath(command.config);
          const { options, warnings } = await loadConfigFile_js.loadAndParseConfigFile(configFile, command);
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index d575cc466..d105d061f 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -81,7 +81,7 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+     # todo: how to disable ninja buffering to get live output?
+     output = io.BytesIO()
+     for line in iter(process.stdout.readline, b''):
+-      line_prefix = b'debug node.py %i %s:   ' % (os.getpid(), datetime.utcnow().strftime('%F %T.%f')[:-3])
++      line_prefix = b'debug node.py %i %s:   ' % (os.getpid(), datetime.utcnow().strftime('%F %T.%f')[:-3].encode('utf8'))
+       sys.stderr.buffer.write(line_prefix + line)
+       sys.stderr.buffer.flush()
+       output.write(line)
 -- 
 2.36.1
 
