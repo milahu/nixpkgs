@@ -132,7 +132,9 @@ qtModule rec {
     ./patches/qtwebengine/0022-fix-node.py-node-path-debug-off.patch # depends on 9
     ./patches/qtwebengine/0023-fix-node.py-dont-capture-output.patch
     ./patches/qtwebengine/0024-node.py-debug-rollup.patch
-    ./patches/qtwebengine/0025-debug-ts_definitions.py-missing-ts-files.patch
+    ./patches/qtwebengine/0025-debug-ts_definitions.py-missing-ts-files.patch # should be fixed with 26
+    ./patches/qtwebengine/0026-fix-node.py-capture-stdout-only.patch
+    ./patches/qtwebengine/0027-fix-node.py-capture-stdout-and-stderr.patch
     # FIXME node.py / rollup / jest-worker
     # many rollup's, but zero cpu load
     # rollup fails to start the first worker? -> bug in jest-worker?

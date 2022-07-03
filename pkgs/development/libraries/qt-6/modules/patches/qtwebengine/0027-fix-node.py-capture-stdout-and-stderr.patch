@@ -1,0 +1,54 @@
+From 6565c836cb60f82758f1d7093d9b78ebfe983bd0 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Sun, 3 Jul 2022 12:16:07 +0200
+Subject: [PATCH] fix node.py capture stdout and stderr
+
+---
+ src/3rdparty/chromium/third_party/node/node.py | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index 7be25fa65..b9c94bda8 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -50,8 +50,11 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+   if name == "rollup":
+     # debug rollup
+     cmd_parts = list(filter(lambda s: s != "--silent", cmd_parts))
+-  cmd = [GetBinaryPath()] + cmd_parts
+-  #cmd = ['node'] + cmd_parts # debug
++
++  # TODO restore
++  #cmd = [GetBinaryPath()] + cmd_parts
++  cmd = ['node'] + cmd_parts # debug
++
+   is_debug = bool(os.environ.get('DEBUG_CHROMIUM_NODE_PY'))
+   options = {
+     'cwd': os.getcwd(),
+@@ -59,7 +62,7 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+     #'text': False, # default
+     'close_fds': False, # inherit fds of parent process for gnumake jobclient
+     'stdout': subprocess.PIPE,
+-    #'stderr': subprocess.STDOUT, # no. capture stdout only
++    'stderr': subprocess.STDOUT,
+   }
+   process = subprocess.Popen(cmd, **options)
+   output = None
+@@ -67,12 +70,9 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+     # note: we need live output to debug deadloops
+     output = io.BytesIO()
+     print(f'debug node.py {os.getpid()}: Running command: {shlex.join(cmd)}', file=sys.stderr)
+-    line = b'%s\n' % (.encode('utf8'),)
+-    sys.stdout.buffer.write(line_prefix + line)
+-    #line_prefix = b'debug node.py %i:   ' % (os.getpid(),)
++    line_prefix = b'debug node.py %i:   ' % (os.getpid(),)
+     for line in iter(process.stdout.readline, b''):
+-      #sys.stdout.buffer.write(line_prefix + line)
+-      sys.stderr.buffer.write(line) # TODO add newline? b'\n'
++      sys.stderr.buffer.write(line_prefix + line)
+       output.write(line)
+     output = output.getvalue()
+     process.wait() # set process.returncode
+-- 
+2.36.1
+
