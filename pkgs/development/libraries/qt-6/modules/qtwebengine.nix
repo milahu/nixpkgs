@@ -175,7 +175,7 @@ qtModule rec {
       cp -r ${gnumake-tokenpool-src} @milahu/gnumake-jobclient
       chmod -R +w @milahu/gnumake-jobclient
       # force debug
-      sed -E 's/^const debug = .*?;$/const debug = true;/' \
+      sed -i -E 's/^const debug = .*?;$/const debug = true;/' \
         @milahu/gnumake-jobclient/js/src/tokenpool.js
     )
 
