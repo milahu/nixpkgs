@@ -131,6 +131,7 @@ qtModule rec {
     ./patches/qtwebengine/0009-debug-node-py-print-live-output.patch # depends on 8
     ./patches/qtwebengine/0022-fix-node.py-node-path-debug-off.patch # depends on 9
     ./patches/qtwebengine/0023-fix-node.py-dont-capture-output.patch
+    ./patches/qtwebengine/0024-node.py-debug-rollup.patch
     # FIXME node.py / rollup / jest-worker
     # many rollup's, but zero cpu load
     # rollup fails to start the first worker? -> bug in jest-worker?
