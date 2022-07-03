@@ -130,6 +130,10 @@ qtModule rec {
     ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
     ./patches/qtwebengine/0009-debug-node-py-print-live-output.patch # depends on 8
     ./patches/qtwebengine/0022-fix-node.py-node-path-debug-off.patch # depends on 9
+    ./patches/qtwebengine/0023-fix-node.py-dont-capture-output.patch
+    # FIXME node.py / rollup / jest-worker
+    # many rollup's, but zero cpu load
+    # rollup fails to start the first worker? -> bug in jest-worker?
 
     # qtwebengine-everywhere-src-6.3.1 $ grep -r -F 'subprocess.Popen(' | grep -v -e test -e tools
     ./patches/qtwebengine/0010-fix-inherit-fds-devtools-frontend-build_inspector_overlay.py.patch
