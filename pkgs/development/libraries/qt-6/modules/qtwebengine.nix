@@ -143,6 +143,7 @@ qtModule rec {
     # many rollup's, but zero cpu load
     # rollup fails to start the first worker? -> bug in jest-worker?
     ./patches/qtwebengine/0028-rollup-trace-all-function-calls.patch
+    ./patches/qtwebengine/0032-rollup-trace-all-function-calls-time.patch
 
     # qtwebengine-everywhere-src-6.3.1 $ grep -r -F 'subprocess.Popen(' | grep -v -e test -e tools
     ./patches/qtwebengine/0010-fix-inherit-fds-devtools-frontend-build_inspector_overlay.py.patch
