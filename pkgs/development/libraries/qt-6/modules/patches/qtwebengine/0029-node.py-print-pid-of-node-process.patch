@@ -1,0 +1,37 @@
+From dcb2b17b9a58d7f82c6d0d742531a5cd6575a07a Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Sun, 3 Jul 2022 16:51:08 +0200
+Subject: [PATCH] node.py print pid of node process
+
+---
+ src/3rdparty/chromium/third_party/node/node.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index b9c94bda8..d22346e64 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -64,12 +64,19 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes: # FIXME stdout is never use
+     'stdout': subprocess.PIPE,
+     'stderr': subprocess.STDOUT,
+   }
++
++  if is_debug:
++    print(f'debug node.py {os.getpid()}: Running command: {shlex.join(cmd)}', file=sys.stderr)
++
+   process = subprocess.Popen(cmd, **options)
++
++  if is_debug:
++    print(f'debug node.py {os.getpid()}: Child PID: {process.pid}', file=sys.stderr)
++
+   output = None
+   if is_debug: # print + capture output https://stackoverflow.com/questions/18421757
+     # note: we need live output to debug deadloops
+     output = io.BytesIO()
+-    print(f'debug node.py {os.getpid()}: Running command: {shlex.join(cmd)}', file=sys.stderr)
+     line_prefix = b'debug node.py %i:   ' % (os.getpid(),)
+     for line in iter(process.stdout.readline, b''):
+       sys.stderr.buffer.write(line_prefix + line)
+-- 
+2.36.1
+
