@@ -69,7 +69,6 @@
 , libkrb5
 , xkeyboard_config
 , enableProprietaryCodecs ? true
-, nix-build-profiler # debug
 , fetchFromGitHub
 }:
 
@@ -108,7 +107,6 @@ qtModule rec {
     which
     #gn # not used?
     nodejs
-    nix-build-profiler # debug
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
