@@ -8,16 +8,12 @@
 , flex
 , git
 , gperf
-, ninja
-, samurai # debug
-, ninja-kitware # debug
-, ninja-tokenpool # debug
+, ninja-tokenpool
 , pkg-config
 , python3
 , which
 , nodejs
 , qtbase
-, srcs # TODO test
 , perl
 , xorg
 , libXcursor
@@ -73,17 +69,16 @@
 }:
 
 let
-  # limit jobs
-  # use jest-worker with jobclient
+  # add jobclients to limit cpu usage to NIX_BUILD_CORES
+  # jest-worker with jobclient
   # call stack: devtools-frontend -> rollup -> terser -> jest-worker
   jest-worker = fetchFromGitHub {
-    # requires gnumake-tokenpool (js)
+    # requires gnumake-tokenpool
     # https://github.com/milahu/jest-worker/tree/26.6.2
     # https://github.com/facebook/jest/pull/12968
-    # nix-prefetch-github milahu jest-worker --rev xxx
     owner = "milahu";
     repo = "jest-worker";
-    rev = "ac66dea6168c3ecfcc88f300dffbc807ac9273a5";
+    rev = "a846fbb511d72ff2439123b3e9a6104524e1d7d2";
     sha256 = "a3TCtjRIKJTKM59G60fLhYiFCCux2JXw/OTUK7i/hRc=";
   };
   gnumake-tokenpool-src = python3.pkgs.gnumake-tokenpool.src;
@@ -98,20 +93,14 @@ qtModule rec {
     flex
     git
     gperf
-    #ninja
-    #samurai
-    #ninja-kitware # debug
-    ninja-tokenpool # debug
+    ninja-tokenpool
     pkg-config
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
-    #gn # not used?
     nodejs
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
-
-  #dontUseGnConfigure = true;
 
   # ninja builds some components with -Wno-format,
   # which cannot be set at the same time as -Wformat-security
@@ -126,17 +115,15 @@ qtModule rec {
   ];
 
   /*
+  # debug jobclient patches
   DEBUG_JOBCLIENT = "1"; # gnumake-tokenpool
   DEBUG_JEST_WORKER = "1"; # src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/jest-worker/build/index.js
   DEBUG_CHROMIUM_NODE_PY = "1"; # src/3rdparty/chromium/third_party/node/node.py
   DEBUG_MOJOM_PARSER = "1"; # src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
   */
 
-  # FIXME ninjaFlags are not inherited to child ninjas, for example via MAKEFLAGS
-  #ninjaFlags = "-v -d explain";
-
   postPatch = ''
-    # Limit jobs in build of devtools-frontend
+    # Add jobclient to javascript build tools
     (
       cd src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules
 
@@ -146,30 +133,27 @@ qtModule rec {
       chmod -R +w jest-worker
       mv jest-worker.node_modules jest-worker/node_modules
 
-      mkdir @milahu
-      cp -r ${gnumake-tokenpool-src} @milahu/gnumake-jobclient
-      chmod -R +w @milahu/gnumake-jobclient
-      # force debug
-      sed -i -E 's/^const debug = .*?;$/const debug = true;/' \
-        @milahu/gnumake-jobclient/js/src/tokenpool.js
+      cp -r ${gnumake-tokenpool-src}/js/src/gnumake-tokenpool .
+      chmod -R +w gnumake-tokenpool
     )
 
+    # Add jobclient to python build tools
     for dst in \
       src/3rdparty/chromium/third_party/blink/renderer/bindings/scripts/bind_gen \
       src/3rdparty/chromium/mojo/public/tools/mojom
     do
       (
         cd "$dst"
-        cp ${gnumake-tokenpool-src}/py/src/gnumake_tokenpool/jobclient.py gnumake_tokenpool.py
-        chmod +w gnumake_tokenpool.py
+        cp -r ${gnumake-tokenpool-src}/py/src/gnumake_tokenpool .
+        chmod -R +w gnumake_tokenpool
       )
     done
 
-    # tokenpool-gnu-make-posix.cc etc
+    # Add jobclient to C++ build tools
     (
       cd src/3rdparty/gn/src/util
-      cp ${gnumake-tokenpool-src}/cc/src/tokenpool* .
-      chmod +w tokenpool*
+      cp -r ${gnumake-tokenpool-src}/cc/src/* .
+      chmod -R +w *
     )
 
     # Patch Chromium build tools
@@ -199,10 +183,6 @@ qtModule rec {
       --replace "QLibraryInfo::path(QLibraryInfo::TranslationsPath)" "\"$out/translations\"" \
       --replace "QLibraryInfo::path(QLibraryInfo::LibraryExecutablesPath)" "\"$out/libexec\""
   '';
-
-  # --replace 'COMMAND Ninja::ninja ' 'COMMAND Ninja::ninja $ENV{NINJAFLAGS} '
-  # error: $NINJAFLAGS is not unpacked -> passed as "-j32 -l32" not as -j32 -l32
-  # ninja: fatal: invalid -j parameter
 
   cmakeFlags = [
     "-DQT_FEATURE_qtpdf_build=ON"
@@ -302,47 +282,6 @@ qtModule rec {
   ];
 
   requiredSystemFeatures = [ "big-parallel" ];
-
-  # NOTE buildPhase ignores NIX_BUILD_CORES
-  # and uses all available cpu cores
-  #
-  # limiting cores by
-  #   export NINJAFLAGS="-j32 -l32"
-  # causes the build error
-  #   internal compiler error: Segmentation fault
-  #
-  # https://bugreports.qt.io/browse/QTBUG-103573
-  #
-  # honor NIX_BUILD_CORES in recursive ninja calls
-  # https://bugreports.qt.io/browse/QTBUG-95176
-  #
-  # based on ninjaBuildPhase in
-  # pkgs/development/tools/build-managers/ninja/setup-hook.sh
-  #
-  # this must run before cmake
-  # to set NINJAFLAGS for qtwebengine/cmake/Functions.cmake
-  #
-  /*
-  preConfigure = ''
-    local buildCores=1
-
-    # Parallel building is enabled by default.
-    if [ "''${enableParallelBuilding-1}" ]; then
-        buildCores="$NIX_BUILD_CORES"
-    fi
-
-    local flagsArray=(
-        -j$buildCores -l$NIX_BUILD_CORES
-        $ninjaFlags "''${ninjaFlagsArray[@]}"
-    )
-
-    # honor NIX_BUILD_CORES in recursive ninja calls
-    export NINJAFLAGS="''${flagsArray[@]}"
-    #export SAMUFLAGS="$NINJAFLAGS" # error: invalid option -l
-    export SAMUFLAGS="-j$buildCores"
-    echo "preConfigure: setting NINJAFLAGS: $NINJAFLAGS"
-  '';
-  */
 
   postInstall = ''
     # This is required at runtime
