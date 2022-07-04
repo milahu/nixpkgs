@@ -79,7 +79,7 @@ let
     owner = "milahu";
     repo = "jest-worker";
     rev = "a846fbb511d72ff2439123b3e9a6104524e1d7d2";
-    sha256 = "a3TCtjRIKJTKM59G60fLhYiFCCux2JXw/OTUK7i/hRc=";
+    sha256 = "Gon76s+F/REm2/5ZvuhaeDVRILKf8xVtvyh1jmLxlWE=";
   };
   gnumake-tokenpool-src = python3.pkgs.gnumake-tokenpool.src;
 in
