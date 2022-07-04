@@ -118,12 +118,17 @@ qtModule rec {
   hardeningDisable = [ "format" ];
 
   patches = [
+    ./patches/qtwebengine/0001-task_queue.py-add-jobclient.patch
+    ./patches/qtwebengine/0002-build_inspector_overlay.py-fix-inherit-fds.patch
+    ./patches/qtwebengine/0003-gn-add-jobclient.patch
+    ./patches/qtwebengine/0004-node.py-add-debug.patch
+    ./patches/qtwebengine/0005-mojom_parser.py-add-jobclient.patch
   ];
 
-  DEBUG_JEST_WORKER = "1";
-  DEBUG_JOBCLIENT = "1";
-  DEBUG_CHROMIUM_NODE_PY = "1";
-  PYTHONUNBUFFERED = "1"; # debug mojom_parser.py jobclient
+  DEBUG_JOBCLIENT = "1"; # gnumake-tokenpool
+  DEBUG_JEST_WORKER = "1"; # src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/jest-worker/build/index.js
+  DEBUG_CHROMIUM_NODE_PY = "1"; # src/3rdparty/chromium/third_party/node/node.py
+  DEBUG_MOJOM_PARSER = "1"; # src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
 
   # FIXME ninjaFlags are not inherited to child ninjas, for example via MAKEFLAGS
   #ninjaFlags = "-v -d explain";
@@ -157,6 +162,13 @@ qtModule rec {
         chmod +w gnumake_tokenpool.py
       )
     done
+
+    # tokenpool-gnu-make-posix.cc etc
+    (
+      cd src/3rdparty/gn/src/util
+      cp ${gnumake-tokenpool-src}/cc/src/tokenpool* .
+      chmod +w tokenpool*
+    )
 
     # Patch Chromium build tools
     (
