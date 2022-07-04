@@ -125,10 +125,12 @@ qtModule rec {
     ./patches/qtwebengine/0005-mojom_parser.py-add-jobclient.patch
   ];
 
+  /*
   DEBUG_JOBCLIENT = "1"; # gnumake-tokenpool
   DEBUG_JEST_WORKER = "1"; # src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/jest-worker/build/index.js
   DEBUG_CHROMIUM_NODE_PY = "1"; # src/3rdparty/chromium/third_party/node/node.py
   DEBUG_MOJOM_PARSER = "1"; # src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
+  */
 
   # FIXME ninjaFlags are not inherited to child ninjas, for example via MAKEFLAGS
   #ninjaFlags = "-v -d explain";
