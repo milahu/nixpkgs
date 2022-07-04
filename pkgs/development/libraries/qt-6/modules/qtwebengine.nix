@@ -118,46 +118,6 @@ qtModule rec {
   hardeningDisable = [ "format" ];
 
   patches = [
-    #./patches/qtwebengine/0005-fix-node.py-for-gnumake-jobclient.patch # TODO restore
-
-    ./patches/qtwebengine/0006-blink-bindgen-limit-jobs-with-jobclient.patch
-    ./patches/qtwebengine/0015-fixup-blink-task_queue.py.patch
-    ./patches/qtwebengine/0021-fix-blink-task_queue.py-this-self.patch
-
-    # node.py -> rollup, tsc, ...
-    ./patches/qtwebengine/0007-debug-chromium-node.py.patch
-    ./patches/qtwebengine/0008-fix-node-py-for-jobclient.patch # TODO remove. depends on 7
-    ./patches/qtwebengine/0009-debug-node-py-print-live-output.patch # depends on 8
-    ./patches/qtwebengine/0022-fix-node.py-node-path-debug-off.patch # depends on 9
-    ./patches/qtwebengine/0023-fix-node.py-dont-capture-output.patch
-    ./patches/qtwebengine/0024-node.py-debug-rollup.patch
-    ./patches/qtwebengine/0025-debug-ts_definitions.py-missing-ts-files.patch # should be fixed with 26
-    ./patches/qtwebengine/0026-fix-node.py-capture-stdout-only.patch
-    ./patches/qtwebengine/0027-fix-node.py-capture-stdout-and-stderr.patch
-    ./patches/qtwebengine/0029-node.py-print-pid-of-node-process.patch
-    ./patches/qtwebengine/0030-node.py-fix-live-output-with-flush-true.patch
-    ./patches/qtwebengine/0031-node.py-log-with-time.patch
-    # FIXME node.py / rollup / jest-worker
-    # many rollup's, but zero cpu load
-    # rollup fails to start the first worker? -> bug in jest-worker?
-    ./patches/qtwebengine/0028-rollup-trace-all-function-calls.patch
-    ./patches/qtwebengine/0032-rollup-trace-all-function-calls-time.patch
-
-    # qtwebengine-everywhere-src-6.3.1 $ grep -r -F 'subprocess.Popen(' | grep -v -e test -e tools
-    ./patches/qtwebengine/0010-fix-inherit-fds-devtools-frontend-build_inspector_overlay.py.patch
-
-    ./patches/qtwebengine/0011-mojom_parser.py-limit-jobs-with-jobclient.patch
-    # FIXME mojom_parser hangs, cpu load is 1 of 32
-    ./patches/qtwebengine/0013-mojom_parser.py-debug-to-stderr.patch
-    ./patches/qtwebengine/0014-mojom_parser.py-add-debug-prints.patch
-    ./patches/qtwebengine/0016-fixup-mojo-mojom_parser.py.patch
-    ./patches/qtwebengine/0017-fix-mojom_parser.py-def-_grow_pool.patch
-
-    # backport of https://github.com/milahu/gn/tree/add-gnumake-jobclient
-    ./patches/qtwebengine/0012-gn-add-gnumake-jobclient.patch
-    ./patches/qtwebengine/0018-gn-debug-token-release.patch
-    ./patches/qtwebengine/0019-gn-try-to-fix-token-release.patch
-    ./patches/qtwebengine/0020-fixup-gn-pool.ClearTokens.patch
   ];
 
   DEBUG_JEST_WORKER = "1";
