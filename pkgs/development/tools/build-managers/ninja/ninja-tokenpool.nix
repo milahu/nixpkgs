@@ -33,6 +33,9 @@
     export TERM=dumb
   '';
 
+  # debug build
+  dontStrip = true;
+
   setupHook = ./setup-hook-tokenpool.sh;
 
   meta = with lib; {
