@@ -8,6 +8,7 @@
   version = "unstable-2022-02-13";
 
   /*
+  # https://github.com/stefanb2/ninja/tree/topic-tokenpool-master
   src = fetchFromGitHub {
     owner = "stefanb2";
     repo = "ninja";
