@@ -1,13 +1,13 @@
-From 331d23b1f4461d2e34cfed444205ad6d97a901b5 Mon Sep 17 00:00:00 2001
+From 54653de341547e8d6590ab73ee2acf4dcd4fa4f3 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Tue, 5 Jul 2022 12:04:11 +0200
 Subject: [PATCH] add debug live output
 
 ---
  src/oprefixstream.h     | 61 +++++++++++++++++++++++++++++++++++++++++
- src/subprocess-posix.cc |  6 ++++
+ src/subprocess-posix.cc |  7 +++++
  src/subprocess.h        |  4 +++
- 3 files changed, 71 insertions(+)
+ 3 files changed, 72 insertions(+)
  create mode 100644 src/oprefixstream.h
 
 diff --git a/src/oprefixstream.h b/src/oprefixstream.h
@@ -78,26 +78,27 @@ index 0000000..de04fb4
 +
 +#endif // NINJA_OPREFIXSTREAM_H_
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 8e78540..4aa9078 100644
+index 8e78540..4b2bcd5 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
-@@ -130,6 +130,10 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+@@ -130,6 +130,11 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
    if (err != 0)
      Fatal("posix_spawn_file_actions_destroy: %s", strerror(err));
  
 +  char line_prefix[100];
 +  assert(snprintf(line_prefix, 100, "pid %d: ", pid_) < 100);
-+  liveoutput_ = new oprefixstream(line_prefix, std::cout);
++  //liveoutput_ = new oprefixstream(line_prefix, std::cout); // no output
++  liveoutput_ = new oprefixstream(line_prefix, std::cerr);
 +
    close(output_pipe[1]);
    return true;
  }
-@@ -139,6 +143,8 @@ void Subprocess::OnPipeReady() {
+@@ -139,6 +144,8 @@ void Subprocess::OnPipeReady() {
    ssize_t len = read(fd_, buf, sizeof(buf));
    if (len > 0) {
      buf_.append(buf, len);
 +    liveoutput_->write(buf, len);
-+    liveoutput_->flush();
++    //liveoutput_->flush();
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
