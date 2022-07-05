@@ -112,7 +112,7 @@ index 1ec7817..70b6b01 100644
    /// Set up pipe_ as the parent-side pipe of the subprocess; return the
    /// other end of the pipe, usable in the child process.
 diff --git a/src/util.cc b/src/util.cc
-index 080883e..bc6647c 100644
+index 080883e..d3b4548 100644
 --- a/src/util.cc
 +++ b/src/util.cc
 @@ -116,6 +116,18 @@ void Info(const char* msg, ...) {
@@ -128,7 +128,7 @@ index 080883e..bc6647c 100644
 +      puts(line_prefix);
 +    }
 +  }
-+  if (*buf[(len - 1)] != '\n') putchar('\n');
++  //if (*buf[(len - 1)] != '\n') putchar('\n'); // FIXME segfault?
 +}
 +
  void CanonicalizePath(string* path, uint64_t* slash_bits) {
