@@ -1,13 +1,13 @@
-From bbb8e55b92e4bd83eea50ba0ac4907d6ee9c2b7a Mon Sep 17 00:00:00 2001
+From 331d23b1f4461d2e34cfed444205ad6d97a901b5 Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Tue, 5 Jul 2022 12:04:11 +0200
 Subject: [PATCH] add debug live output
 
 ---
  src/oprefixstream.h     | 61 +++++++++++++++++++++++++++++++++++++++++
- src/subprocess-posix.cc |  5 ++++
+ src/subprocess-posix.cc |  6 ++++
  src/subprocess.h        |  4 +++
- 3 files changed, 70 insertions(+)
+ 3 files changed, 71 insertions(+)
  create mode 100644 src/oprefixstream.h
 
 diff --git a/src/oprefixstream.h b/src/oprefixstream.h
@@ -78,7 +78,7 @@ index 0000000..de04fb4
 +
 +#endif // NINJA_OPREFIXSTREAM_H_
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 8e78540..93d0725 100644
+index 8e78540..4aa9078 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -130,6 +130,10 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
@@ -92,11 +92,12 @@ index 8e78540..93d0725 100644
    close(output_pipe[1]);
    return true;
  }
-@@ -139,6 +143,7 @@ void Subprocess::OnPipeReady() {
+@@ -139,6 +143,8 @@ void Subprocess::OnPipeReady() {
    ssize_t len = read(fd_, buf, sizeof(buf));
    if (len > 0) {
      buf_.append(buf, len);
-+    liveoutput_->write(&buf[0], len);
++    liveoutput_->write(buf, len);
++    liveoutput_->flush();
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
