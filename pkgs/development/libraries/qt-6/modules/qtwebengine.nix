@@ -121,6 +121,9 @@ qtModule rec {
     ./patches/qtwebengine/0003-gn-add-jobclient.patch
     ./patches/qtwebengine/0004-node.py-add-debug.patch
     ./patches/qtwebengine/0005-mojom_parser.py-add-jobclient.patch
+
+    # TODO fixup to 4
+    ./patches/qtwebengine/0006-node.py-fix-type-byte-str-in-line_prefix.patch
   ];
 
   # debug jobclient patches

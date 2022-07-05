@@ -1,0 +1,25 @@
+From eb9576a7a1e5f3e389fff246a4782eb21ef6e934 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Tue, 5 Jul 2022 09:30:02 +0200
+Subject: [PATCH] node.py: fix type byte str in line_prefix
+
+---
+ src/3rdparty/chromium/third_party/node/node.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/chromium/third_party/node/node.py b/src/3rdparty/chromium/third_party/node/node.py
+index ff6a99933..63614bc2b 100755
+--- a/src/3rdparty/chromium/third_party/node/node.py
++++ b/src/3rdparty/chromium/third_party/node/node.py
+@@ -80,7 +80,7 @@ def RunNode(cmd_parts, stdout=None) -> str or bytes:
+     # todo: how to disable ninja buffering to get live output?
+     output = io.BytesIO()
+     for line in iter(process.stdout.readline, b''):
+-      line_prefix = b'debug node.py %i %s:   ' % (os.getpid(), datetime.utcnow().strftime('%F %T.%f')[:-3])
++      line_prefix = b'debug node.py %i %s:   ' % (os.getpid(), datetime.utcnow().strftime('%F %T.%f')[:-3].encode("ascii"))
+       sys.stderr.buffer.write(line_prefix + line)
+       output.write(line)
+     output = output.getvalue()
+-- 
+2.36.1
+
