@@ -1,0 +1,127 @@
+From 18f53c6f85c222e46b2de143dad5371000770b3d Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Tue, 5 Jul 2022 12:04:11 +0200
+Subject: [PATCH] add debug live output
+
+---
+ src/oprefixstream.h     | 61 +++++++++++++++++++++++++++++++++++++++++
+ src/subprocess-posix.cc |  5 ++++
+ src/subprocess.h        |  4 +++
+ 3 files changed, 70 insertions(+)
+ create mode 100644 src/oprefixstream.h
+
+diff --git a/src/oprefixstream.h b/src/oprefixstream.h
+new file mode 100644
+index 0000000..de04fb4
+--- /dev/null
++++ b/src/oprefixstream.h
+@@ -0,0 +1,61 @@
++// https://stackoverflow.com/a/27336473/10440128
++// https://github.com/milahu/random/blob/master/cc/print-lines-with-prefix/main.cc
++
++#ifndef NINJA_OPREFIXSTREAM_H_
++#define NINJA_OPREFIXSTREAM_H_
++
++#include <iostream>
++
++class prefixbuf
++    : public std::streambuf
++{
++    std::string     prefix;
++    std::streambuf* sbuf;
++    bool            need_prefix;
++
++    int sync() {
++        return this->sbuf->pubsync();
++    }
++    int overflow(int c) {
++        if (c != std::char_traits<char>::eof()) {
++            if (this->need_prefix
++                && !this->prefix.empty()
++                && this->prefix.size() != (long unsigned int) this->sbuf->sputn(&this->prefix[0], this->prefix.size())) {
++                return std::char_traits<char>::eof();
++            }
++            this->need_prefix = c == '\n';
++        }
++        return this->sbuf->sputc(c);
++    }
++public:
++    prefixbuf(std::string const& prefix, std::streambuf* sbuf)
++        : prefix(prefix)
++        , sbuf(sbuf)
++        , need_prefix(true) {
++    }
++};
++
++class oprefixstream
++    : private virtual prefixbuf
++    , public std::ostream
++{
++public:
++    oprefixstream(std::string const& prefix, std::ostream& out)
++        : prefixbuf(prefix, out.rdbuf())
++        , std::ios(static_cast<std::streambuf*>(this))
++        , std::ostream(static_cast<std::streambuf*>(this)) {
++    }
++};
++
++/*
++demo:
++
++int main()
++{
++    oprefixstream out("prefix: ", std::cout);
++    out << "hello\n"
++        << "world\n";
++}
++*/
++
++#endif // NINJA_OPREFIXSTREAM_H_
+diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
+index 8e78540..c12e27b 100644
+--- a/src/subprocess-posix.cc
++++ b/src/subprocess-posix.cc
+@@ -130,6 +130,10 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+   if (err != 0)
+     Fatal("posix_spawn_file_actions_destroy: %s", strerror(err));
+ 
++  char line_prefix[100];
++  assert(snprintf(line_prefix, 100, "pid %d: ", pid_) < 100);
++  liveoutput_ = new oprefixstream(line_prefix, std::cout);
++
+   close(output_pipe[1]);
+   return true;
+ }
+@@ -139,6 +143,7 @@ void Subprocess::OnPipeReady() {
+   ssize_t len = read(fd_, buf, sizeof(buf));
+   if (len > 0) {
+     buf_.append(buf, len);
++    liveoutput_.write(&buf[0], len);
+   } else {
+     if (len < 0)
+       Fatal("read: %s", strerror(errno));
+diff --git a/src/subprocess.h b/src/subprocess.h
+index 9e3d2ee..dd6419c 100644
+--- a/src/subprocess.h
++++ b/src/subprocess.h
+@@ -35,6 +35,8 @@
+ 
+ #include "exit_status.h"
+ 
++#include "oprefixstream.h"
++
+ /// Subprocess wraps a single async subprocess.  It is entirely
+ /// passive: it expects the caller to notify it when its fds are ready
+ /// for reading, as well as call Finish() to reap the child once done()
+@@ -57,6 +59,8 @@ struct Subprocess {
+ 
+   std::string buf_;
+ 
++  oprefixstream *liveoutput_;
++
+ #ifdef _WIN32
+   /// Set up pipe_ as the parent-side pipe of the subprocess; return the
+   /// other end of the pipe, usable in the child process.
+-- 
+2.36.1
+

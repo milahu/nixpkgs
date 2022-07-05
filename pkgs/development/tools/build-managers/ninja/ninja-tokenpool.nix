@@ -14,6 +14,11 @@
     sha256 = "sha256-cxtmBptmqxFyEXpgFNs7extyDfZBrJKMy1hsIqzruIc=";
   };
 
+  patches = [
+    # https://github.com/ninja-build/ninja/issues/2164
+    ./add-debug-live-output.patch
+  ];
+
   setupHook = ./setup-hook-tokenpool.sh;
 
   meta = with lib; {
