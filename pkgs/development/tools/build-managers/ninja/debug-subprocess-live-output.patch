@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..e59ae86 100644
+index 3183927..dc94b8f 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -58,18 +58,21 @@ index 3183927..e59ae86 100644
  ExitStatus Subprocess::Finish() {
    assert(pid_ != -1);
    int status;
-@@ -185,6 +201,10 @@ const string& Subprocess::GetOutput() const {
+@@ -185,6 +201,13 @@ const string& Subprocess::GetOutput() const {
    return buf_;
  }
  
++/*
++// TODO?
 +const string& Subprocess::GetLiveOutput() const {
 +  return buf_;
 +}
++*/
 +
  int SubprocessSet::interrupted_;
  
  void SubprocessSet::SetInterruptedFlag(int signum) {
-@@ -292,7 +312,17 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -292,7 +315,17 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
        continue;
      assert(fd == fds[cur_nfd].fd);
      if (fds[cur_nfd++].revents) {
