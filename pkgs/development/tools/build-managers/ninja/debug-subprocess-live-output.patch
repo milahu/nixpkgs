@@ -121,26 +121,34 @@ index 1ec7817..b2220ff 100644
    /// Set up pipe_ as the parent-side pipe of the subprocess; return the
    /// other end of the pipe, usable in the child process.
 diff --git a/src/util.cc b/src/util.cc
-index 080883e..1b226de 100644
+index 080883e..3cb443a 100644
 --- a/src/util.cc
 +++ b/src/util.cc
-@@ -116,6 +116,21 @@ void Info(const char* msg, ...) {
+@@ -116,6 +116,29 @@ void Info(const char* msg, ...) {
    va_end(ap);
  }
  
 +void SubprocessOutput(char* line_prefix, char* buf, size_t len) {
 +  if (len == 0) return;
-+  printf("SubprocessOutput: len = %i\n", len);
-+  puts(line_prefix);
++  //printf("SubprocessOutput: len = %li\n", len);
++  fprintf(stderr, "SubprocessOutput: len = %li\n", len);
++  //puts(line_prefix);
++  fputs(line_prefix, stderr);
 +  for (size_t i = 0; i < len; i++) {
-+    printf("SubprocessOutput: buf[%i] = int %i = char '%c'\n", i, (int) buf[i], buf[i]);
-+    putchar(buf[i]);
++    //printf("SubprocessOutput: buf[%i] = int %i = char '%c'\n", i, (int) buf[i], buf[i]);
++    //putchar(buf[i]); // stdout
++    //putc(buf[i], stderr);
++    fputc(buf[i], stderr);
 +    if (buf[i] == '\n') {
-+      printf("SubprocessOutput: end of line\n");
-+      puts(line_prefix);
++      //printf("SubprocessOutput: end of line\n");
++      //puts(line_prefix);
++      fputs(line_prefix, stderr);
 +    }
 +  }
-+  if (buf[(len - 1)] != '\n') putchar('\n');
++  if (buf[(len - 1)] != '\n') {
++    //putchar('\n');
++    fputc('\n', stderr);
++  }
 +}
 +
  void CanonicalizePath(string* path, uint64_t* slash_bits) {
