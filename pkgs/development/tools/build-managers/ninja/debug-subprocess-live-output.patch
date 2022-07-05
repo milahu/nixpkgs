@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..5f67494 100644
+index 3183927..be81afa 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -31,15 +31,16 @@ index 3183927..5f67494 100644
    close(output_pipe[1]);
    return true;
  }
-@@ -140,6 +143,7 @@ void Subprocess::OnPipeReady() {
+@@ -140,6 +143,8 @@ void Subprocess::OnPipeReady() {
    ssize_t len = read(fd_, buf, sizeof(buf));
    if (len > 0) {
      buf_.append(buf, len);
 +    //SubprocessOutput(line_prefix, buf, len); // wrong.
++    SubprocessOutput("ninja child 1234: ", buf, len); // wrong.
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
-@@ -148,6 +152,18 @@ void Subprocess::OnPipeReady() {
+@@ -148,6 +153,18 @@ void Subprocess::OnPipeReady() {
    }
  }
  
@@ -58,7 +59,7 @@ index 3183927..5f67494 100644
  ExitStatus Subprocess::Finish() {
    assert(pid_ != -1);
    int status;
-@@ -185,6 +201,13 @@ const string& Subprocess::GetOutput() const {
+@@ -185,6 +202,13 @@ const string& Subprocess::GetOutput() const {
    return buf_;
  }
  
@@ -72,12 +73,11 @@ index 3183927..5f67494 100644
  int SubprocessSet::interrupted_;
  
  void SubprocessSet::SetInterruptedFlag(int signum) {
-@@ -292,7 +315,17 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
-       continue;
+@@ -293,6 +317,18 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      assert(fd == fds[cur_nfd].fd);
      if (fds[cur_nfd++].revents) {
--      (*i)->OnPipeReady();
-+      //(*i)->OnPipeReady();
+       (*i)->OnPipeReady();
++      /*
 +      // TODO live output?
 +      char* buf;
 +      const size_t buf_size = 4 << 10;
@@ -87,6 +87,7 @@ index 3183927..5f67494 100644
 +      SubprocessOutput((*i)->line_prefix, buf, (size_t) len); // FIXME
 +      free(buf);
 +      buf = NULL;
++      */
 +
        if ((*i)->Done()) {
          finished_.push(*i);
