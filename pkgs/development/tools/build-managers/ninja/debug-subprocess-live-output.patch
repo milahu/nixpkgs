@@ -1,45 +1,76 @@
-From 9facff74e188898d0c08b4e3c21f08eb0617e68d Mon Sep 17 00:00:00 2001
-From: Milan Hauth <milahu@gmail.com>
-Date: Tue, 5 Jul 2022 12:04:11 +0200
-Subject: [PATCH] add debug live output
-
----
- src/subprocess-posix.cc |  3 +++
- src/subprocess.h        |  5 +++++
- src/util.cc             | 12 ++++++++++++
- src/util.h              |  3 +++
- 4 files changed, 23 insertions(+)
-
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 8e78540..4c33bdb 100644
+index 8e78540..31e117a 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -130,6 +130,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
    if (err != 0)
      Fatal("posix_spawn_file_actions_destroy: %s", strerror(err));
  
-+  assert(snprintf(line_prefix_, 32, "pid %d: ", pid_) < 32);
++  assert(snprintf(line_prefix, 32, "pid %d: ", pid_) < 32);
 +
    close(output_pipe[1]);
    return true;
  }
-@@ -139,6 +141,7 @@ void Subprocess::OnPipeReady() {
+@@ -139,6 +141,20 @@ void Subprocess::OnPipeReady() {
    ssize_t len = read(fd_, buf, sizeof(buf));
    if (len > 0) {
      buf_.append(buf, len);
-+    SubprocessOutput(line_prefix_, buf, len);
++    //SubprocessOutput(line_prefix, buf, len); // wrong.
++  } else {
++    if (len < 0)
++      Fatal("read: %s", strerror(errno));
++    close(fd_);
++    fd_ = -1;
++  }
++}
++
++void Subprocess::OnPipeReadyBuf(char *buf, size_t buf_len, size_t *len) {
++  ssize_t len = read(fd_, buf, buf_len);
++  if (len > 0) {
++    buf_.append(buf, len);
++    //SubprocessOutput(line_prefix, buf, len); // wrong. prints garbage
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
+@@ -184,6 +200,10 @@ const string& Subprocess::GetOutput() const {
+   return buf_;
+ }
+ 
++const string& Subprocess::GetLiveOutput() const {
++  return buf_;
++}
++
+ int SubprocessSet::interrupted_;
+ 
+ void SubprocessSet::SetInterruptedFlag(int signum) {
+@@ -285,7 +305,13 @@ bool SubprocessSet::DoWork() {
+       continue;
+     assert(fd == fds[cur_nfd].fd);
+     if (fds[cur_nfd++].revents) {
+-      (*i)->OnPipeReady();
++      //(*i)->OnPipeReady();
++      // TODO live output?
++      char buf[4 << 10];
++      size_t len = 0;
++      (*i)->OnPipeReadyBuf(&buf, sizeof(buf), &len);
++      SubprocessOutput((*i)->line_prefix, buf, len); // TODO test
++
+       if ((*i)->Done()) {
+         finished_.push(*i);
+         i = running_.erase(i);
 diff --git a/src/subprocess.h b/src/subprocess.h
-index 9e3d2ee..d06778c 100644
+index 9e3d2ee..12c626e 100644
 --- a/src/subprocess.h
 +++ b/src/subprocess.h
-@@ -57,6 +57,11 @@ struct Subprocess {
+@@ -54,9 +54,15 @@ struct Subprocess {
+   Subprocess(bool use_console);
+   bool Start(struct SubprocessSet* set, const std::string& command);
+   void OnPipeReady();
++  void OnPipeReadyBuf(char *buf, size_t buf_len, size_t *len);
  
    std::string buf_;
  
-+  char line_prefix_[32];
++  char line_prefix[32];
 +  // 31 bytes + \0
 +  // '1234567890123456789012345678901'
 +  // 'pid xxxxxxxxxxxx: '
@@ -84,6 +115,3 @@ index 4a7fea2..fa020e9 100644
  /// Canonicalize a path like "foo/../bar.h" into just "bar.h".
  /// |slash_bits| has bits set starting from lowest for a backslash that was
  /// normalized to a forward slash. (only used on Windows)
--- 
-2.36.1
-
