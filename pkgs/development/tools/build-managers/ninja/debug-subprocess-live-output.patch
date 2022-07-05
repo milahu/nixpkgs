@@ -1,4 +1,4 @@
-From 6c982b1ed1a9e17152e8ce83802d4dd6d2e9a92d Mon Sep 17 00:00:00 2001
+From 9facff74e188898d0c08b4e3c21f08eb0617e68d Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Tue, 5 Jul 2022 12:04:11 +0200
 Subject: [PATCH] add debug live output
@@ -7,7 +7,8 @@ Subject: [PATCH] add debug live output
  src/subprocess-posix.cc |  3 +++
  src/subprocess.h        |  5 +++++
  src/util.cc             | 12 ++++++++++++
- 3 files changed, 20 insertions(+)
+ src/util.h              |  3 +++
+ 4 files changed, 23 insertions(+)
 
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
 index 8e78540..4c33bdb 100644
@@ -69,6 +70,20 @@ index 483f4a6..ce8cbaf 100644
  void CanonicalizePath(string* path, uint64_t* slash_bits) {
    size_t len = path->size();
    char* str = 0;
+diff --git a/src/util.h b/src/util.h
+index 4a7fea2..fa020e9 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -61,6 +61,9 @@ void Error(const char* msg, va_list ap);
+ void Info(const char* msg, ...);
+ void Info(const char* msg, va_list ap);
+ 
++/// Log live output of subprocess.
++void SubprocessOutput(const char* line_prefix, const char* buf, size_t len);
++
+ /// Canonicalize a path like "foo/../bar.h" into just "bar.h".
+ /// |slash_bits| has bits set starting from lowest for a backslash that was
+ /// normalized to a forward slash. (only used on Windows)
 -- 
 2.36.1
 
