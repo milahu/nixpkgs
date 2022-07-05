@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..3018b2e 100644
+index 3183927..9493681 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -40,7 +40,7 @@ index 3183927..3018b2e 100644
 +  //fprintf(stderr, "Subprocess::Start: bytes_written ptr = %i\n", bytes_written);
 +  //fprintf(stderr, "Subprocess::Start: line_prefix ptr = '%s'\n", line_prefix_ptr);
 +
-+  fprintf(stderr, "ninja worker %i: starting\n", pid_);
++  //fprintf(stderr, "ninja worker %i: starting\n", pid_);
 +
 +  close(output_pipe[1]); // TODO(milahu) what is closed here?
    return true;
@@ -50,7 +50,7 @@ index 3183927..3018b2e 100644
  void Subprocess::OnPipeReady() {
    char buf[4 << 10];
    ssize_t len = read(fd_, buf, sizeof(buf));
-+  fprintf(stderr, "Subprocess::OnPipeReady: len = %li\n", len);
++  //fprintf(stderr, "Subprocess::OnPipeReady: len = %li\n", len);
    if (len > 0) {
      buf_.append(buf, len);
 +    //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix = '%s'\n", line_prefix); // ok
@@ -207,7 +207,7 @@ index 1ec7817..584a52d 100644
    std::string buf_;
  
 diff --git a/src/util.cc b/src/util.cc
-index 080883e..531e59c 100644
+index 080883e..3dfac04 100644
 --- a/src/util.cc
 +++ b/src/util.cc
 @@ -116,6 +116,32 @@ void Info(const char* msg, ...) {
@@ -216,7 +216,7 @@ index 080883e..531e59c 100644
  
 +void SubprocessOutput(char* line_prefix, char* buf, size_t len) {
 +  if (len == 0) return;
-+  fputc('\n', stderr);
++  //fputc('\n', stderr);
 +  //printf("SubprocessOutput: len = %li\n", len);
 +  //fprintf(stderr, "SubprocessOutput: len = %li\n", len);
 +  //puts(line_prefix);
