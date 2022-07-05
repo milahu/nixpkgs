@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..0a64bd6 100644
+index 3183927..ac3c97e 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -94,15 +94,19 @@ index 3183927..0a64bd6 100644
  int SubprocessSet::interrupted_;
  
  void SubprocessSet::SetInterruptedFlag(int signum) {
-@@ -245,6 +287,7 @@ Subprocess *SubprocessSet::Add(const string& command, bool use_console) {
+@@ -245,6 +287,11 @@ Subprocess *SubprocessSet::Add(const string& command, bool use_console) {
      delete subprocess;
      return 0;
    }
-+  fprintf(stderr, "SubprocessSet::Add: pid %i: use_console = %s\n", subprocess->pid_, use_console);
++  //fprintf(stderr, "SubprocessSet::Add: pid %i: use_console = %i\n", subprocess->pid_, use_console);
++  // always 0?
++  if (use_console == true) {
++    fprintf(stderr, "SubprocessSet::Add: pid %i: use_console = %i\n", subprocess->pid_, use_console);
++  }
    running_.push_back(subprocess);
    return subprocess;
  }
-@@ -254,6 +297,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -254,6 +301,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
    vector<pollfd> fds;
    nfds_t nfds = 0;
  
@@ -111,7 +115,7 @@ index 3183927..0a64bd6 100644
    for (vector<Subprocess*>::iterator i = running_.begin();
         i != running_.end(); ++i) {
      int fd = (*i)->fd_;
-@@ -264,12 +309,16 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -264,12 +313,16 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      ++nfds;
    }
  
@@ -128,7 +132,7 @@ index 3183927..0a64bd6 100644
    interrupted_ = 0;
    int ret = ppoll(&fds.front(), nfds, NULL, &old_mask_);
    if (ret == -1) {
-@@ -280,10 +329,14 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -280,10 +333,14 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      return IsInterrupted();
    }
  
@@ -143,7 +147,7 @@ index 3183927..0a64bd6 100644
    nfds_t cur_nfd = 0;
    for (vector<Subprocess*>::iterator i = running_.begin();
         i != running_.end(); ) {
-@@ -292,7 +345,20 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -292,7 +349,20 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
        continue;
      assert(fd == fds[cur_nfd].fd);
      if (fds[cur_nfd++].revents) {
@@ -164,7 +168,7 @@ index 3183927..0a64bd6 100644
        if ((*i)->Done()) {
          finished_.push(*i);
          i = running_.erase(i);
-@@ -302,6 +368,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -302,6 +372,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      ++i;
    }
  
@@ -173,7 +177,7 @@ index 3183927..0a64bd6 100644
    if (tokens) {
      pollfd *pfd = &fds[nfds - 1];
      if (pfd->fd >= 0) {
-@@ -311,6 +379,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -311,6 +383,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      }
    }
  
