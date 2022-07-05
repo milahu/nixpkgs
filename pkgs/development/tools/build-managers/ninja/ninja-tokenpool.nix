@@ -24,6 +24,10 @@
     sha256 = "u61W036KkPuaXPsRPWO5KqnY7cKB3Hnsr8bR7QAcaP8=";
   };
 
+  patches = [
+    ./debug-subprocess-live-output.patch
+  ];
+
   setupHook = ./setup-hook-tokenpool.sh;
 
   meta = with lib; {
