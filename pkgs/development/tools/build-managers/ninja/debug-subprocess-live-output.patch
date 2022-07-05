@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..6b216fd 100644
+index 3183927..3018b2e 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -22,23 +22,27 @@ index 3183927..6b216fd 100644
  
  #if defined(USE_PPOLL)
  #include <poll.h>
-@@ -131,15 +132,33 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+@@ -131,15 +132,37 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
    if (err != 0)
      Fatal("posix_spawn_file_actions_destroy: %s", strerror(err));
  
+-  close(output_pipe[1]);
 +  //assert(snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_) < SUBPROCESS_LINE_PREFIX_SIZE);
 +  //assert(snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_) < SUBPROCESS_LINE_PREFIX_SIZE);
++  // line_prefix prints garbage ... just why?
 +  int bytes_written = 0;
-+  bytes_written = snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_);
++  //bytes_written = snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_);
 +  //fprintf(stderr, "Subprocess::Start: bytes_written = %i\n", bytes_written);
-+  fprintf(stderr, "Subprocess::Start: line_prefix = '%s'\n", line_prefix);
++  //fprintf(stderr, "Subprocess::Start: line_prefix = '%s'\n", line_prefix);
 +
 +  line_prefix_ptr = (char*) malloc(SUBPROCESS_LINE_PREFIX_SIZE);
-+  bytes_written = snprintf(line_prefix_ptr, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_);
++  bytes_written = snprintf(line_prefix_ptr, SUBPROCESS_LINE_PREFIX_SIZE, "ninja worker %d: ", pid_);
 +  //fprintf(stderr, "Subprocess::Start: bytes_written ptr = %i\n", bytes_written);
-+  fprintf(stderr, "Subprocess::Start: line_prefix ptr = '%s'\n", line_prefix_ptr);
++  //fprintf(stderr, "Subprocess::Start: line_prefix ptr = '%s'\n", line_prefix_ptr);
 +
-   close(output_pipe[1]);
++  fprintf(stderr, "ninja worker %i: starting\n", pid_);
++
++  close(output_pipe[1]); // TODO(milahu) what is closed here?
    return true;
  }
  
@@ -46,17 +50,18 @@ index 3183927..6b216fd 100644
  void Subprocess::OnPipeReady() {
    char buf[4 << 10];
    ssize_t len = read(fd_, buf, sizeof(buf));
++  fprintf(stderr, "Subprocess::OnPipeReady: len = %li\n", len);
    if (len > 0) {
      buf_.append(buf, len);
-+    fprintf(stderr, "Subprocess::OnPipeReady: line_prefix = '%s'\n", line_prefix);
-+    fprintf(stderr, "Subprocess::OnPipeReady: line_prefix_ptr = '%s'\n", line_prefix_ptr);
-+    //SubprocessOutput(line_prefix, buf, len); // bug in line_prefix
++    //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix = '%s'\n", line_prefix); // ok
++    //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix_ptr = '%s'\n", line_prefix_ptr); // ok
++    //SubprocessOutput(line_prefix, buf, len); // prints garbage from line_prefix. wtf?
 +    //SubprocessOutput("ninja child 1234: ", buf, len); // ok
 +    SubprocessOutput(line_prefix_ptr, buf, len); // ok
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
-@@ -148,6 +167,18 @@ void Subprocess::OnPipeReady() {
+@@ -148,6 +171,18 @@ void Subprocess::OnPipeReady() {
    }
  }
  
@@ -75,7 +80,7 @@ index 3183927..6b216fd 100644
  ExitStatus Subprocess::Finish() {
    assert(pid_ != -1);
    int status;
-@@ -185,6 +216,13 @@ const string& Subprocess::GetOutput() const {
+@@ -185,6 +220,13 @@ const string& Subprocess::GetOutput() const {
    return buf_;
  }
  
@@ -89,20 +94,20 @@ index 3183927..6b216fd 100644
  int SubprocessSet::interrupted_;
  
  void SubprocessSet::SetInterruptedFlag(int signum) {
-@@ -254,6 +292,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -254,6 +296,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
    vector<pollfd> fds;
    nfds_t nfds = 0;
  
-+  fprintf(stderr, "Subprocess::DoWork\n");
++  //fprintf(stderr, "Subprocess::DoWork\n");
 +
    for (vector<Subprocess*>::iterator i = running_.begin();
         i != running_.end(); ++i) {
      int fd = (*i)->fd_;
-@@ -264,12 +304,16 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -264,12 +308,16 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      ++nfds;
    }
  
-+  fprintf(stderr, "Subprocess::DoWork 2\n");
++  //fprintf(stderr, "Subprocess::DoWork 2\n");
 +
    if (tokens) {
      pollfd pfd = { tokens->GetMonitorFd(), POLLIN | POLLPRI, 0 };
@@ -110,31 +115,31 @@ index 3183927..6b216fd 100644
      ++nfds;
    }
  
-+  fprintf(stderr, "Subprocess::DoWork 3\n");
++  //fprintf(stderr, "Subprocess::DoWork 3\n");
 +
    interrupted_ = 0;
    int ret = ppoll(&fds.front(), nfds, NULL, &old_mask_);
    if (ret == -1) {
-@@ -280,10 +324,14 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -280,10 +328,14 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      return IsInterrupted();
    }
  
-+  fprintf(stderr, "Subprocess::DoWork 4\n");
++  //fprintf(stderr, "Subprocess::DoWork 4\n");
 +
    HandlePendingInterruption();
    if (IsInterrupted())
      return true;
  
-+  fprintf(stderr, "Subprocess::DoWork 5\n");
++  //fprintf(stderr, "Subprocess::DoWork 5\n");
 +
    nfds_t cur_nfd = 0;
    for (vector<Subprocess*>::iterator i = running_.begin();
         i != running_.end(); ) {
-@@ -292,7 +340,20 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -292,7 +344,20 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
        continue;
      assert(fd == fds[cur_nfd].fd);
      if (fds[cur_nfd++].revents) {
-+      fprintf(stderr, "Subprocess::DoWork 5a: pid %i: OnPipeReady\n", (*i)->pid_);
++      //fprintf(stderr, "Subprocess::DoWork 5a: pid %i: OnPipeReady\n", (*i)->pid_);
        (*i)->OnPipeReady();
 +      /*
 +      // TODO live output?
@@ -151,20 +156,20 @@ index 3183927..6b216fd 100644
        if ((*i)->Done()) {
          finished_.push(*i);
          i = running_.erase(i);
-@@ -302,6 +363,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -302,6 +367,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      ++i;
    }
  
-+  fprintf(stderr, "Subprocess::DoWork 6\n");
++  //fprintf(stderr, "Subprocess::DoWork 6\n");
 +
    if (tokens) {
      pollfd *pfd = &fds[nfds - 1];
      if (pfd->fd >= 0) {
-@@ -311,6 +374,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -311,6 +378,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      }
    }
  
-+  fprintf(stderr, "Subprocess::DoWork 7\n");
++  //fprintf(stderr, "Subprocess::DoWork 7\n");
 +
    return IsInterrupted();
  }
@@ -202,10 +207,10 @@ index 1ec7817..584a52d 100644
    std::string buf_;
  
 diff --git a/src/util.cc b/src/util.cc
-index 080883e..20a40e4 100644
+index 080883e..531e59c 100644
 --- a/src/util.cc
 +++ b/src/util.cc
-@@ -116,6 +116,30 @@ void Info(const char* msg, ...) {
+@@ -116,6 +116,32 @@ void Info(const char* msg, ...) {
    va_end(ap);
  }
  
@@ -213,10 +218,11 @@ index 080883e..20a40e4 100644
 +  if (len == 0) return;
 +  fputc('\n', stderr);
 +  //printf("SubprocessOutput: len = %li\n", len);
-+  fprintf(stderr, "SubprocessOutput: len = %li\n", len);
++  //fprintf(stderr, "SubprocessOutput: len = %li\n", len);
 +  //puts(line_prefix);
 +  fputs(line_prefix, stderr);
-+  for (size_t i = 0; i < len; i++) {
++  //for (size_t i = 0; i < len; i++) {
++  for (size_t i = 0; i < (len - 1); i++) { // all except last char
 +    //printf("SubprocessOutput: buf[%i] = int %i = char '%c'\n", i, (int) buf[i], buf[i]);
 +    //putchar(buf[i]); // stdout
 +    //putc(buf[i], stderr);
@@ -227,6 +233,7 @@ index 080883e..20a40e4 100644
 +      fputs(line_prefix, stderr);
 +    }
 +  }
++  fputc(buf[(len - 1)], stderr); // last char. avoid printing extra line_prefix
 +  if (buf[(len - 1)] != '\n') {
 +    //putchar('\n');
 +    fputc('\n', stderr);
