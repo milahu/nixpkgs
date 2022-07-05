@@ -1,5 +1,5 @@
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 8e78540..2359226 100644
+index 8e78540..0f0f71f 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -130,6 +130,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
@@ -11,27 +11,34 @@ index 8e78540..2359226 100644
    close(output_pipe[1]);
    return true;
  }
-@@ -139,6 +141,20 @@ void Subprocess::OnPipeReady() {
+@@ -139,6 +141,7 @@ void Subprocess::OnPipeReady() {
    ssize_t len = read(fd_, buf, sizeof(buf));
    if (len > 0) {
      buf_.append(buf, len);
 +    //SubprocessOutput(line_prefix, buf, len); // wrong.
+   } else {
+     if (len < 0)
+       Fatal("read: %s", strerror(errno));
+@@ -147,6 +150,19 @@ void Subprocess::OnPipeReady() {
+   }
+ }
+ 
++void Subprocess::OnPipeReadyBuf(char **buf, size_t buf_len, size_t *len) {
++  *len = read(fd_, *buf, buf_len);
++  if (*len > 0) {
++    buf_.append(*buf, *len);
++    //SubprocessOutput(line_prefix, *buf, *len); // wrong. prints garbage
 +  } else {
-+    if (len < 0)
++    if (*len < 0)
 +      Fatal("read: %s", strerror(errno));
 +    close(fd_);
 +    fd_ = -1;
 +  }
 +}
 +
-+void Subprocess::OnPipeReadyBuf(char *buf, size_t buf_len, size_t *len) {
-+  *len = read(fd_, buf, buf_len);
-+  if (len > 0) {
-+    buf_.append(buf, len);
-+    //SubprocessOutput(line_prefix, buf, len); // wrong. prints garbage
-   } else {
-     if (len < 0)
-       Fatal("read: %s", strerror(errno));
+ ExitStatus Subprocess::Finish() {
+   assert(pid_ != -1);
+   int status;
 @@ -184,6 +200,10 @@ const string& Subprocess::GetOutput() const {
    return buf_;
  }
