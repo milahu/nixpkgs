@@ -1,4 +1,4 @@
-From 18f53c6f85c222e46b2de143dad5371000770b3d Mon Sep 17 00:00:00 2001
+From bbb8e55b92e4bd83eea50ba0ac4907d6ee9c2b7a Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Tue, 5 Jul 2022 12:04:11 +0200
 Subject: [PATCH] add debug live output
@@ -78,7 +78,7 @@ index 0000000..de04fb4
 +
 +#endif // NINJA_OPREFIXSTREAM_H_
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 8e78540..c12e27b 100644
+index 8e78540..93d0725 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -130,6 +130,10 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
@@ -96,7 +96,7 @@ index 8e78540..c12e27b 100644
    ssize_t len = read(fd_, buf, sizeof(buf));
    if (len > 0) {
      buf_.append(buf, len);
-+    liveoutput_.write(&buf[0], len);
++    liveoutput_->write(&buf[0], len);
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
