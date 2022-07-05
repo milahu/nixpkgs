@@ -29,6 +29,10 @@
     ./debug-subprocess-live-output.patch
   ];
 
+  preConfigure = ''
+    export TERM=dumb
+  '';
+
   setupHook = ./setup-hook-tokenpool.sh;
 
   meta = with lib; {
