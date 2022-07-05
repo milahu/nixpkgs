@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..dc94b8f 100644
+index 3183927..ca997e2 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -79,9 +79,9 @@ index 3183927..dc94b8f 100644
 -      (*i)->OnPipeReady();
 +      //(*i)->OnPipeReady();
 +      // TODO live output?
-+      char *buf;
++      char* buf;
 +      const size_t buf_size = 4 << 10;
-+      buf = malloc(buf_size);
++      buf = (char*) malloc(buf_size);
 +      ssize_t len = 0;
 +      (*i)->OnPipeReadyBuf(&buf, buf_size, &len);
 +      SubprocessOutput((*i)->line_prefix, buf, len); // TODO test
