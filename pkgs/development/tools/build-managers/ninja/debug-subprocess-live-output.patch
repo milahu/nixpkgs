@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..ac3c97e 100644
+index 3183927..37c9591 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -22,11 +22,69 @@ index 3183927..ac3c97e 100644
  
  #if defined(USE_PPOLL)
  #include <poll.h>
-@@ -131,15 +132,37 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+@@ -37,6 +38,7 @@ extern char** environ;
+ 
+ using namespace std;
+ 
++// use_console = nested ninja process = ninja calls ninja
+ Subprocess::Subprocess(bool use_console) : fd_(-1), pid_(-1),
+                                            use_console_(use_console) {
+ }
+@@ -53,7 +55,7 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+   int output_pipe[2];
+   if (pipe(output_pipe) < 0)
+     Fatal("pipe: %s", strerror(errno));
+-  fd_ = output_pipe[0];
++  fd_ = output_pipe[0]; // read from output_pipe[0]
+ #if !defined(USE_PPOLL)
+   // If available, we use ppoll in DoWork(); otherwise we use pselect
+   // and so must avoid overly-large FDs.
+@@ -67,6 +69,7 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+   if (err != 0)
+     Fatal("posix_spawn_file_actions_init: %s", strerror(err));
+ 
++  // TODO(milahu) what is addclose?
+   err = posix_spawn_file_actions_addclose(&action, output_pipe[0]);
+   if (err != 0)
+     Fatal("posix_spawn_file_actions_addclose: %s", strerror(err));
+@@ -98,17 +101,25 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+       Fatal("posix_spawn_file_actions_addopen: %s", strerror(err));
+     }
+ 
++    // write stdout + stderr to output_pipe[1]
++    // duplicate output_pipe[1] so we can close(output_pipe[1])
+     err = posix_spawn_file_actions_adddup2(&action, output_pipe[1], 1);
+     if (err != 0)
+       Fatal("posix_spawn_file_actions_adddup2: %s", strerror(err));
++
+     err = posix_spawn_file_actions_adddup2(&action, output_pipe[1], 2);
+     if (err != 0)
+       Fatal("posix_spawn_file_actions_adddup2: %s", strerror(err));
++
++    // TODO(milahu) what is addclose?
++    // close output_pipe[1] when subprocess done?
+     err = posix_spawn_file_actions_addclose(&action, output_pipe[1]);
+     if (err != 0)
+       Fatal("posix_spawn_file_actions_addclose: %s", strerror(err));
+     // In the console case, output_pipe is still inherited by the child and
+     // closed when the subprocess finishes, which then notifies ninja.
++
++    // TODO(milahu) live output, before "subprocess ... notifies ninja"
+   }
+ #ifdef POSIX_SPAWN_USEVFORK
+   flags |= POSIX_SPAWN_USEVFORK;
+@@ -118,6 +129,7 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+   if (err != 0)
+     Fatal("posix_spawnattr_setflags: %s", strerror(err));
+ 
++  // start the subprocess
+   const char* spawned_args[] = { "/bin/sh", "-c", command.c_str(), NULL };
+   err = posix_spawn(&pid_, "/bin/sh", &action, &attr,
+         const_cast<char**>(spawned_args), environ);
+@@ -131,15 +143,41 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
    if (err != 0)
      Fatal("posix_spawn_file_actions_destroy: %s", strerror(err));
  
--  close(output_pipe[1]);
 +  //assert(snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_) < SUBPROCESS_LINE_PREFIX_SIZE);
 +  //assert(snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_) < SUBPROCESS_LINE_PREFIX_SIZE);
 +  // line_prefix prints garbage ... just why?
@@ -42,7 +100,7 @@ index 3183927..ac3c97e 100644
 +
 +  //fprintf(stderr, "ninja worker %i: starting\n", pid_);
 +
-+  close(output_pipe[1]); // TODO(milahu) what is closed here?
+   close(output_pipe[1]);
    return true;
  }
  
@@ -52,16 +110,21 @@ index 3183927..ac3c97e 100644
    ssize_t len = read(fd_, buf, sizeof(buf));
 +  //fprintf(stderr, "Subprocess::OnPipeReady: len = %li\n", len);
    if (len > 0) {
-     buf_.append(buf, len);
-+    //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix = '%s'\n", line_prefix); // ok
-+    //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix_ptr = '%s'\n", line_prefix_ptr); // ok
-+    //SubprocessOutput(line_prefix, buf, len); // prints garbage from line_prefix. wtf?
-+    //SubprocessOutput("ninja child 1234: ", buf, len); // ok
-+    SubprocessOutput(line_prefix_ptr, buf, len); // ok
+-    buf_.append(buf, len);
++    // dont double print?
++    #if 0
++      buf_.append(buf, len);
++    #else
++      //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix = '%s'\n", line_prefix); // ok
++      //fprintf(stderr, "Subprocess::OnPipeReady: line_prefix_ptr = '%s'\n", line_prefix_ptr); // ok
++      //SubprocessOutput(line_prefix, buf, len); // prints garbage from line_prefix. wtf?
++      //SubprocessOutput("ninja child 1234: ", buf, len); // ok
++      SubprocessOutput(line_prefix_ptr, buf, len); // ok
++    #endif
    } else {
      if (len < 0)
        Fatal("read: %s", strerror(errno));
-@@ -148,6 +171,18 @@ void Subprocess::OnPipeReady() {
+@@ -148,6 +186,18 @@ void Subprocess::OnPipeReady() {
    }
  }
  
@@ -80,7 +143,7 @@ index 3183927..ac3c97e 100644
  ExitStatus Subprocess::Finish() {
    assert(pid_ != -1);
    int status;
-@@ -185,6 +220,13 @@ const string& Subprocess::GetOutput() const {
+@@ -185,6 +235,13 @@ const string& Subprocess::GetOutput() const {
    return buf_;
  }
  
@@ -94,7 +157,7 @@ index 3183927..ac3c97e 100644
  int SubprocessSet::interrupted_;
  
  void SubprocessSet::SetInterruptedFlag(int signum) {
-@@ -245,6 +287,11 @@ Subprocess *SubprocessSet::Add(const string& command, bool use_console) {
+@@ -245,6 +302,11 @@ Subprocess *SubprocessSet::Add(const string& command, bool use_console) {
      delete subprocess;
      return 0;
    }
@@ -106,7 +169,7 @@ index 3183927..ac3c97e 100644
    running_.push_back(subprocess);
    return subprocess;
  }
-@@ -254,6 +301,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -254,6 +316,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
    vector<pollfd> fds;
    nfds_t nfds = 0;
  
@@ -115,7 +178,7 @@ index 3183927..ac3c97e 100644
    for (vector<Subprocess*>::iterator i = running_.begin();
         i != running_.end(); ++i) {
      int fd = (*i)->fd_;
-@@ -264,12 +313,16 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -264,12 +328,16 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      ++nfds;
    }
  
@@ -132,7 +195,7 @@ index 3183927..ac3c97e 100644
    interrupted_ = 0;
    int ret = ppoll(&fds.front(), nfds, NULL, &old_mask_);
    if (ret == -1) {
-@@ -280,10 +333,14 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -280,10 +348,14 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      return IsInterrupted();
    }
  
@@ -147,7 +210,7 @@ index 3183927..ac3c97e 100644
    nfds_t cur_nfd = 0;
    for (vector<Subprocess*>::iterator i = running_.begin();
         i != running_.end(); ) {
-@@ -292,7 +349,20 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -292,7 +364,20 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
        continue;
      assert(fd == fds[cur_nfd].fd);
      if (fds[cur_nfd++].revents) {
@@ -168,7 +231,7 @@ index 3183927..ac3c97e 100644
        if ((*i)->Done()) {
          finished_.push(*i);
          i = running_.erase(i);
-@@ -302,6 +372,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -302,6 +387,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      ++i;
    }
  
@@ -177,7 +240,7 @@ index 3183927..ac3c97e 100644
    if (tokens) {
      pollfd *pfd = &fds[nfds - 1];
      if (pfd->fd >= 0) {
-@@ -311,6 +383,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
+@@ -311,6 +398,8 @@ bool SubprocessSet::DoWork(TokenPool* tokens) {
      }
    }
  
