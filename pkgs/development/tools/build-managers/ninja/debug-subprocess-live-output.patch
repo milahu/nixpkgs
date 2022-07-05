@@ -1,4 +1,4 @@
-From 5f15b481ea8c37999355c7e295c16cb250b489d1 Mon Sep 17 00:00:00 2001
+From 6c982b1ed1a9e17152e8ce83802d4dd6d2e9a92d Mon Sep 17 00:00:00 2001
 From: Milan Hauth <milahu@gmail.com>
 Date: Tue, 5 Jul 2022 12:04:11 +0200
 Subject: [PATCH] add debug live output
@@ -47,7 +47,7 @@ index 9e3d2ee..d06778c 100644
    /// Set up pipe_ as the parent-side pipe of the subprocess; return the
    /// other end of the pipe, usable in the child process.
 diff --git a/src/util.cc b/src/util.cc
-index 483f4a6..30eb2a9 100644
+index 483f4a6..ce8cbaf 100644
 --- a/src/util.cc
 +++ b/src/util.cc
 @@ -119,6 +119,18 @@ void Info(const char* msg, ...) {
@@ -58,12 +58,12 @@ index 483f4a6..30eb2a9 100644
 +  if (len == 0) return;
 +  puts(line_prefix);
 +  for (size_t i = 0; i < len; i++) {
-+    putc(buf[i]);
++    putchar(buf[i]);
 +    if (buf[i] == '\n') {
 +      puts(line_prefix);
 +    }
 +  }
-+  if (buf[(len - 1)] != '\n') putc('\n');
++  if (buf[(len - 1)] != '\n') putchar('\n');
 +}
 +
  void CanonicalizePath(string* path, uint64_t* slash_bits) {
