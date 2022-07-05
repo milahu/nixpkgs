@@ -16167,6 +16167,10 @@ with pkgs;
 
   nix-bisect = callPackage ../development/tools/misc/nix-bisect { };
 
+  nix-build-profiler = callPackage ../development/python-modules/nix-build-profiler {
+    inherit (python3Packages) buildPythonPackage psutil prefixed;
+  };
+
   nix-build-uncached = callPackage ../development/tools/misc/nix-build-uncached { };
 
   nexus = callPackage ../development/tools/repository-managers/nexus {

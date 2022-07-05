@@ -65,6 +65,7 @@
 , libkrb5
 , xkeyboard_config
 , enableProprietaryCodecs ? true
+, nix-build-profiler # debug jobclient patches
 }:
 
 let
@@ -102,6 +103,7 @@ qtModule rec {
     (python3.withPackages (ps: with ps; [ html5lib ]))
     which
     nodejs
+    nix-build-profiler # debug jobclient patches
   ];
   doCheck = true;
   outputs = [ "out" "dev" ];
@@ -118,13 +120,11 @@ qtModule rec {
     ./patches/qtwebengine/0005-mojom_parser.py-add-jobclient.patch
   ];
 
-  /*
   # debug jobclient patches
   DEBUG_JOBCLIENT = "1"; # gnumake-tokenpool
   DEBUG_JEST_WORKER = "1"; # src/3rdparty/chromium/third_party/devtools-frontend/src/node_modules/jest-worker/build/index.js
   DEBUG_CHROMIUM_NODE_PY = "1"; # src/3rdparty/chromium/third_party/node/node.py
   DEBUG_MOJOM_PARSER = "1"; # src/3rdparty/chromium/mojo/public/tools/mojom/mojom_parser.py
-  */
 
   postPatch = ''
     # Add jobclient to javascript build tools
