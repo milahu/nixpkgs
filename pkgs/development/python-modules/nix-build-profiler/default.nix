@@ -9,15 +9,15 @@
 let
   gnumake-tokenpool = buildPythonPackage rec {
     pname = "gnumake-tokenpool";
-    version = "0.0.1";
+    version = "0.0.2";
 
     # note: gnumake-tokenpool src is also in
     # pkgs/development/libraries/qt-6/modules/qtwebengine.nix
     src = fetchFromGitHub {
       owner = "milahu";
       repo = "gnumake-tokenpool";
-      rev = "4eb559ae323bef153cbe1d0a5e3496b377fb7856";
-      sha256 = "v3UqPi4fCnN86xmp4eOSz8IXNH70E8Kvvq6HVOiCiwk=";
+      rev = "1bfc3aaa47fe6f230fff5df0014db549cec18620";
+      sha256 = "fsqDRMq7JH1zGBqsJGSllJpNATuaoAbWo1ZrpK9y9k8=";
     };
 
     meta = with lib; {

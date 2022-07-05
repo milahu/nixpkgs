@@ -81,11 +81,12 @@ let
     rev = "a846fbb511d72ff2439123b3e9a6104524e1d7d2";
     sha256 = "Gon76s+F/REm2/5ZvuhaeDVRILKf8xVtvyh1jmLxlWE=";
   };
+
   gnumake-tokenpool = fetchFromGitHub {
     owner = "milahu";
     repo = "gnumake-tokenpool";
-    rev = "4eb559ae323bef153cbe1d0a5e3496b377fb7856";
-    sha256 = "v3UqPi4fCnN86xmp4eOSz8IXNH70E8Kvvq6HVOiCiwk=";
+    rev = "1bfc3aaa47fe6f230fff5df0014db549cec18620";
+    sha256 = "fsqDRMq7JH1zGBqsJGSllJpNATuaoAbWo1ZrpK9y9k8=";
   };
 in
 
