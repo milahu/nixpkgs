@@ -82,11 +82,13 @@ let
     sha256 = "Gon76s+F/REm2/5ZvuhaeDVRILKf8xVtvyh1jmLxlWE=";
   };
 
+  # note: gnumake-tokenpool is also in
+  # pkgs/development/python-modules/nix-build-profiler/default.nix
   gnumake-tokenpool = fetchFromGitHub {
     owner = "milahu";
     repo = "gnumake-tokenpool";
-    rev = "1bfc3aaa47fe6f230fff5df0014db549cec18620";
-    sha256 = "fsqDRMq7JH1zGBqsJGSllJpNATuaoAbWo1ZrpK9y9k8=";
+    rev = "f2a40df69b0fbe5da400e2d4ba9502a978071d0e";
+    sha256 = "VFoZBZGubY1nhbfBpboFFEKEJNMXWNPj3LRF53QVySo=";
   };
 in
 
