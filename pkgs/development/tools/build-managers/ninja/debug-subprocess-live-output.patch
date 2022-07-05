@@ -11,7 +11,7 @@ index 43c317d..d003b66 100644
        return false;
    }
 diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
-index 3183927..abc0a21 100644
+index 3183927..dfea37f 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
 @@ -24,6 +24,7 @@
@@ -26,7 +26,7 @@ index 3183927..abc0a21 100644
    if (err != 0)
      Fatal("posix_spawn_file_actions_destroy: %s", strerror(err));
  
-+  assert(snprintf(line_prefix, 32, "pid %d: ", pid_) < 32);
++  assert(snprintf(line_prefix, SUBPROCESS_LINE_PREFIX_SIZE, "pid %d: ", pid_) < SUBPROCESS_LINE_PREFIX_SIZE);
 +
    close(output_pipe[1]);
    return true;
@@ -92,10 +92,19 @@ index 3183927..abc0a21 100644
          finished_.push(*i);
          i = running_.erase(i);
 diff --git a/src/subprocess.h b/src/subprocess.h
-index 1ec7817..3826354 100644
+index 1ec7817..b2220ff 100644
 --- a/src/subprocess.h
 +++ b/src/subprocess.h
-@@ -54,9 +54,15 @@ struct Subprocess {
+@@ -35,6 +35,8 @@
+ 
+ #include "exit_status.h"
+ 
++#define SUBPROCESS_LINE_PREFIX_SIZE 1024
++
+ /// Subprocess wraps a single async subprocess.  It is entirely
+ /// passive: it expects the caller to notify it when its fds are ready
+ /// for reading, as well as call Finish() to reap the child once done()
+@@ -54,9 +56,15 @@ struct Subprocess {
    Subprocess(bool use_console);
    bool Start(struct SubprocessSet* set, const std::string& command);
    void OnPipeReady();
@@ -103,7 +112,7 @@ index 1ec7817..3826354 100644
  
    std::string buf_;
  
-+  char line_prefix[32];
++  char line_prefix[SUBPROCESS_LINE_PREFIX_SIZE];
 +  // 31 bytes + \0
 +  // '1234567890123456789012345678901'
 +  // 'pid xxxxxxxxxxxx: '
@@ -112,7 +121,7 @@ index 1ec7817..3826354 100644
    /// Set up pipe_ as the parent-side pipe of the subprocess; return the
    /// other end of the pipe, usable in the child process.
 diff --git a/src/util.cc b/src/util.cc
-index 080883e..50ffbfe 100644
+index 080883e..225517a 100644
 --- a/src/util.cc
 +++ b/src/util.cc
 @@ -116,6 +116,18 @@ void Info(const char* msg, ...) {
@@ -123,12 +132,12 @@ index 080883e..50ffbfe 100644
 +  if (len == 0) return;
 +  puts(line_prefix);
 +  for (size_t i = 0; i < len; i++) {
-+    putchar(buf[i]); // FIXME segfault
++    putchar(buf[i]);
 +    if (buf[i] == '\n') {
 +      puts(line_prefix);
 +    }
 +  }
-+  //if (*buf[(len - 1)] != '\n') putchar('\n'); // FIXME segfault?
++  if (buf[(len - 1)] != '\n') putchar('\n');
 +}
 +
  void CanonicalizePath(string* path, uint64_t* slash_bits) {
