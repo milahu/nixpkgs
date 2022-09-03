@@ -142,8 +142,6 @@ stdenv.mkDerivation rec {
   '';
 
   postInstall = ''
-    mkdir -p $out/share/applications
-    cp share/applications/org.qt-project.qtcreator.desktop $out/share/applications
     substituteInPlace $out/share/applications/org.qt-project.qtcreator.desktop \
       --replace "Exec=qtcreator" "Exec=$out/bin/qtcreator"
   '';
