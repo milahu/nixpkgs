@@ -114,7 +114,11 @@ stdenv.mkDerivation rec {
 
   buildFlags = lib.optional withDocumentation "docs";
 
-  installFlags = [ "INSTALL_ROOT=$(out)" ] ++ lib.optional withDocumentation "install_docs";
+  cmakeFlags = [
+    "-DCMAKE_BUILD_TYPE=Debug"
+  ];
+
+  installFlags = [ "INSTALL_ROOT=$(out)" ] ++ optional withDocumentation "install_docs";
 
   qtWrapperArgs = [ "--set-default PERFPROFILER_PARSER_FILEPATH ${lib.getBin perf}/bin" ];
 
