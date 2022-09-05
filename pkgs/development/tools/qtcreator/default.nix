@@ -93,15 +93,18 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [
-      qtbase qt5compat qtdeclarative qtquick3d qtquicktimeline qtserialport
-      qtsvg qttools elfutils.dev rustc-demangle
+      qtbase qt5compat
+      #qtdeclarative qtquick3d qtquicktimeline qtserialport
+      #qtsvg qttools elfutils.dev rustc-demangle
       #qtwebengine
     ] ++
     optionals withClangPlugins [
+      /*
       llvmPackages.libclang
       #llvmPackages.clang-unwrapped
       clang-unwrapped-qt
       llvmPackages.llvm
+      */
     ];
 
   nativeBuildInputs = [
@@ -118,13 +121,13 @@ stdenv.mkDerivation rec {
     cp ${./src/qt-creator-opensource-src-8.0.1/src/plugins/welcome/welcomeplugin.cpp} src/plugins/welcome/welcomeplugin.cpp
   '';
 
-  buildFlags = optional withDocumentation "docs";
+  #buildFlags = optional withDocumentation "docs";
 
   cmakeBuildType = "Debug";
 
-  installFlags = [ "INSTALL_ROOT=$(out)" ] ++ optional withDocumentation "install_docs";
+  #installFlags = [ "INSTALL_ROOT=$(out)" ] ++ optional withDocumentation "install_docs";
 
-  qtWrapperArgs = [ "--set-default PERFPROFILER_PARSER_FILEPATH ${lib.getBin perf}/bin" ];
+  #qtWrapperArgs = [ "--set-default PERFPROFILER_PARSER_FILEPATH ${lib.getBin perf}/bin" ];
 
   preConfigure = ''
     substituteInPlace src/plugins/plugins.pro \
