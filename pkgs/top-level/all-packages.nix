@@ -1476,6 +1476,8 @@ with pkgs;
     wine = wineWowPackages.staging;
   };
 
+  yacy = callPackage ../tools/search/yacy { };
+
   yafetch = callPackage ../tools/misc/yafetch {
     stdenv = clangStdenv;
   };
