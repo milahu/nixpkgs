@@ -10,8 +10,8 @@ stdenvNoCC.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "ipfs";
     repo = "fs-repo-migrations";
-    rev = "fs-repo-11-to-12/v1.0.2";
-    hash = "sha256-CG4utwH+/+Igw+SP3imhl39wijlB53UGtkJG5Mwh+Ik=";
+    rev = "fs-repo-12-to-13/v1.0.0";
+    hash = "sha256-QQone7E2Be+jVfnrwqQ1Ny4jo6mSDHhaY3ErkNdn2f8=";
   };
 
   patches = [
