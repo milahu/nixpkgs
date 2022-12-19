@@ -986,6 +986,7 @@
   ./services/networking/websockify.nix
   ./services/networking/wg-netmanager.nix
   ./services/networking/wg-quick.nix
+  ./services/networking/windscribe.nix
   ./services/networking/wireguard.nix
   ./services/networking/wpa_supplicant.nix
   ./services/networking/xandikos.nix

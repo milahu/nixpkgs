@@ -1159,6 +1159,12 @@
     githubId = 338268;
     name = "Alexei Robyn";
   };
+  arphe42 = {
+    email = "arphe42@gmail.com";
+    github = "arphe42";
+    githubId = 74418654;
+    name = "Raphael Drouin";
+  };
   artemist = {
     email = "me@artem.ist";
     github = "artemist";

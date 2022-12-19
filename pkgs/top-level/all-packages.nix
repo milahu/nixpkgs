@@ -32833,6 +32833,8 @@ with pkgs;
   windowmaker = callPackage ../applications/window-managers/windowmaker { };
   dockapps = callPackage ../applications/window-managers/windowmaker/dockapps { };
 
+  windscribe = libsForQt5.callPackage ../applications/networking/windscribe { };
+
   wily = callPackage ../applications/editors/wily { };
 
   wings = callPackage ../applications/graphics/wings {
