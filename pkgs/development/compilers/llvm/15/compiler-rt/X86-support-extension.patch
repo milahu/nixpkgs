@@ -1,0 +1,23 @@
+diff --git a/lib/builtins/CMakeLists.txt b/lib/builtins/CMakeLists.txt
+index df02682..6e08768 100644
+--- a/lib/builtins/CMakeLists.txt
++++ b/lib/builtins/CMakeLists.txt
+@@ -353,6 +353,10 @@ if (NOT MSVC)
+     )
+   endif()
+ 
++  set(i486_SOURCES ${i386_SOURCES})
++  set(i586_SOURCES ${i386_SOURCES})
++  set(i686_SOURCES ${i386_SOURCES})
++
+   if (WIN32)
+     set(i386_SOURCES
+       ${i386_SOURCES}
+@@ -731,6 +735,7 @@ else ()
+   append_list_if(COMPILER_RT_HAS_ASM_LSE HAS_ASM_LSE BUILTIN_DEFS)
+ 
+   foreach (arch ${BUILTIN_SUPPORTED_ARCH})
++      message("arch: ${arch}")
+     if (CAN_TARGET_${arch})
+       set(BUILTIN_CFLAGS_${arch} ${BUILTIN_CFLAGS})
+       # For ARM archs, exclude any VFP builtins if VFP is not supported
