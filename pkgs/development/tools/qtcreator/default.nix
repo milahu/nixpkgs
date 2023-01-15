@@ -123,6 +123,10 @@ stdenv.mkDerivation rec {
   '';
 */
 
+  postPatch = ''
+    cp -v ${./icore.cpp} src/plugins/coreplugin/icore.cpp
+  '';
+
   #buildFlags = optional withDocumentation "docs";
 
   cmakeBuildType = "Debug";
