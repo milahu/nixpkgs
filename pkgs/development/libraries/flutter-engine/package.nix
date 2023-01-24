@@ -162,29 +162,29 @@ in stdenvNoCC.mkDerivation rec {
     echo "Building flatc"
     #ninja flatc -j$NIX_BUILD_CORES
     # debug
-    ninja flatc -j$NIX_BUILD_CORES -d explain
+    TERM=dumb ninja flatc -j$NIX_BUILD_CORES -d explain
     # FIXME: ninja explain: output ../../../../../../build/flutter-engine-src-857bd6b74c5eb56151bfafe91e7fa6a82b6fee25/src/third_party/dart/.git/logs/HEAD of phony edge with no inputs doesn't exist
     patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} flatc
 
     echo "Building blobcat"
-    ninja blobcat -j$NIX_BUILD_CORES
+    TERM=dumb ninja blobcat -j$NIX_BUILD_CORES
     patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} blobcat
 
     echo "Building gen_snapshot"
-    ninja gen_snapshot -j$NIX_BUILD_CORES
+    TERM=dumb ninja gen_snapshot -j$NIX_BUILD_CORES
     patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} gen_snapshot
 
     echo "Building impellerc"
-    ninja impellerc -j$NIX_BUILD_CORES
+    TERM=dumb ninja impellerc -j$NIX_BUILD_CORES
     patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} impellerc
 
     echo "Building Flutter Engine library"
-    ninja flutter_engine_library -j$NIX_BUILD_CORES
+    TERM=dumb ninja flutter_engine_library -j$NIX_BUILD_CORES
 
     echo "Building icudtl.dat"
-    ninja icudtl.dat -j$NIX_BUILD_CORES
+    TERM=dumb ninja icudtl.dat -j$NIX_BUILD_CORES
 
-    ninja flutter_embedder.h -j$NIX_BUILD_CORES
+    TERM=dumb ninja flutter_embedder.h -j$NIX_BUILD_CORES
   '';
 
   installPhase = ''
