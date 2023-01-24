@@ -72,8 +72,17 @@ let
       mkdir $out
       # copy files and make them writable. "copy read write"
       function cprw {
-        # do we really need -P?
-        cp -r -P "$1" "$2"
+        # TODO: do we really need "cp -P"?
+        if [ -d "$1" ]; then
+          mkdir -p "$2"
+          (
+            shopt -s dotglob
+            cp -r -P "$1/"* "$2"
+          )
+        else
+          mkdir -p "$(dirname "$2")"
+          cp -P "$1" "$2"
+        fi
         chmod -R +w "$2"
       }
       cprw $buildroot $out/src
@@ -109,7 +118,7 @@ let
 
       cd $out
       mkdir -p $out/src/third_party/dart/.dart_tool
-      cp -r $dartPackageConfig $out/src/third_party/dart/.dart_tool/package_config.json
+      cprw $dartPackageConfig $out/src/third_party/dart/.dart_tool/package_config.json
 
       python3 $out/src/third_party/dart/tools/generate_package_config.py
       python3 $out/src/third_party/dart/tools/generate_sdk_version_file.py
