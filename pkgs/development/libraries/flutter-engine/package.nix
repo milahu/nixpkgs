@@ -69,17 +69,23 @@ let
 
     ## FIXME: instead of patching a bunch of binaries, maybe we copy from nixpkgs?
     installPhase = ''
-      mkdir -p $out
-      cp -r -P --no-preserve=mode,ownership $buildroot $out/src
-      cp -r -P --no-preserve=mode,ownership $src $out/src/flutter
+      mkdir $out
+      # copy files and make them writable. "copy read write"
+      function cprw {
+        # do we really need -P?
+        cp -r -P "$1" "$2"
+        chmod -R +w "$2"
+      }
+      cprw $buildroot $out/src
+      cprw $src $out/src/flutter
 
       ${concatStringsSep "\n" (attrValues (mapAttrs (name: src: ''
         if [[ -d ${src} ]]; then
           mkdir -p $out/${name}
-          cp -r -P --no-preserve=mode,ownership ${src}/* $out/${name}
-          find ${src} -type f -name '.*' | xargs -I {} cp --no-preserve=mode,ownership {} $out/${name}
+          cprw ${src}/* $out/${name}
+          find ${src} -type f -name '.*' | xargs -I {} cp {} $out/${name}
         else
-          cp -P --no-preserve=mode,ownership ${src} $out/${name}
+          cp -P ${src} $out/${name}
         fi
       '') flutter-deps))}
 
@@ -109,7 +115,7 @@ let
 
       cd $out
       mkdir -p $out/src/third_party/dart/.dart_tool
-      cp -r --no-preserve=ownership,mode $dartPackageConfig $out/src/third_party/dart/.dart_tool/package_config.json
+      cp -r $dartPackageConfig $out/src/third_party/dart/.dart_tool/package_config.json
 
       python3 $out/src/third_party/dart/tools/generate_package_config.py
       python3 $out/src/third_party/dart/tools/generate_sdk_version_file.py
