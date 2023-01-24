@@ -1,11 +1,12 @@
-{ lib, callPackage, stdenvNoCC }:
+{ lib, stdenv, stdenvNoCC, hostPlatform, callPackage, fetchFromGitHub, fetchurl, writeText,
+  ninja, gnumake, patchelf, python3, clang, clang-tools, pkg-config, openssh, git, gclient-wrapped }@inputs:
 with lib;
 let
   # Get this from "flutter doctor"
   version = "857bd6b74c5eb56151bfafe91e7fa6a82b6fee25";
   sha256 = "sha256-+661KBEcyNj1t0h9rp1kM+hv1DdI/pxxnrJtHihnXyc=";
 
-  mkPackage = callPackage ./package.nix {};
+  mkPackage = (import ./package.nix) inputs;
   runtimeModes = builtins.listToAttrs (builtins.map (runtimeMode: {
     name = runtimeMode;
     value = mkPackage {

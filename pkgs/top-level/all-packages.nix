@@ -14121,7 +14121,11 @@ with pkgs;
 
   fluidd = callPackage ../applications/misc/fluidd { };
 
-  flutter-engine = callPackage ../development/libraries/flutter-engine {};
+  flutter-engine = callPackage ../development/libraries/flutter-engine {
+    # TODO wait for clang_15 https://github.com/NixOS/nixpkgs/pull/209536
+    #clang = clang_15;
+    #clang-tools = clang-tools_15;
+  };
 
   flutterPackages =
     recurseIntoAttrs (callPackage ../development/compilers/flutter { });
