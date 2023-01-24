@@ -80,13 +80,7 @@ let
       cprw $src $out/src/flutter
 
       ${concatStringsSep "\n" (attrValues (mapAttrs (name: src: ''
-        if [[ -d ${src} ]]; then
-          mkdir -p $out/${name}
-          cprw ${src}/* $out/${name}
-          find ${src} -type f -name '.*' | xargs -I {} cp {} $out/${name}
-        else
-          cp -P ${src} $out/${name}
-        fi
+        cprw ${src} $out/${name}
       '') flutter-deps))}
 
       touch $out/src/third_party/dart/build/config/gclient_args.gni
