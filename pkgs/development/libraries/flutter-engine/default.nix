@@ -1,5 +1,6 @@
 { lib, stdenv, stdenvNoCC, hostPlatform, callPackage, fetchFromGitHub, fetchurl, writeText,
-  ninja, gnumake, patchelf, python3, clang, clang-tools, pkg-config, openssh, git, gclient-wrapped }@inputs:
+  ninja, gnumake, patchelf, python3, llvmPackages, clang-tools, gcc-unwrapped, libcxx,
+  pkg-config, openssh, git, gclient-wrapped }@inputs:
 with lib;
 let
   # Get this from "flutter doctor"

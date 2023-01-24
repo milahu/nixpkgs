@@ -14,11 +14,6 @@ let
   toolchainArch = if hostPlatform.isx86_64 then "amd64" else if hostPlatform.isAarch64 then "aarch64" else throws "Unsupported platform";
   ## Note: this must match Flutter Engine's DEPS file
 in {
-  "src/buildtools/linux-x64/clang" = fetchcipd {
-    package = "fuchsia/third_party/clang/linux-amd64";
-    version = "ugk-KfeqO9fhSfhBFRG4Z-56Kr2AQVSEbku9AEUdotYC";
-    sha256 = "sha256-ih43GvJdG+4+iLDJ7Exmj16hvPZe2yC7ePqTMkkrDpY=";
-  };
   "src/flutter/prebuilts/linux-x64/dart-sdk" = fetchcipd {
     package = "flutter/dart-sdk/linux-amd64";
     version = "git_revision:b6592742d9f1a82af319f46eda3d59a61e89b91b";

@@ -99,13 +99,6 @@ let
       mkdir -p $out/src/third_party/dart/.git/logs
       echo ${flutter-deps."src/third_party/dart".rev} > $out/src/third_party/dart/.git/logs/HEAD
 
-      rm -rf $out/src/buildtools/linux-x64/clang
-      ln -s ${clang} $out/src/buildtools/linux-x64/clang
-      echo "using clang version:"
-      #patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} $out/src/buildtools/linux-x64/clang/bin/clang++
-      $out/src/buildtools/linux-x64/clang/bin/clang++ --version
-      ## Fuchsia clang version 15.0.0
-
       for bin in $binaryFixes; do
         chmod 0755 $out/$bin
         patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} $out/$bin
@@ -133,7 +126,9 @@ let
       python3 $out/src/flutter/tools/pub_get_offline.py
     '';
   };
-in stdenvNoCC.mkDerivation rec {
+in
+
+llvmPackages.stdenv.mkDerivation rec {
   pname = "flutter-engine-${runtimeMode}";
   inherit version runtimeMode src;
 
@@ -158,6 +153,13 @@ in stdenvNoCC.mkDerivation rec {
   ## TODO: add more builds and possibly better cross-compiling
   buildPhase = ''
     cd $out/lib/flutter/$runtimeMode
+
+    # FIXME generate correct toolchain.ninja file in the first place
+    substituteInPlace toolchain.ninja \
+      --replace "../../../../../../../build/flutter-engine-src-857bd6b74c5eb56151bfafe91e7fa6a82b6fee25/src/buildtools/linux-x64/clang" "${llvmPackages.clang}"
+
+    # debug
+    #grep -EHn "*" toolchain.ninja
 
     echo "Building flatc"
     #ninja flatc -j$NIX_BUILD_CORES

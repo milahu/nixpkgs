@@ -14127,8 +14127,8 @@ with pkgs;
   fluidd = callPackage ../applications/misc/fluidd { };
 
   flutter-engine = callPackage ../development/libraries/flutter-engine {
-    clang = clang_15;
     clang-tools = clang-tools_15;
+    llvmPackages = llvmPackages_15;
   };
 
   flutterPackages =
