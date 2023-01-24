@@ -461,6 +461,8 @@ with pkgs;
 
   deadnix = callPackage ../development/tools/deadnix { };
 
+  depot_tools = callPackage ../development/tools/depot_tools {};
+
   dsq = callPackage ../tools/misc/dsq { };
 
   dtv-scan-tables_linuxtv = callPackage ../data/misc/dtv-scan-tables/linuxtv.nix { };
@@ -496,6 +498,8 @@ with pkgs;
   frece = callPackage ../development/tools/frece { };
 
   frugal = callPackage ../development/tools/frugal { };
+
+  gclient-wrapped = callPackage ../development/tools/gclient-wrapped {};
 
   glade = callPackage ../development/tools/glade { };
 
@@ -909,6 +913,9 @@ with pkgs;
   fetchipfs = import ../build-support/fetchipfs {
     inherit curl stdenv;
   };
+
+  cipd = callPackage ../development/tools/cipd {};
+  fetchcipd = callPackage ../build-support/fetchcipd {};
 
   fetchit = callPackage ../applications/networking/cluster/fetchit { };
 
@@ -14113,6 +14120,8 @@ with pkgs;
   flyctl = callPackage ../development/web/flyctl { };
 
   fluidd = callPackage ../applications/misc/fluidd { };
+
+  flutter-engine = callPackage ../development/libraries/flutter-engine {};
 
   flutterPackages =
     recurseIntoAttrs (callPackage ../development/compilers/flutter { });
