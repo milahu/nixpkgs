@@ -13,7 +13,7 @@ let
   fs-repo-common = pname: version: buildGoModule {
     inherit pname version;
     inherit (kubo-migrator-unwrapped) src;
-    sourceRoot = "source/${pname}";
+    sourceRoot = "kubo-migrator-src/${pname}";
     vendorSha256 = null;
     doCheck = false;
     meta = kubo-migrator-unwrapped.meta // {
