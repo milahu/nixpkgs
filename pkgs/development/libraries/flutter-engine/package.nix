@@ -99,17 +99,12 @@ let
       mkdir -p $out/src/third_party/dart/.git/logs
       echo ${flutter-deps."src/third_party/dart".rev} > $out/src/third_party/dart/.git/logs/HEAD
 
-      # FIXME use clang_15 from nixpkgs
-      # clang_14 throws:
-      # error: unknown warning option '-Wno-unqualified-std-cast-call'
-      #rm -rf $out/src/buildtools/linux-x64/clang
-      #ln -s ${clang} $out/src/buildtools/linux-x64/clang
+      rm -rf $out/src/buildtools/linux-x64/clang
+      ln -s ${clang} $out/src/buildtools/linux-x64/clang
       echo "using clang version:"
-      patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} $out/src/buildtools/linux-x64/clang/bin/clang++
+      #patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} $out/src/buildtools/linux-x64/clang/bin/clang++
       $out/src/buildtools/linux-x64/clang/bin/clang++ --version
-      # Fuchsia clang version 15.0.0
-
-      # FIXME clang-15: error: unable to execute command: posix_spawn failed: No such file or directory
+      ## Fuchsia clang version 15.0.0
 
       for bin in $binaryFixes; do
         chmod 0755 $out/$bin
