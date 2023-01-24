@@ -140,7 +140,10 @@ in stdenvNoCC.mkDerivation rec {
     cd $out/lib/flutter/$runtimeMode
 
     echo "Building flatc"
-    ninja flatc -j$NIX_BUILD_CORES
+    #ninja flatc -j$NIX_BUILD_CORES
+    # debug
+    ninja flatc -j$NIX_BUILD_CORES -d explain
+    # FIXME: ninja explain: output ../../../../../../build/flutter-engine-src-857bd6b74c5eb56151bfafe91e7fa6a82b6fee25/src/third_party/dart/.git/logs/HEAD of phony edge with no inputs doesn't exist
     patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} flatc
 
     echo "Building blobcat"
