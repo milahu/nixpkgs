@@ -86,6 +86,10 @@ let
       touch $out/src/third_party/dart/build/config/gclient_args.gni
       cp $gitrev $out/src/flutter/build/git_revision.py
 
+      # fix: ninja flatc
+      mkdir -p $out/src/third_party/dart/.git/logs
+      echo ${flutter-deps."src/third_party/dart".rev} > $out/src/third_party/dart/.git/logs/HEAD
+
       for bin in $binaryFixes; do
         chmod 0755 $out/$bin
         patchelf --set-interpreter ${stdenv.cc.libc}/lib/${interpreter} $out/$bin
