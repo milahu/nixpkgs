@@ -23788,6 +23788,7 @@ with pkgs;
   # the unversioned attributes should always point to the same go version
   go = go_1_19;
   buildGoModule = buildGo119Module;
+  buildGoModule2 = buildGo119Module2;
   buildGoPackage = buildGo119Package;
 
   # requires a newer Apple SDK
@@ -23806,6 +23807,9 @@ with pkgs;
     inherit (darwin.apple_sdk_11_0.frameworks) Foundation Security;
   };
   buildGo119Module = darwin.apple_sdk_11_0.callPackage ../build-support/go/module.nix {
+    go = buildPackages.go_1_19;
+  };
+  buildGo119Module2 = darwin.apple_sdk_11_0.callPackage ../build-support/go/module2.nix {
     go = buildPackages.go_1_19;
   };
   buildGo119Package = darwin.apple_sdk_11_0.callPackage ../build-support/go/package.nix {

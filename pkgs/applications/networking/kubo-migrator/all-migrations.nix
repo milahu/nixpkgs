@@ -3,13 +3,14 @@
 , symlinkJoin
 , buildGoModule
 , kubo-migrator-unwrapped
-}:
+} @ pkgs:
 
 # This package contains all the individual migrations in the bin directory.
 # This is used by fs-repo-migrations and could also be used by Kubo itself
 # when starting it like this: ipfs daemon --migrate
 
 let
+/*
   fs-repo-common = pname: version: buildGoModule {
     inherit pname version;
     inherit (kubo-migrator-unwrapped) src;
@@ -21,10 +22,99 @@ let
       description = "Individual migration for the filesystem repository of Kubo clients";
     };
   };
+*/
+
+/*
+  # use overrideAttrs to inherit all attributes, including src and patches
+  fs-repo-common = pname: version: kubo-migrator-unwrapped.overrideAttrs (old: {
+    inherit pname version;
+    modRoot = pname;
+    vendorSha256 = null;
+    vendorHash = null;
+    #vendorHash = "";
+    #deleteVendor = true; # no. use vendor folder in src
+    postUnpack = ''
+    #(set -x;pwd;ls kubo-migrator-src/${pname};); exit 1
+    set -x
+    echo modRoot=$modRoot
+    '';
+    postConfigure = ''
+    # FIXME not reached
+    pwd
+    ls
+    '';
+    doCheck = false;
+    meta = old.meta // {
+      mainProgram = pname;
+      description = "Individual migration for the filesystem repository of Kubo clients";
+    };
+  });
+*/
+
+/*
+# overrideModAttrs is broken!
+# called with unexpected argument 'overrideModAttrs'
+fs-repo-common = pname: version: kubo-migrator-unwrapped.override ({
+#fs-repo-common = pname: version: kubo-migrator-unwrapped.overrideAttrs (old: {
+  overrideModAttrs = (old: {
+    inherit pname version;
+    modRoot = pname;
+    vendorSha256 = null;
+    vendorHash = null;
+    #vendorHash = "";
+    #deleteVendor = true; # no. use vendor folder in src
+    postUnpack = ''
+    #(set -x;pwd;ls kubo-migrator-src/${pname};); exit 1
+    set -x
+    echo modRoot=$modRoot
+    '';
+    postConfigure = ''
+    # FIXME not reached
+    pwd
+    ls
+    '';
+    doCheck = false;
+    meta = old.meta // {
+      mainProgram = pname;
+      description = "Individual migration for the filesystem repository of Kubo clients";
+    };
+  });
+});
+*/
+
+
+# override buildGoModule
+# https://github.com/NixOS/nixpkgs/issues/86349#issuecomment-945210042
+fs-repo-common = pname: version: kubo-migrator-unwrapped.override ({
+  buildGoModule = old: pkgs.buildGoModule (old // {
+    inherit pname version;
+    modRoot = pname;
+    #vendorSha256 = null;
+    vendorHash = null;
+    #vendorHash = "";
+    #deleteVendor = true; # no. use vendor folder in src
+    postUnpack = ''
+    #(set -x;pwd;ls kubo-migrator-src/${pname};); exit 1
+    set -x
+    echo modRoot=$modRoot
+    '';
+    postConfigure = ''
+    # FIXME not reached
+    pwd
+    ls
+    '';
+    doCheck = false;
+    meta = old.meta // {
+      mainProgram = pname;
+      description = "Individual migration for the filesystem repository of Kubo clients";
+    };
+  });
+});
 
   # Concatenation of the latest repo version and the version of that migration
   version = "13.1.0.0";
 
+  all-migrations-set = {
   fs-repo-12-to-13 = fs-repo-common "fs-repo-12-to-13" "1.0.0";
   fs-repo-11-to-12 = fs-repo-common "fs-repo-11-to-12" "1.0.2";
   fs-repo-10-to-11 = fs-repo-common "fs-repo-10-to-11" "1.0.1";
@@ -38,8 +128,9 @@ let
   fs-repo-2-to-3   = fs-repo-common "fs-repo-2-to-3"   "1.0.1";
   fs-repo-1-to-2   = fs-repo-common "fs-repo-1-to-2"   "1.0.1";
   fs-repo-0-to-1   = fs-repo-common "fs-repo-0-to-1"   "1.0.1";
+  };
 
-  all-migrations = [
+  all-migrations = with all-migrations-set; [
     fs-repo-12-to-13
     fs-repo-11-to-12
     fs-repo-10-to-11
@@ -62,4 +153,5 @@ in
 symlinkJoin {
   name = "kubo-migrator-all-fs-repo-migrations-${version}";
   paths = all-migrations;
+  passthru = all-migrations-set;
 }
