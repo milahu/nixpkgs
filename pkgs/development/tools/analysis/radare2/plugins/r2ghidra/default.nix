@@ -71,7 +71,7 @@ clangStdenv.mkDerivation rec {
       --replace \
         'path = strdup (R2_PREFIX "/lib/radare2/" R2_VERSION "/r2ghidra_sleigh");' \
         'path = strdup ("'$out'" "/lib/radare2/" R2_VERSION "/r2ghidra_sleigh");'
-  ''
+  '';
 
   NIX_CFLAGS_COMPILE = [
     "-O1" # fortify
