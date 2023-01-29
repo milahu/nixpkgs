@@ -66,13 +66,6 @@ clangStdenv.mkDerivation rec {
     chmod -R +w source/ghidra/src
   '';
 
-  postPatch = ''
-    substituteInPlace src/SleighAsm.cpp \
-      --replace \
-        'path = strdup (R2_PREFIX "/lib/radare2/" R2_VERSION "/r2ghidra_sleigh");' \
-        'path = strdup ("'$out'" "/lib/radare2/" R2_VERSION "/r2ghidra_sleigh");'
-  '';
-
   NIX_CFLAGS_COMPILE = [
     "-O1" # fortify
     # hide warnings
@@ -94,6 +87,12 @@ clangStdenv.mkDerivation rec {
     sed -i.bak "s|^  r2_plugdir = res.stdout().strip()$|&.replace('${radare2.out}', '$out')|" meson.build
     diff -u meson.build{.bak,} || true
     rm meson.build.bak
+
+    echo "Patching radare2 library path"
+    substituteInPlace src/SleighAsm.cpp \
+      --replace \
+        'path = strdup (R2_PREFIX "/lib/radare2/" R2_VERSION "/r2ghidra_sleigh");' \
+        'path = strdup ("'$out'" "/lib/radare2/" R2_VERSION "/r2ghidra_sleigh");'
 
     echo "Patching ghidra-native"
     make -C ghidra-native patch
