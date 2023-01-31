@@ -3840,6 +3840,7 @@ with pkgs;
   candle = libsForQt5.callPackage ../applications/misc/candle { };
 
   capstone = callPackage ../development/libraries/capstone { };
+  capstone_5 = callPackage ../development/libraries/capstone/capstone_5.nix { };
 
   keystone = callPackage ../development/libraries/keystone { };
 
