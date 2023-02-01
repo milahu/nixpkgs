@@ -26,13 +26,13 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 }:
 
 let
-  common = import ./common.nix { inherit fetchFromGitHub; };
+  srcs = builtins.fromJSON (builtins.readFile ./srcs.json);
 in
 
 stdenv.mkDerivation rec {
   pname = "frida-gum";
-  inherit (common) version;
-  src = common.srcs.${pname};
+  inherit (srcs) version;
+  src = fetchFromGitHub srcs.paths.${pname}.github;
 
   patches = [
     # https://github.com/frida/frida-gum/issues/710
@@ -59,6 +59,10 @@ stdenv.mkDerivation rec {
     libdwarf
     gobject-introspection # g-ir-scanner
     #gioopenssl
+  ];
+
+  propagatedBuildInputs = [
+    capstone_5
   ];
 
   meta = with lib; {

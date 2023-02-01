@@ -1,0 +1,85 @@
+{
+  "paths": {
+    "frida-clr": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-clr",
+        "rev": "7bcf6fcdf26afe9dae338deea3b7204880b1ae28",
+        "sha256": "4xU3OOi3dUD/XfhbKy4tIQJmd1Nesuljp3vrrVRxlwY="
+      }
+    },
+    "frida-core": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-core",
+        "rev": "c6754979ff4ae7f96f910f95477d6af224ffd541",
+        "sha256": "vgrhkZFomHdCEjlPCwhMFQ57PThBwhDOp/7YZWigDg0="
+      }
+    },
+    "frida-go": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-go",
+        "rev": "eb3b734e5d8cbfb1a00308c636a3429ab9a1836f",
+        "sha256": "oYqiYQtxa56Cu1Ua0pOFr5XCXaXXMtLA+zIeqNycBIQ="
+      }
+    },
+    "frida-gum": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-gum",
+        "rev": "be5fc6d95bfc490dbd83d3e0847f0fef01c1f009",
+        "sha256": "GNxCLbi35qH4bvSwdxF3h2eirOhKKdg9BWNzx2OmXik="
+      }
+    },
+    "frida-node": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-node",
+        "rev": "2f232a66c1c7db858578c08f3b0a0e9f99b6944e",
+        "sha256": "lDmhQJ07YafHgEu3Z2ZInukzINZaC8JooxaGPp9A29I="
+      }
+    },
+    "frida-python": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-python",
+        "rev": "b236764ef0744d85a423b67bf9c434912d3d756f",
+        "sha256": "HvTFazqVK/8J9k3odMQ62095OrfiJTERMzMs2lBC0LU="
+      }
+    },
+    "frida-qml": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-qml",
+        "rev": "6c9b71f758671e4f67ba1aff3d2c99ebdc68c20c",
+        "sha256": "773/+L6+oxyGArbtWZE3zQtBCx5aa+wKHHdWCKDOEJE="
+      }
+    },
+    "frida-swift": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-swift",
+        "rev": "e6a37b000237e46c3ce5948f9cd1939613324f25",
+        "sha256": "40Fq2FuJ5TPdUohOwMKEPLZ71TIdz0PSpgJcjqCcJC4="
+      }
+    },
+    "frida-tools": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida-tools",
+        "rev": "8b4905958541aef72c2b304dc366994f8daecfb9",
+        "sha256": "5/p2vuT27tGVszxzL7l4nvn3ATXcYZpDae810fEJp40="
+      }
+    },
+    "releng/meson": {
+      "github": {
+        "owner": "frida",
+        "repo": "meson",
+        "rev": "c9e4363f18d8fe226487647a7cbe338baed54090",
+        "sha256": "iYtgIr+MmTvO3d63f29/cyg5lPn4aCwlTvHtN6Us3yo="
+      }
+    }
+  },
+  "version": "16.0.8"
+}
