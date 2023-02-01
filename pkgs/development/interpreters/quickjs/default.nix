@@ -4,6 +4,7 @@
 , texinfo
 }:
 
+let quickjs =
 stdenv.mkDerivation rec {
   pname = "quickjs";
   version = "2021-03-27";
@@ -57,4 +58,33 @@ stdenv.mkDerivation rec {
     license = licenses.mit;
     mainProgram = "qjs";
   };
+
+  passthru = {
+    dev = stdenv.mkDerivation {
+      name = quickjs.name + "-dev";
+      inherit (quickjs) version;
+      phases = "buildPhase";
+      buildPhase = ''
+        mkdir -p $out/lib/pkgconfig
+
+        cat >$out/lib/pkgconfig/quickjs.pc <<'EOF'
+        prefix=${quickjs.outPath}
+        exec_prefix=''${prefix}
+        libdir=''${prefix}/lib
+        pkglibdir=''${prefix}/lib/quickjs
+        includedir=''${prefix}/include
+        pkgincludedir=''${prefix}/include/quickjs
+
+        Name: quickjs
+        Description: ${quickjs.meta.description}
+        Version: ${quickjs.version}
+        Requires.private:
+        Libs: -L''${pkglibdir} -lquickjs
+        Libs.private:
+        Cflags: -I''${pkgincludedir}
+        EOF
+      '';
+    };
+  };
 }
+; in quickjs
