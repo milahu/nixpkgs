@@ -1,0 +1,39 @@
+From 61200df4c35314f55d867df04ae1ac2d18f42005 Mon Sep 17 00:00:00 2001
+From: Milan Hauth <milahu@gmail.com>
+Date: Wed, 1 Feb 2023 12:46:43 +0100
+Subject: [PATCH 3/5] use libdwarf 0.2
+
+---
+ gum/backend-libdwarf/gumsymbolutil-libdwarf.c | 2 +-
+ meson.build                                   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gum/backend-libdwarf/gumsymbolutil-libdwarf.c b/gum/backend-libdwarf/gumsymbolutil-libdwarf.c
+index d575a50..f0983c8 100644
+--- a/gum/backend-libdwarf/gumsymbolutil-libdwarf.c
++++ b/gum/backend-libdwarf/gumsymbolutil-libdwarf.c
+@@ -555,7 +555,7 @@ static void
+ gum_module_entry_free (GumModuleEntry * entry)
+ {
+   if (entry->dbg != NULL)
+-    dwarf_finish (entry->dbg, NULL);
++    dwarf_finish (entry->dbg);
+ 
+   if (entry->module != NULL)
+     gum_object_unref (entry->module);
+diff --git a/meson.build b/meson.build
+index 79665d3..62c5ec0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -470,7 +470,7 @@ if host_os_family in ['linux', 'freebsd', 'qnx']
+     endif
+   endif
+ 
+-  libdwarf_dep = dependency('libdwarf', required: false, version: ['>= 0.1', '< 0.2'])
++  libdwarf_dep = dependency('libdwarf', required: false, version: ['>= 0.2', '< 0.3'])
+   if not libdwarf_dep.found()
+     found = false
+     if not meson.is_cross_build()
+-- 
+2.39.0
+
