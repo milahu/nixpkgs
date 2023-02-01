@@ -7351,7 +7351,7 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) AppKit CoreFoundation DiskArbitration Foundation IOKit;
   };
 
-  frida-gum = callPackage ../development/tools/analysis/frida/frida-gum.nix { };
+  frida-gum = callPackage ../development/tools/analysis/frida/frida-gum { };
 
   frostwire = callPackage ../applications/networking/p2p/frostwire { };
   frostwire-bin = callPackage ../applications/networking/p2p/frostwire/frostwire-bin.nix { };
