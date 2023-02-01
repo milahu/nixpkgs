@@ -26,20 +26,13 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 }:
 
 let
-  common = import ./common.nix;
+  common = import ./common.nix { inherit fetchFromGitHub; };
 in
 
 stdenv.mkDerivation rec {
   pname = "frida-gum";
   inherit (common) version;
-
-  src = fetchFromGitHub {
-    owner = "frida";
-    repo = "frida-gum";
-    # pinned in https://github.com/frida/frida
-    rev = "be5fc6d95bfc490dbd83d3e0847f0fef01c1f009";
-    sha256 = "sha256-GNxCLbi35qH4bvSwdxF3h2eirOhKKdg9BWNzx2OmXik=";
-  };
+  src = common.srcs.${pname};
 
   patches = [
     # https://github.com/frida/frida-gum/issues/710
