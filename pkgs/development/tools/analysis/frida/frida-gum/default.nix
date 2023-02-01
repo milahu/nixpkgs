@@ -26,7 +26,7 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 }:
 
 let
-  srcs = builtins.fromJSON (builtins.readFile ./srcs.json);
+  srcs = builtins.fromJSON (builtins.readFile ../srcs.json);
 in
 
 stdenv.mkDerivation rec {
@@ -36,11 +36,11 @@ stdenv.mkDerivation rec {
 
   patches = [
     # https://github.com/frida/frida-gum/issues/710
-    ./patches/frida-gum/0001-use-libdwarf-0.0-libdwarf-20210528.patch
-    ./patches/frida-gum/0002-use-libdwarf-0.1.patch
-    ./patches/frida-gum/0003-use-libdwarf-0.2.patch
-    ./patches/frida-gum/0004-use-libdwarf-0.3.patch
-    ./patches/frida-gum/0005-use-libdwarf-0.4-or-later.patch
+    ./patches/0001-use-libdwarf-0.0-libdwarf-20210528.patch
+    ./patches/0002-use-libdwarf-0.1.patch
+    ./patches/0003-use-libdwarf-0.2.patch
+    ./patches/0004-use-libdwarf-0.3.patch
+    ./patches/0005-use-libdwarf-0.4-or-later.patch
   ];
 
   nativeBuildInputs = [
