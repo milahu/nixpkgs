@@ -1,5 +1,6 @@
 { lib
 , stdenv
+, fetchFromGitHub
 , autoreconfHook
 , meson
 , pkg-config
