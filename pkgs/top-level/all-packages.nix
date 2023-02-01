@@ -20745,7 +20745,14 @@ with pkgs;
 
   libdwarf = callPackage ../development/libraries/libdwarf { };
   dwarfdump = libdwarf.bin;
-  libdwarf_20210528 = callPackage ../development/libraries/libdwarf/20210528.nix { };
+  libdwarf_20210528 = callPackage ../development/libraries/libdwarf { version = "20210528"; };
+  /* not used
+  libdwarf_0_1 = callPackage ../development/libraries/libdwarf { version = "0.1.1"; };
+  libdwarf_0_2 = callPackage ../development/libraries/libdwarf { version = "0.2.0"; };
+  libdwarf_0_3 = callPackage ../development/libraries/libdwarf { version = "0.3.4"; };
+  libdwarf_0_4 = callPackage ../development/libraries/libdwarf { version = "0.4.2"; };
+  libdwarf_0_5 = callPackage ../development/libraries/libdwarf { version = "0.5.0"; };
+  */
 
   libe57format = callPackage ../development/libraries/libe57format { };
 
