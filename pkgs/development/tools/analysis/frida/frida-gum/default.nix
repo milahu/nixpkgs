@@ -1,7 +1,7 @@
 /*
 TODO?
-Fetching value of define "FRIDA_VERSION" :
 Has header "android/api-level.h" : NO
+Fetching value of define "FRIDA_VERSION" :
 Checking for function "g_thread_set_callbacks" with dependency glib-2.0: NO
 Checking for function "ffi_set_mem_callbacks" with dependency libffi: NO
 Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
@@ -22,6 +22,16 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 , libunwind
 , libelf
 , libdwarf
+, nodejs-19_x
+, frida-v8
+, json-glib
+, frida-tinycc
+, sqlite
+, libsoup_3
+, python3
+, nodePackages
+, enableGumjs ? true # Build JavaScript bindings
+, enableGumpp ? false # Build C++ bindings # NOTE: not tested
 #, gioopenssl
 }:
 
@@ -41,11 +51,37 @@ stdenv.mkDerivation rec {
     ./patches/0003-use-libdwarf-0.2.patch
     ./patches/0004-use-libdwarf-0.3.patch
     ./patches/0005-use-libdwarf-0.4-or-later.patch
+
+    # https://github.com/frida/frida-gum/issues/713
+    ./patches/0006-fix-loading-unicode-strings.patch
+    ./patches/0007-fix-codegen-for-missing-sourcemap.patch
   ];
+
+  # capture_output=False: show output of npm
+  postPatch = ''
+    patchShebangs .
+    substituteInPlace bindings/gumjs/generate-runtime.py \
+      --replace 'capture_output=True' 'capture_output=False' \
+      --replace \
+        'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
+        'frida_compile = Path("${nodePackages.frida-compile}/bin/frida-compile")' \
+
+  '';
 
   nativeBuildInputs = [
     meson
   ];
+
+  mesonFlags = []
+    ++ lib.optionals enableGumjs [
+      "-Dgumjs=enabled"
+      "-Dquickjs=disabled"
+      "-Dv8=enabled"
+    ]
+    ++ lib.optionals enableGumpp [
+      "-Dgumpp=enabled"
+    ]
+  ;
 
   buildInputs = [
     pkg-config
@@ -59,6 +95,13 @@ stdenv.mkDerivation rec {
     libdwarf
     gobject-introspection # g-ir-scanner
     #gioopenssl
+  ] ++ lib.optionals enableGumjs [
+    frida-v8
+    json-glib
+    frida-tinycc
+    sqlite
+    libsoup_3
+    python3 # generate-bindings.py
   ];
 
   propagatedBuildInputs = [
@@ -71,9 +114,5 @@ stdenv.mkDerivation rec {
     license = licenses.wxWindows;
     maintainers = with maintainers; [ milahu ];
     platforms = platforms.unix;
-  };
-
-  passthru = {
-    inherit libdwarf;
   };
 }
