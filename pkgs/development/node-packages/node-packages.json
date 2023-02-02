@@ -142,6 +142,7 @@
 , "fleek-cli"
 , "flood"
 , "forever"
+, "frida-compile"
 , "fx"
 , "ganache"
 , "gatsby-cli"
