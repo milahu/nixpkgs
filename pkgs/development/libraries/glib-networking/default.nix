@@ -10,6 +10,7 @@
 , gettext
 , makeWrapper
 , gnutls
+, openssl
 , p11-kit
 , libproxy
 , gnome
@@ -51,6 +52,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     glib
     gnutls
+    openssl
     p11-kit
     libproxy
     gsettings-desktop-schemas
@@ -60,6 +62,8 @@ stdenv.mkDerivation rec {
   doCheck = false; # tests need to access the certificates (among other things)
 
   mesonFlags = [
+    "-Dopenssl=enabled"
+    "-Denvironment_proxy=enabled"
     "-Dinstalled_tests=true"
     "-Dinstalled_test_prefix=${placeholder "installedTests"}"
   ];
