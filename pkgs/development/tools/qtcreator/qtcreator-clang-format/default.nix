@@ -29,6 +29,29 @@
 }:
 
 let
+  /*
+    wontfix? patch breaks with clang 15.0.7
+
+    applying patch for clang-format
+    patching file include/clang/Format/Format.h
+    Hunk #1 succeeded at 21 with fuzz 1 (offset -1 lines).
+    Hunk #2 succeeded at 1668 (offset -885 lines).
+    Hunk #3 succeeded at 2370 with fuzz 1 (offset -1562 lines).
+    patching file lib/Format/Format.cpp
+    Hunk #1 succeeded at 532 with fuzz 1 (offset -282 lines).
+    Hunk #2 succeeded at 891 with fuzz 2 (offset -388 lines).
+    Hunk #3 succeeded at 976 (offset -407 lines).
+    patching file lib/Format/UnwrappedLineFormatter.cpp
+    Hunk #1 succeeded at 732 (offset -187 lines).
+    Hunk #2 FAILED at 961.
+    Hunk #3 succeeded at 819 (offset -201 lines).
+    Hunk #4 succeeded at 845 (offset -201 lines).
+    1 out of 4 hunks FAILED -- saving rejects to file lib/Format/UnwrappedLineFormatter.cpp.rej
+    patching file lib/Format/UnwrappedLineParser.cpp
+    Hunk #1 succeeded at 3063 with fuzz 2 (offset -1133 lines).
+    patching file unittests/Format/FormatTest.cpp
+    Hunk #1 succeeded at 393 (offset -134 lines).
+  */
   clang-format-patch =
     # TODO: use latest patch from https://code.qt.io/cgit/clang/llvm-project.git/
     # [clang-format] Introduce the flag which allows not to shrink lines
@@ -43,10 +66,19 @@ let
   enableManpages = false; # TODO? get value from llvmPackages.clang-unwrapped
 in
 
-llvmPackages.clang-unwrapped.overrideAttrs (oldAttrs: {
+llvmPackages.clang-unwrapped.overrideAttrs (oldAttrs: rec {
   pname = "qtcreator-clang-format";
+  version = "15.0.0";
 
-  # patch -p2: patch is for llvm, but sourceRoot is llvm/clang
+  src = fetchgit {
+    # https://code.qt.io/cgit/clang/llvm-project.git/
+    url = "https://code.qt.io/clang/llvm-project.git";
+    # note: refs/heads != refs/tags
+    # git ls-remote https://code.qt.io/clang/llvm-project.git
+    rev = "refs/heads/release_${version}-based";
+    sha256 = "sha256-/MPeDgGPMUYabw9l1hWFtWO3NPd9g54v/TNP0rjoXyg=";
+  };
+
   nativeBuildInputs = [
     cmake
     # build without ninja
@@ -78,10 +110,13 @@ llvmPackages.clang-unwrapped.overrideAttrs (oldAttrs: {
   # take only ClangFormat.cpp and CMakeLists.txt
   # and try to build it with libraries and headers
   # from llvm and clang-unwrapped
-  postPatch = (oldAttrs.postPatch or "") + ''
-    echo "applying patch for clang-format"
-    patch -p2 < ${clang-format-patch}
 
+  /*
+    echo "applying patch for clang-format"
+    # -p2: patch is for llvm, but sourceRoot is llvm/clang
+    patch -p2 < ${clang-format-patch}
+  */
+  postPatch = (oldAttrs.postPatch or "") + ''
     if false; then
     echo "patching cmake files of llvm and clang"
     mkdir patched-cmake-modules
