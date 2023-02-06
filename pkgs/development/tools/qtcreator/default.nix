@@ -123,7 +123,7 @@ let
     });
   */
 
-  qtcreator-clang-format = callPackage ./qtcreator-clang-format.nix {
+  qtcreator-clang-format = callPackage ./qtcreator-clang-format {
     inherit buildLlvmTools;
   };
 
