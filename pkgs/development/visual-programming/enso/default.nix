@@ -10,7 +10,7 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "enso";
-  version = "2022.6.1";
+  version = "2022.6.1"; # 2022-12-06
 
   src = fetchFromGitHub {
     owner = "enso-org";
@@ -18,6 +18,9 @@ rustPlatform.buildRustPackage rec {
     rev = version;
     hash = "sha256-YM+l+96n55nbZak019gtha++XllBV1jRiXOnSaTo+2o=";
   };
+
+  # fix? error[E0554]: `#![feature]` may not be used on the stable release channel
+  RUSTC_BOOTSTRAP = "1";
 
   cargoHash = "sha256-nSOlAQbcNgIG+GBk2MA+7Wq3+tiBEQTt8+DIr7YNhgA=";
 
