@@ -6,6 +6,11 @@
 , openssl
 , stdenv
 , darwin
+, nodejs
+, graalvm17-ce
+, flatbuffers # https://github.com/google/flatbuffers
+, wasm-pack
+, cargo-watch
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -31,12 +36,24 @@ rustPlatform.buildRustPackage rec {
 
   buildInputs = [
     openssl
+    nodejs
+    graalvm17-ce
+    flatbuffers # https://github.com/google/flatbuffers
+    wasm-pack
+    cargo-watch
   ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
     CoreFoundation
     DiskArbitration
     Foundation
     Security
   ]);
+
+  dontConfigure = true;
+
+  # based on the "run" script
+  buildPhase = ''
+    cargo build --profile buildscript --target-dir target/enso-build --package enso-build-cli
+  '';
 
   meta = with lib; {
     description = "Hybrid visual and textual functional programming";
