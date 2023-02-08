@@ -6,6 +6,7 @@
 , pkg-config
 , openssl
 , stdenv
+, glibc
 , darwin
 , nodejs
 , graalvm17-ce
@@ -38,10 +39,6 @@ rustPlatform.buildRustPackage rec {
       sha256 = "sha256-7p3duSqx3+vlfd1VJghXjVL0Ux9y9+Wt9wiI11XhNE8=";
     };
 
-  patches = [
-    ./disable-download-msdfgen-wasm-js.patch
-  ];
-
   # fix: error[E0554]: `#![feature]` may not be used on the stable release channel
   RUSTC_BOOTSTRAP = 1;
 
@@ -68,16 +65,28 @@ rustPlatform.buildRustPackage rec {
 
   dontConfigure = true;
 
-  # based on the "run" script
-  #
-  # libgcc_s.so.1
-  # fix error: No such file or directory: libgcc_s.so.1
-  # lib path found with strace -f -v -s 100
-  # https://github.com/enso-org/enso/issues/5587
-  #
-  # msdfgen_wasm.js
-  # fix: Error: Failed to get https://github.com/enso-org/msdfgen-wasm/releases/download/v1.4.1/msdfgen_wasm.js
-  # https://github.com/enso-org/enso/issues/5586
+  /*
+    based on the "run" script
+
+    libgcc_s.so.1
+    fix error: No such file or directory: libgcc_s.so.1
+    lib path found with strace -f -v -s 100
+    https://github.com/enso-org/enso/issues/5587
+
+    msdfgen_wasm.js
+    fix: Error: Failed to get https://github.com/enso-org/msdfgen-wasm/releases/download/v1.4.1/msdfgen_wasm.js
+    https://github.com/enso-org/enso/issues/5586
+
+    Compiling ensogl-text-embedded-fonts v0.1.0
+    Error: Failed to get https://github.com/dejavu-fonts/dejavu-fonts//releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip
+    TODO use /nix/store/sybg4kcgcy64vbvxb35q07yzfwhh17b8-dejavu-fonts-2.37/share/fonts/truetype/*.ttf
+    lib/rust/ensogl/component/text/src/font/embedded/build.rs
+    const FILE_NAMES: [&str; 4] =
+        ["DejaVuSans.ttf", "DejaVuSans-Bold.ttf", "DejaVuSansMono.ttf", "DejaVuSansMono-Bold.ttf"];
+    let out_dir = ide_ci::programs::cargo::build_env::OUT_DIR.get()?;
+    deja_vu::download_and_extract_all_fonts(&out_dir).await?;
+
+  */
 
   buildPhase = ''
     set -x
@@ -87,9 +96,18 @@ rustPlatform.buildRustPackage rec {
     mkdir -p $out/lib64
     ln -s -v ${glibc}/lib/libgcc_s.so.1 $out/lib64/libgcc_s.so.1
 
+    substituteInPlace lib/rust/ensogl/component/text/src/font/msdf/build.rs \
+      --replace 'let mut stream = ide_ci::io::web::download_reader(PACKAGE.url()?).await?;' "/*" \
+      --replace '.with_context(|| format!("Failed to stream download to file {}.", PACKAGE.filename))?;' "*/"
     cp -v --no-preserve=mode ${src-msdfgen-wasm-js} lib/rust/ensogl/component/text/src/font/msdf/msdfgen_wasm.js
 
+    substituteInPlace lib/rust/ensogl/component/text/src/font/embedded/build.rs \
+      --replace 'deja_vu::download_and_extract_all_fonts(&out_dir).await?;' ""
+    ln -s ${dejavu_fonts}/share/fonts/truetype/*.ttf $out
+
     OUT_DIR=$out strace -f -v -s 100 ./target/enso-build/buildscript/build/enso-build-*/build-script-build
+
+    rm $out/*.ttf
   '';
 
   meta = with lib; {
