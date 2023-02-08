@@ -14,6 +14,7 @@
 , wasm-pack
 , cargo-watch
 , rustfmt
+, dejavu_fonts
 
 , strace
 }:
@@ -86,12 +87,16 @@ rustPlatform.buildRustPackage rec {
     let out_dir = ide_ci::programs::cargo::build_env::OUT_DIR.get()?;
     deja_vu::download_and_extract_all_fonts(&out_dir).await?;
 
+    lib/rust/ensogl/component/text/src/font/embedded/build.rs
+    google_fonts::load(&out_dir, &mut code_gen, "mplus1").await?;
+    google_fonts::load(&out_dir, &mut code_gen, "mplus1p").await?;
+    TODO add package google-fonts: mplus1 mplus1p
+    ${asciidoctor}/lib/ruby/gems/2.7.0/gems/asciidoctor-pdf-1.6.0/data/fonts/mplus1p-regular-fallback.ttf
+
   */
 
   buildPhase = ''
     set -x
-
-    cargo build --profile buildscript --target-dir target/enso-build --package enso-build-cli || true
 
     mkdir -p $out/lib64
     ln -s -v ${glibc}/lib/libgcc_s.so.1 $out/lib64/libgcc_s.so.1
@@ -105,7 +110,13 @@ rustPlatform.buildRustPackage rec {
       --replace 'deja_vu::download_and_extract_all_fonts(&out_dir).await?;' ""
     ln -s ${dejavu_fonts}/share/fonts/truetype/*.ttf $out
 
-    OUT_DIR=$out strace -f -v -s 100 ./target/enso-build/buildscript/build/enso-build-*/build-script-build
+    if ! \
+    OUT_DIR=$out \
+    cargo build --profile buildscript --target-dir target/enso-build --package enso-build-cli
+    then
+      OUT_DIR=$out strace -f -v -s 100 \
+      ./target/enso-build/buildscript/build/enso-build-*/build-script-build
+    fi
 
     rm $out/*.ttf
   '';
