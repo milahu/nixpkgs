@@ -40,6 +40,46 @@ rustPlatform.buildRustPackage rec {
       sha256 = "sha256-7p3duSqx3+vlfd1VJghXjVL0Ux9y9+Wt9wiI11XhNE8=";
     };
 
+  # TODO move to pkgs.google-fonts.mplus1
+  google-fonts-mplus1 = stdenv.mkDerivation {
+    # https://github.com/google/fonts/tree/main/ofl/mplus1
+    pname = "google-fonts-mplus1";
+    version = "unstable-2022-05-23";
+    src = fetchurl {
+      # MPLUS1[wght].ttf
+      #url = "https://github.com/google/fonts/raw/96800fb3e967b900421481008771f14c3717ec52/ofl/mplus1/MPLUS1%5Bwght%5D.ttf";
+      url = "https://github.com/google/fonts/raw/96800fb3e967b900421481008771f14c3717ec52/ofl/mplus1/MPLUS1[wght].ttf";
+      sha256 = "";
+    };
+    buildCommand = ''
+      mkdir -p $out/share/fonts/truetype
+      cp -v $src $out/share/fonts/truetype
+    '';
+  };
+
+  # TODO move to pkgs.google-fonts.mplus1p
+  google-fonts-mplus1p = stdenv.mkDerivation {
+    # https://github.com/google/fonts/tree/main/ofl/mplus1p
+    pname = "google-fonts-mplus1p";
+    version = "unstable-2022-07-29";
+    srcs = let files = [
+      { path = "MPLUS1p-Black.ttf"; sha256 = ""; }
+      { path = "MPLUS1p-Bold.ttf"; sha256 = ""; }
+      { path = "MPLUS1p-ExtraBold.ttf"; sha256 = ""; }
+      { path = "MPLUS1p-Light.ttf"; sha256 = ""; }
+      { path = "MPLUS1p-Medium.ttf"; sha256 = ""; }
+      { path = "MPLUS1p-Regular.ttf"; sha256 = ""; }
+      { path = "MPLUS1p-Thin.ttf"; sha256 = ""; }
+    ]; in (map (f: with f; fetchurl {
+      url = "https://github.com/google/fonts/raw/a24c920263576ec723d64c1b26f8afabb841601d/ofl/mplus1p/${path}";
+      inherit sha256;
+    }) files);
+    buildCommand = ''
+      mkdir -p $out/share/fonts/truetype
+      cp -v $srcs $out/share/fonts/truetype
+    '';
+  };
+
   # fix: error[E0554]: `#![feature]` may not be used on the stable release channel
   RUSTC_BOOTSTRAP = 1;
 
@@ -109,6 +149,9 @@ rustPlatform.buildRustPackage rec {
     substituteInPlace lib/rust/ensogl/component/text/src/font/embedded/build.rs \
       --replace 'deja_vu::download_and_extract_all_fonts(&out_dir).await?;' ""
     ln -s ${dejavu_fonts}/share/fonts/truetype/*.ttf $out
+
+    ln -s ${google-fonts-mplus1}/share/fonts/truetype/*.ttf $out
+    ln -s ${google-fonts-mplus1p}/share/fonts/truetype/*.ttf $out
 
     if ! \
     OUT_DIR=$out \
