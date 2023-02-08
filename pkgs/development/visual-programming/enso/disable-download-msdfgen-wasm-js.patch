@@ -1,0 +1,20 @@
+diff --git a/lib/rust/ensogl/component/text/src/font/msdf/build.rs b/lib/rust/ensogl/component/text/src/font/msdf/build.rs
+index 06b3f4f..9c00760 100644
+--- a/lib/rust/ensogl/component/text/src/font/msdf/build.rs
++++ b/lib/rust/ensogl/component/text/src/font/msdf/build.rs
+@@ -25,6 +25,7 @@ async fn main() -> Result {
+     println!("cargo:rerun-if-changed=build.rs");
+     setup_logging()?;
+ 
++/*
+     // Downloads the msdfgen package.
+     //
+     // **Note**
+@@ -40,6 +41,7 @@ async fn main() -> Result {
+         .await
+         .with_context(|| format!("Failed to stream download to file {}.", PACKAGE.filename))?;
+ 
++*/
+     // Patch downloaded msdfgen_wasm.js file.
+     //
+     // For some reason, for wasm-bindgen test on browsers the function must be explicitly
