@@ -7350,6 +7350,7 @@ with pkgs;
   frida-gum = callPackage ../development/tools/analysis/frida/frida-gum { };
   frida-v8 = callPackage ../development/tools/analysis/frida/frida-v8 { };
   frida-tinycc = callPackage ../development/tools/analysis/frida/frida-tinycc { };
+  frida-glib-networking = callPackage ../development/tools/analysis/frida/frida-glib-networking { };
 
   frostwire = callPackage ../applications/networking/p2p/frostwire { };
   frostwire-bin = callPackage ../applications/networking/p2p/frostwire/frostwire-bin.nix { };
