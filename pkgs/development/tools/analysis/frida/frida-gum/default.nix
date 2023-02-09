@@ -11,7 +11,7 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 , stdenv
 , fetchFromGitHub
 , meson
-, vala
+#, frida-vala
 , pkg-config
 , cmake
 , ninja
@@ -28,11 +28,12 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 , frida-tinycc
 , sqlite
 , libsoup_3
+, glib-networking
+, frida-glib-networking
 , python3
 , nodePackages
 , enableGumjs ? true # Build JavaScript bindings
 , enableGumpp ? false # Build C++ bindings # NOTE: not tested
-#, gioopenssl
 }:
 
 let
@@ -94,7 +95,10 @@ stdenv.mkDerivation rec {
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
-    #gioopenssl
+    # FIXME Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
+    # https://gitlab.gnome.org/GNOME/glib-networking/-/issues/206
+    #glib-networking # gioopenssl
+    frida-glib-networking # gioopenssl
   ] ++ lib.optionals enableGumjs [
     frida-v8
     json-glib
