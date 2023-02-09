@@ -7347,6 +7347,7 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) AppKit CoreFoundation DiskArbitration Foundation IOKit;
   };
 
+  frida-core = callPackage ../development/tools/analysis/frida/frida-core { };
   frida-gum = callPackage ../development/tools/analysis/frida/frida-gum { };
   frida-v8 = callPackage ../development/tools/analysis/frida/frida-v8 { };
   frida-tinycc = callPackage ../development/tools/analysis/frida/frida-tinycc { };
