@@ -55,6 +55,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     meson
     ninja
+    frida-vala
   ];
 
   /*
@@ -67,7 +68,6 @@ stdenv.mkDerivation rec {
   buildInputs = [
     pkg-config
     frida-gum
-    frida-vala
     cmake
     glib
     libgee
