@@ -1,15 +1,13 @@
 { lib
-, stdenv
+, glib
 , fetchFromGitHub
-, meson
-, pkg-config
-, ninja
-, pcre2
 }:
 
-stdenv.mkDerivation rec {
+# based on pkgs/development/libraries/glib/default.nix
+
+glib.overrideAttrs (oldAttrs: rec {
   pname = "frida-glib";
-  version = "unstable-2022-12-10";
+  version = "2.75.0-unstable-2022-12-10";
 
   src = fetchFromGitHub {
     owner = "frida";
@@ -19,16 +17,6 @@ stdenv.mkDerivation rec {
     # subprojects/gvdb
     fetchSubmodules = true;
   };
-
-  nativeBuildInputs = [
-    meson
-    pkg-config
-    ninja
-  ];
-
-  buildInputs = [
-    pcre2
-  ];
 
   meta = with lib; {
     description = "Frida fork of GLib";
