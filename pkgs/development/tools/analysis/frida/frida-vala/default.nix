@@ -5,7 +5,7 @@
 , flex
 , bison
 , libxslt
-, graphviz
+#, graphviz
 , expat
 , vala
 , meson
@@ -28,7 +28,8 @@ vala.overrideAttrs (oldAttrs: rec {
   patches = [];
 
   buildInputs = oldAttrs.buildInputs ++ [
-    graphviz
+    # https://github.com/frida/vala/issues/5
+    #graphviz
   ];
 
   nativeBuildInputs = [
