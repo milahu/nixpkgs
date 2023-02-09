@@ -25,6 +25,8 @@ vala.overrideAttrs (oldAttrs: rec {
     hash = "sha256-czzWYcOo6qkvUNldDBWC2/1ugcaRwD2AnGGdq1ksLAE=";
   };
 
+  outputs = [ "out" ]; # remove output "devdoc"
+
   patches = [];
 
   buildInputs = oldAttrs.buildInputs ++ [
