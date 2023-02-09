@@ -1,3 +1,6 @@
+# NOTE: v8-mksnapshot binary is in $out/bin/linux-x86_64/v8-mksnapshot-linux-x86_64
+# workaround: export PATH=${frida-v8}/bin/linux-x86_64:$PATH
+
 { lib
 , stdenv
 , fetchFromGitHub
