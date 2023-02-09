@@ -1,9 +1,16 @@
 { lib
+, stdenv
 , glib
 , fetchFromGitHub
 }:
 
 # based on pkgs/development/libraries/glib/default.nix
+
+/*
+FIXME
+https://github.com/frida/glib/issues/10
+glib/gmem.c:81:3: error: ignoring return value of 'posix_memalign'
+*/
 
 glib.overrideAttrs (oldAttrs: rec {
   pname = "frida-glib";
@@ -18,6 +25,25 @@ glib.overrideAttrs (oldAttrs: rec {
     fetchSubmodules = true;
   };
 
+  # TODO add patches?
+  patches = [];
+
+  postPatch = (oldAttrs.postPatch or "") + ''
+    chmod +x tools/gen-visibility-macros.py
+    patchShebangs tools/gen-visibility-macros.py
+  '';
+
+  mesonFlags = [
+    # Avoid the need for gobject introspection binaries in PATH in cross-compiling case.
+    # Instead we just copy them over from the native output.
+    #"-Dgtk_doc=${lib.boolToString buildDocs}"
+    "-Dnls=enabled"
+    # ERROR: Unknown options: "devbindir"
+    #"-Ddevbindir=${placeholder "dev"}/bin"
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    "-Dman=true"                # broken on Darwin
+  ];
+
   meta = with lib; {
     description = "Frida fork of GLib";
     homepage = "https://github.com/frida/glib";
@@ -25,4 +51,4 @@ glib.overrideAttrs (oldAttrs: rec {
     license = licenses.lgpl21Only;
     maintainers = with maintainers; [ ];
   };
-}
+})
