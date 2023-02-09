@@ -1,0 +1,72 @@
+#! /usr/bin/env bash
+
+# find absolute path of a qt tool
+
+# this script is called from qtbase-dev/mkspecs/features/qt_functions.prf
+
+# resolution order:
+# 1. try $QMAKE_<TOOL_NAME> - example: tool_name=lrelease -> $QMAKE_LRELEASE
+# 2. search in $instloc passed by qt_functions.prf
+# 3. search in all prefixes in $QMAKEPATH
+# 4. search in $PATH
+
+if [[ $# != 2 ]]; then
+    echo 'usage: find-qt-tool.sh tool_name instloc' >&2
+    exit 1
+fi
+
+# example: lrelease
+tool_name=$1
+
+# absolute path to bin/ or libexec/
+instloc=$2
+
+if [ -n "$NIX_DEBUG" ]; then
+  log() {
+    echo "find-qt-tool.sh $tool_name: $*" >&2
+  }
+else
+  log() { :; }
+fi
+
+# test: tool was not found
+#log "not found"; exit
+
+# example: some-tool.pl -> QMAKE_SOME_TOOL_PL
+tool_cmd_env=QMAKE_$(echo $tool_name | tr '[:lower:]-.' '[:upper:]__')
+tool_cmd="${!tool_cmd_env}"
+if [ -n "$tool_cmd" ]; then
+  log "using env $tool_cmd_env: $tool_cmd"
+  echo "$tool_cmd"
+  exit
+fi
+
+instloc_prefix=${instloc%/*} # usually ${qtbase.dev}
+instloc_dir=${instloc##*/} # bin or libexec
+
+if [ -z "$instloc_dir" ]; then
+    log 'instloc_dir is empty, using instloc_dir=bin'
+    instloc_dir=bin
+fi
+
+while read -d: prefix; do
+  if [ -z "$prefix" ]; then continue; fi
+  tool_cmd=$prefix/$instloc_dir/$tool_name
+  if [ -e $tool_cmd ]; then
+    log "found in QMAKEPATH: $tool_cmd"
+    echo $tool_cmd
+    exit
+  fi
+  #log "missing in QMAKEPATH: tool_cmd=$tool_cmd"
+done <<< "$instloc_prefix:$QMAKEPATH:" # append : to path to also read last item
+log "not found $instloc_dir/$tool_name in instloc_prefix=$instloc_prefix or QMAKEPATH=$QMAKEPATH"
+
+#log "trying PATH ..."
+if tool_cmd=$(command -v $tool_name); then
+  log "found in PATH: $tool_cmd"
+    echo $tool_cmd
+    exit
+fi
+log "not found $tool_name in PATH=$PATH"
+
+log "not found, giving up. hint: set env: $tool_cmd_env=/absolute/path/to/$tool_name"
