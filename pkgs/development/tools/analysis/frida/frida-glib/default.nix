@@ -4,6 +4,7 @@
 , meson
 , pkg-config
 , ninja
+, pcre2
 }:
 
 stdenv.mkDerivation rec {
@@ -14,13 +15,19 @@ stdenv.mkDerivation rec {
     owner = "frida";
     repo = "glib";
     rev = "805e42d63aa17f58b90a57c71f4b1896f154a535";
-    hash = "sha256-HQ1UXvxMo6Hy8/vGQhO6W2H5rJnoYHgsd8Hdl9XcY0c=";
+    hash = "sha256-XSOukzSm8c6XbkafKSWhcxbwJSE71P3tYat6Il+NsDU=";
+    # subprojects/gvdb
+    fetchSubmodules = true;
   };
 
   nativeBuildInputs = [
     meson
     pkg-config
     ninja
+  ];
+
+  buildInputs = [
+    pcre2
   ];
 
   meta = with lib; {
