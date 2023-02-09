@@ -1,44 +1,3 @@
-/*
-
-  devloop:
-
-  sudo rm -rf clang-src-15.0.7/ && nix-shell ~/src/nixpkgs/ -A qtcreator.clang-format
-
-  eval ${unpackPhase:-unpackPhase} &&
-  cd $sourceRoot &&
-  eval ${patchPhase:-patchPhase} &&
-  eval ${configurePhase:-configurePhase} &&
-  eval ${buildPhase:-buildPhase}
-
-
-
-  https://code.qt.io/cgit/qt-creator/qt-creator.git/tree/README.md
-
-  FIXME
-
-  -- The following packages have not been found:
-
-  * Qt6QmlCompilerPlusPrivate
-  * litehtml
-  * Qt6WebEngineWidgets
-  * LibRustcDemangle, Demangling for Rust symbols, written in Rust., <https://github.com/alexcrichton/rustc-demangle>
-    Demangling of Rust symbols
-
-  -- The following features have been disabled:
-
-  * Build documentation
-  * Build online documentation
-  * Build tests
-  * Build with sanitize, SANITIZE_FLAGS=''
-  * Build with Crashpad
-  * Library Nanotrace
-  * Build Qbs
-  * Native WebKit help viewer, with CONDITION FWWebKit AND FWAppKit AND Qt5_VERSION VERSION_LESS 6.0.0
-  * QtWebEngine help viewer, with CONDITION BUILD_HELPVIEWERBACKEND_QTWEBENGINE AND TARGET Qt5::WebEngineWidgets
-  * multilanguage-support in qml2puppet, with CONDITION TARGET QtCreator::multilanguage-support
-  * Include developer documentation
-*/
-
 { stdenv
 , lib
 , fetchurl
@@ -57,7 +16,6 @@
 , wrapQtAppsHook
   #, qtwebengine
 , llvmPackages # "The currently recommended LLVM/Clang version is 14.0."
-, buildLlvmTools
 , elfutils
 , rustc-demangle
 , perf
@@ -73,39 +31,6 @@
 }:
 
 let
-
-  /*
-
-    TODO build only bin/clang-format with patched clang source
-
-    https://code.qt.io/cgit/qt-creator/qt-creator.git/tree/README.md
-
-    ## Getting LLVM/Clang for the Clang Code Model
-
-    The Clang code model uses `Clangd` and the ClangFormat plugin depends on the
-    LLVM/Clang libraries. The currently recommended LLVM/Clang version is 14.0.
-
-    ### Clang-Format
-
-    The ClangFormat plugin depends on the additional patch
-
-    https://code.qt.io/cgit/clang/llvm-project.git/commit/?h=release_130-based&id=42879d1f355fde391ef46b96a659afeb4ad7814a
-
-    While the plugin builds without it, it might not be fully functional.
-
-    Note that the plugin is disabled by default.
-
-
-
-    > The ClangFormat plugin depends on the additional patch
-
-    upstream PR:
-    https://reviews.llvm.org/D53072
-
-    history of the patched file:
-    https://code.qt.io/cgit/clang/llvm-project.git/log/clang/include/clang/Format/Format.h
-
-  */
 
   /*
     # TODO clazy?
@@ -124,21 +49,9 @@ let
   */
 
   qtcreator-clang-format = callPackage ./qtcreator-clang-format {
-    inherit buildLlvmTools;
+    inherit llvmPackages;
   };
-
-  clang-unwrapped =
-    if !withClangPlugins then llvmPackages.clang-unwrapped else
-    symlinkJoin {
-      name = llvmPackages.clang-unwrapped.name + "-with-qtcreator-clang-format";
-      paths = [
-        llvmPackages.clang-unwrapped
-        qtcreator-clang-format
-      ];
-    };
 in
-
-#with lib;
 
 stdenv.mkDerivation rec {
   pname = "qtcreator";
@@ -157,9 +70,10 @@ stdenv.mkDerivation rec {
     #qtwebengine
   ]
   ++ lib.optionals withClangPlugins [
-    clang-unwrapped
+    llvmPackages.clang-unwrapped
     llvmPackages.libclang
     llvmPackages.llvm
+    qtcreator-clang-format
   ];
 
   nativeBuildInputs = [
@@ -171,30 +85,13 @@ stdenv.mkDerivation rec {
   doCheck = true;
 
   postPatch = ''
-    echo patching the clangformat plugin to use qtcreator-clang-format instead of clang-format
+  '' + lib.optionalString withClangPlugins ''
+    echo patching the clangformat plugin to use qtcreator-clang-format
     substituteInPlace src/plugins/beautifier/clangformat/clangformatsettings.cpp \
       --replace \
         'setCommand("clang-format");' \
-        'setCommand("qtcreator-clang-format");'
+        'setCommand("${qtcreator-clang-format}/bin/clang-format");'
   '';
-
-  /*
-  postPatch = ''
-    stat src/libs/extensionsystem/pluginmanager.cpp
-    cp ${./src/qt-creator-opensource-src-8.0.1/src/libs/extensionsystem/pluginmanager.cpp} src/libs/extensionsystem/pluginmanager.cpp
-    cp ${./src/qt-creator-opensource-src-8.0.1/src/plugins/welcome/welcomeplugin.cpp} src/plugins/welcome/welcomeplugin.cpp
-  '';
-  */
-
-  /*
-  postPatch = ''
-    cp -v ${./icore.cpp} src/plugins/coreplugin/icore.cpp
-    cp -v ${./qtc.qbs} qbs/modules/qtc/qtc.qbs
-    cp -v ${./qtcreator.pri} qtcreator.pri
-    cp -v ${./QtCreatorAPI.cmake} cmake/QtCreatorAPI.cmake
-    cp -v ${./QtCreatorAPIInternal.cmake} cmake/QtCreatorAPIInternal.cmake
-  '';
-  */
 
   cmakeFlags = [
     # workaround for missing CMAKE_INSTALL_DATAROOTDIR
@@ -210,14 +107,6 @@ stdenv.mkDerivation rec {
 
   #qtWrapperArgs = [ "--set-default PERFPROFILER_PARSER_FILEPATH ${lib.getBin perf}/bin" ];
 
-  # TODO remove?
-  /*
-    # qt5
-    substituteInPlace src/plugins/plugins.pro \
-      --replace '$$[QT_INSTALL_QML]/QtQuick/Controls' '${qtquickcontrols}/${qtbase.qtQmlPrefix}/QtQuick/Controls'
-    substituteInPlace src/libs/libs.pro \
-      --replace '$$[QT_INSTALL_QML]/QtQuick/Controls' '${qtquickcontrols}/${qtbase.qtQmlPrefix}/QtQuick/Controls'
-  */
   preConfigure = ''
   '' + lib.optionalString withClangPlugins ''
     # Fix paths for llvm/clang includes directories.
