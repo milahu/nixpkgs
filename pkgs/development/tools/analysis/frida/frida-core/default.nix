@@ -8,7 +8,7 @@
 , frida-gum
 , frida-vala
 , cmake
-, glib
+, frida-glib
 , libgee
 , json-glib
 , libsoup_3
@@ -69,7 +69,7 @@ stdenv.mkDerivation rec {
     pkg-config
     frida-gum
     cmake
-    glib
+    frida-glib
     libgee
     json-glib
     libsoup_3
