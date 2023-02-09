@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
   ];
 
   meta = with lib; {
-    description = "Tiny C Compiler";
+    description = "Frida fork of the Tiny C Compiler";
     homepage = "https://github.com/frida/tinycc";
     changelog = "https://github.com/frida/tinycc/blob/${src.rev}/Changelog";
     license = licenses.lgpl21Only;
