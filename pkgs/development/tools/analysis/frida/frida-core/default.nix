@@ -16,7 +16,6 @@
 , frida-glib-networking
 , coreutils
 , libnice
-, usrsctp # debug
 , frida-usrsctp
 , python3
 , nodejs-19_x
@@ -78,8 +77,7 @@ stdenv.mkDerivation rec {
     frida-glib-networking # gioopenssl
     libnice
     #usrsctp # build error: undefined reference to usrsctp_get_timeout https://github.com/sctplab/usrsctp/pull/591
-    usrsctp # debug
-    #frida-usrsctp # TODO restore
+    frida-usrsctp
     python3 # src/compiler/generate-agent.py
     nodejs-19_x # npm, same nodejs version as frida-gum
     frida-v8
