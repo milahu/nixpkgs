@@ -16,6 +16,8 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
   pname = "frida-glib";
   version = "2.75.0-unstable-2022-12-10";
 
+  outputs = [ "bin" "out" "dev" ]; # "devdoc" # no docs
+
   src = fetchFromGitHub {
     owner = "frida";
     repo = "glib";
