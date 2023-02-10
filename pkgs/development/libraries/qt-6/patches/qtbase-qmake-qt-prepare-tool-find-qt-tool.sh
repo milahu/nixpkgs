@@ -1,5 +1,3 @@
-#! /usr/bin/env bash
-
 # find absolute path of a qt tool
 
 # this script is called from qtbase-dev/mkspecs/features/qt_functions.prf

@@ -15,7 +15,7 @@
 , cmake
 , ninja
 , writeText
-, writeScript
+, writeShellScript
 , substituteAll
 , gstreamer
 , gst-plugins-base
@@ -69,7 +69,7 @@ let
           })
           (substituteAll {
             src = ./patches/qtbase-qmake-qt-prepare-tool.diff;
-            findQtTool = writeScript "find-qt-tool.sh" (
+            findQtTool = writeShellScript "find-qt-tool.sh" (
               builtins.readFile ./patches/qtbase-qmake-qt-prepare-tool-find-qt-tool.sh);
           })
         ];
