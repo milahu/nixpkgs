@@ -114,6 +114,7 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
       --replace '        (output_dir / "node_modules" / "@types" / "frida-gum"' '#' \
       --replace '    shutil.copyfileobj(response, frida_gum_types)' '#' \
 
+    cp -v ${./meson.build} meson.build
   '';
 
   # https://github.com/frida/v8/issues/14
@@ -122,6 +123,9 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
   '';
 
   preBuild = ''
+    echo TODO fix meson.build
+    exit 1
+
     mkdir -p src/compiler
     pushd src/compiler
 
