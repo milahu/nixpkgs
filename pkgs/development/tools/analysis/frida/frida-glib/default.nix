@@ -33,7 +33,9 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
   };
 
   # TODO add patches?
-  patches = [];
+  patches = [
+    ../../../../../development/libraries/glib/split-dev-programs.patch
+  ];
 
   postPatch = (oldAttrs.postPatch or "") + ''
     chmod +x tools/gen-visibility-macros.py
@@ -43,13 +45,23 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
   postInstall = ''
     moveToOutput "share/glib-2.0" "$dev"
     # FIXME? no such file
-    #substituteInPlace "$dev/bin/gdbus-codegen" --replace "$out" "$dev"
     (
       echo debug. where is gdbus-codegen
       set -x
       find . -name gdbus-codegen
+      # before patch:
+      # ./gio/gdbus-2.0/codegen/gdbus-codegen
       find $out -name gdbus-codegen
       find $dev -name gdbus-codegen
+    )
+    substituteInPlace "$dev/bin/gdbus-codegen" --replace "$out" "$dev"
+    # FIXME? no such file
+    (
+      echo debug. where is glib-gettextize
+      set -x
+      find . -name glib-gettextize
+      find $out -name glib-gettextize
+      find $dev -name glib-gettextize
     )
     sed -i "$dev/bin/glib-gettextize" -e "s|^gettext_dir=.*|gettext_dir=$dev/share/glib-2.0/gettext|"
 
