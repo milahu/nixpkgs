@@ -70,7 +70,7 @@ let
           (substituteAll {
             src = ./patches/qtbase-qmake-qt-prepare-tool.diff;
             findQtTool = writeScript "find-qt-tool.sh" (
-              readFile ./patches/qtbase-qmake-qt-prepare-tool-find-qt-tool.sh);
+              builtins.readFile ./patches/qtbase-qmake-qt-prepare-tool-find-qt-tool.sh);
           })
         ];
       };
