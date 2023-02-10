@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
   prePatch = ''
     cd examples/widgets/tools/i18n
   '';
-  # tries install to ${qtbase.out}/examples/
+  # fix default install location: ${qtbase.out}/examples/
   installPhase = ''
     runHook preInstall
     install -Dm 555 i18n $out/bin/i18n
