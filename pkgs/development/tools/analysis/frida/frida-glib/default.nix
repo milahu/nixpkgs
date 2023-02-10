@@ -17,10 +17,20 @@ glib.overrideAttrs (oldAttrs: rec {
   version = "2.75.0-unstable-2022-12-10";
 
   src = fetchFromGitHub {
+    /*
     owner = "frida";
     repo = "glib";
     rev = "805e42d63aa17f58b90a57c71f4b1896f154a535";
     hash = "sha256-XSOukzSm8c6XbkafKSWhcxbwJSE71P3tYat6Il+NsDU=";
+    */
+    # fix: error: ignoring return value of posix_memalign
+    # https://github.com/frida/glib/issues/10
+    # https://github.com/milahu/frida-glib
+    owner = "milahu";
+    repo = "frida-glib";
+    rev = "6bb81f198823f47c571da5700158eb841ec26e16";
+    hash = "sha256-Et4BwBDTcaulI78ZTt+igY9DsFSi/fKoCABLad8s3u4=";
+
     # subprojects/gvdb
     fetchSubmodules = true;
   };
