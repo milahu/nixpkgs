@@ -7354,6 +7354,7 @@ with pkgs;
   frida-glib = callPackage ../development/tools/analysis/frida/frida-glib { };
   frida-glib-networking = callPackage ../development/tools/analysis/frida/frida-glib-networking { };
   frida-vala = callPackage ../development/tools/analysis/frida/frida-vala { };
+  frida-usrsctp = callPackage ../development/tools/analysis/frida/frida-usrsctp { };
 
   frostwire = callPackage ../applications/networking/p2p/frostwire { };
   frostwire-bin = callPackage ../applications/networking/p2p/frostwire/frostwire-bin.nix { };
