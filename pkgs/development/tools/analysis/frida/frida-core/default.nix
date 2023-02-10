@@ -123,9 +123,6 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
   '';
 
   preBuild = ''
-    echo TODO fix meson.build
-    exit 1
-
     mkdir -p src/compiler
     pushd src/compiler
 
