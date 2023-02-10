@@ -15,7 +15,7 @@
 , brotli
 , frida-glib-networking
 , coreutils
-, libnice
+#, libnice # build error: undefined reference to usrsctp_get_timeout
 , usrsctp
 , python3
 , nodejs-19_x
@@ -75,7 +75,7 @@ stdenv.mkDerivation rec {
     libsoup_3
     brotli
     frida-glib-networking # gioopenssl
-    libnice
+    #libnice # build error: undefined reference to usrsctp_get_timeout
     usrsctp
     python3 # src/compiler/generate-agent.py
     nodejs-19_x # npm, same nodejs version as frida-gum
