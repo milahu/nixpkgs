@@ -40,6 +40,30 @@ glib.overrideAttrs (oldAttrs: rec {
     patchShebangs tools/gen-visibility-macros.py
   '';
 
+  postInstall = ''
+    moveToOutput "share/glib-2.0" "$dev"
+    # FIXME? no such file
+    #substituteInPlace "$dev/bin/gdbus-codegen" --replace "$out" "$dev"
+    (
+      echo debug. where is gdbus-codegen
+      set -x
+      find . -name gdbus-codegen
+      find $out -name gdbus-codegen
+      find $dev -name gdbus-codegen
+    )
+    sed -i "$dev/bin/glib-gettextize" -e "s|^gettext_dir=.*|gettext_dir=$dev/share/glib-2.0/gettext|"
+
+    # This file is *included* in gtk3 and would introduce runtime reference via __FILE__.
+    sed '1i#line 1 "glib-${finalAttrs.version}/include/glib-2.0/gobject/gobjectnotifyqueue.c"' \
+      -i "$dev"/include/glib-2.0/gobject/gobjectnotifyqueue.c
+    for i in $bin/bin/*; do
+      moveToOutput "share/bash-completion/completions/''${i##*/}" "$bin"
+    done
+    for i in $dev/bin/*; do
+      moveToOutput "share/bash-completion/completions/''${i##*/}" "$dev"
+    done
+  '';
+
   mesonFlags = [
     # Avoid the need for gobject introspection binaries in PATH in cross-compiling case.
     # Instead we just copy them over from the native output.
