@@ -81,8 +81,8 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
     # Instead we just copy them over from the native output.
     #"-Dgtk_doc=${lib.boolToString buildDocs}"
     "-Dnls=enabled"
-    # ERROR: Unknown options: "devbindir"
-    #"-Ddevbindir=${placeholder "dev"}/bin"
+    # split-dev-programs.patch
+    "-Ddevbindir=${placeholder "dev"}/bin"
   ] ++ lib.optionals (!stdenv.isDarwin) [
     "-Dman=true"                # broken on Darwin
   ];
