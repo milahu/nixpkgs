@@ -12,7 +12,7 @@ https://github.com/frida/glib/issues/10
 glib/gmem.c:81:3: error: ignoring return value of 'posix_memalign'
 */
 
-glib.overrideAttrs (oldAttrs: rec {
+glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
   pname = "frida-glib";
   version = "2.75.0-unstable-2022-12-10";
 
