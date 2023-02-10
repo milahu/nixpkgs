@@ -9,7 +9,7 @@
 -            $${1}_EXE = $${cmd}.pl
 -            cmd = perl -w $$system_path($${cmd}.pl)
 +        # ${qtbase.dev}/mkspecs/features/find-qt-tool.sh
-+        find_qt_tool = @@NIXPKGS_QTBASE_FIND_QT_TOOL@@
++        find_qt_tool = @findQtTool@
 +        # extensions: pl, exe, app
 +        cmd = $$system("$${find_qt_tool} $${2}.pl $${instloc}")
 +        !isEmpty(cmd) {

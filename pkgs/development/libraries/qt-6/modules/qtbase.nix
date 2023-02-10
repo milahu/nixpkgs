@@ -195,11 +195,6 @@ stdenv.mkDerivation rec {
   # https://bugreports.qt.io/browse/QTBUG-97568
   postPatch = ''
     substituteInPlace src/corelib/CMakeLists.txt --replace /bin/ls ${coreutils}/bin/ls
-    # patches/qtbase-qmake-qt-prepare-tool.diff
-    substituteInPlace mkspecs/features/qt_functions.prf \
-      --replace @@NIXPKGS_QTBASE_FIND_QT_TOOL@@ $dev/mkspecs/features/find-qt-tool.sh
-    cp ${../patches/qtbase-qmake-qt-prepare-tool-find-qt-tool.sh} mkspecs/features/find-qt-tool.sh
-    chmod +x mkspecs/features/find-qt-tool.sh
   '' + lib.optionalString stdenv.isDarwin ''
     substituteInPlace cmake/QtAutoDetect.cmake --replace "/usr/bin/xcrun" "${xcbuild}/bin/xcrun"
   '';

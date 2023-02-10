@@ -21,7 +21,7 @@ tool_name=$1
 # absolute path to bin/ or libexec/
 instloc=$2
 
-if [ -n "$NIX_DEBUG" ]; then
+if (( "${NIX_DEBUG:-0}" >= 1 )); then
   log() {
     echo "find-qt-tool.sh $tool_name: $*" >&2
   }
