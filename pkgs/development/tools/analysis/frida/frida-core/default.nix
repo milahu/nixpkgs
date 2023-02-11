@@ -113,6 +113,12 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
       url = "https://github.com/frida/frida-core/pull/452.patch";
       sha256 = "sha256-Sslimh/FafS7ZtMEgujT+IyWPEbXxUPJeirC9TzbQdc=";
     })
+    # fix build on linux
+    # https://github.com/frida/frida-core/pull/454
+    (fetchpatch {
+      url = "https://github.com/frida/frida-core/pull/454.patch";
+      sha256 = "sha256-6ihcR/MOHP0Hbm9BHyGo8rOgyP5XYso/FtGyELSXb1I=";
+    })
   ];
 
   postPatch = ''
