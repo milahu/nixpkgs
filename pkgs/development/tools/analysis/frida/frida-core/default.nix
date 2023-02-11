@@ -2,6 +2,7 @@
 , stdenv
 , fetchFromGitHub
 , fetchurl
+, fetchpatch
 , meson
 , ninja
 , pkg-config
@@ -105,6 +106,15 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
 
 */
 
+  patches = [
+    # Check required functions
+    # https://github.com/frida/frida-core/pull/452
+    (fetchpatch {
+      url = "https://github.com/frida/frida-core/pull/452.patch";
+      sha256 = "sha256-Sslimh/FafS7ZtMEgujT+IyWPEbXxUPJeirC9TzbQdc=";
+    })
+  ];
+
   postPatch = ''
     patchShebangs .
     substituteInPlace src/compiler/generate-agent.py \
@@ -114,7 +124,6 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
       --replace '        (output_dir / "node_modules" / "@types" / "frida-gum"' '#' \
       --replace '    shutil.copyfileobj(response, frida_gum_types)' '#' \
 
-    cp -v ${./meson.build} meson.build
   '';
 
   # https://github.com/frida/v8/issues/14
