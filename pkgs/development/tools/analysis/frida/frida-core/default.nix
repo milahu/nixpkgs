@@ -65,6 +65,10 @@ stdenv.mkDerivation rec {
     nodejs-19_x # npm, same nodejs version as frida-gum
   ];
 
+  propagatedBuildInputs = [
+    frida-glib
+  ];
+
   patches = [
     # fix build on linux
     # https://github.com/frida/frida-core/pull/454
