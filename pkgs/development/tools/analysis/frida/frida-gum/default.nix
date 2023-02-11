@@ -1,21 +1,14 @@
-/*
-TODO?
-Has header "android/api-level.h" : NO
-Fetching value of define "FRIDA_VERSION" :
-Checking for function "g_thread_set_callbacks" with dependency glib-2.0: NO
-Checking for function "ffi_set_mem_callbacks" with dependency libffi: NO
-Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
-*/
-
 { lib
 , stdenv
 , fetchFromGitHub
 , fetchpatch
 , meson
-#, frida-vala
 , pkg-config
 , cmake
 , ninja
+, frida-glib-networking
+, frida-tinycc
+, frida-v8
 , glib
 , capstone_5
 , lzma
@@ -23,18 +16,13 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 , libunwind
 , libelf
 , libdwarf
-, nodejs-19_x
-, frida-v8
 , json-glib
-, frida-tinycc
 , sqlite
 , libsoup_3
-, glib-networking
-, frida-glib-networking
 , python3
 , nodePackages
 , enableGumjs ? true # Build JavaScript bindings
-, enableGumpp ? false # Build C++ bindings # NOTE: not tested
+, enableGumpp ? true # Build C++ bindings
 }:
 
 let
@@ -47,24 +35,13 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub srcs.paths.${pname}.github;
 
   patches = [
-    # https://github.com/frida/frida-gum/issues/710
+    # make it build with latest libdwarf
+    # https://github.com/frida/frida-gum/pull/711
     ./patches/0001-use-libdwarf-0.0-libdwarf-20210528.patch
     ./patches/0002-use-libdwarf-0.1.patch
     ./patches/0003-use-libdwarf-0.2.patch
     ./patches/0004-use-libdwarf-0.3.patch
     ./patches/0005-use-libdwarf-0.4-or-later.patch
-
-    # https://github.com/frida/frida-gum/issues/713
-    ./patches/0006-fix-loading-unicode-strings.patch
-    ./patches/0007-fix-codegen-for-missing-sourcemap.patch
-
-    # make it build with vanilla tinycc
-    # make it build with fixed frida-tinycc https://github.com/frida/tinycc/pull/7
-    # https://github.com/frida/frida-gum/pull/720
-    (fetchpatch {
-      url = "https://github.com/frida/frida-gum/pull/720.patch";
-      sha256 = "sha256-2AAW9rV8+4okALRcV57S4clfDGnqQ8+VsmA9RQkfxTc=";
-    })
   ];
 
   # capture_output=False: show output of npm
@@ -94,6 +71,7 @@ stdenv.mkDerivation rec {
   ;
 
   buildInputs = [
+    frida-glib-networking
     pkg-config
     cmake
     ninja
@@ -104,14 +82,10 @@ stdenv.mkDerivation rec {
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
-    # FIXME Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
-    # https://gitlab.gnome.org/GNOME/glib-networking/-/issues/206
-    #glib-networking # gioopenssl
-    frida-glib-networking # gioopenssl
   ] ++ lib.optionals enableGumjs [
+    frida-tinycc
     frida-v8
     json-glib
-    frida-tinycc
     sqlite
     libsoup_3
     python3 # generate-bindings.py

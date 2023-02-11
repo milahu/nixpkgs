@@ -28,8 +28,8 @@
       "github": {
         "owner": "frida",
         "repo": "frida-gum",
-        "rev": "be5fc6d95bfc490dbd83d3e0847f0fef01c1f009",
-        "sha256": "GNxCLbi35qH4bvSwdxF3h2eirOhKKdg9BWNzx2OmXik="
+        "rev": "acaec42263a89bbc8a8ac045e1d5c91003c9dd9a",
+        "sha256": "sha256-jYEkyFUtGKaPEv+a5DL0/vdbV/vROOPwxIbN+cwQW5k="
       }
     },
     "frida-node": {
