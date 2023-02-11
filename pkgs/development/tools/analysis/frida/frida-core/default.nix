@@ -65,8 +65,11 @@ stdenv.mkDerivation rec {
     nodejs-19_x # npm, same nodejs version as frida-gum
   ];
 
+  # lib/pkgconfig/frida-core-1.0.pc
+  # Requires: glib-2.0, gobject-2.0, gio-2.0, json-glib-1.0
   propagatedBuildInputs = [
     frida-glib
+    json-glib
   ];
 
   patches = [
