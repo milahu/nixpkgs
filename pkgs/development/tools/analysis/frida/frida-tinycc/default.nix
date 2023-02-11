@@ -13,8 +13,9 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "frida";
     repo = "tinycc";
-    rev = "a438164dd4c453ae62c1224b4b7997507a388b3d";
-    hash = "sha256-BoTzGr/4z8h7/EqUP9N1Xtg7CCtqT/uKVX8P/lzmDHg=";
+    # https://github.com/frida/tinycc/pull/7
+    rev = "dcd12ae0654369c59f58b868df6a2633d4435b79";
+    hash = "sha256-PB0eeWV344+5b2hFXYRjSGr8JwlIeQ2HysTNg+FOIbQ=";
   };
 
   nativeBuildInputs = [
