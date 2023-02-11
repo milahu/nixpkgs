@@ -8,27 +8,19 @@
 , pkg-config
 , frida-gum
 , frida-vala
-, cmake
 , frida-glib
+, frida-glib-networking
+, frida-usrsctp
+, frida-v8
+, cmake
 , libgee
 , json-glib
 , libsoup_3
 , brotli
-, frida-glib-networking
-, coreutils
 , libnice
-, frida-usrsctp
 , python3
 , nodejs-19_x
-, nodePackages
 , callPackage
-, frida-v8
-/*
-, nodejs
-, which
-, git
-, perl
-*/
 }:
 
 let
@@ -37,11 +29,8 @@ let
   frida-compiler-agent = callPackage ./frida-compiler-agent {
     nodejs = nodejs-19_x;
   };
-
-  # cd src/compiler && node2nix -l package-lock.json -d && cp *.nix package* ~/src/nixpkgs/pkgs/development/tools/analysis/frida/frida-core/frida-compiler-agent/
 in
 
-#let frida =
 stdenv.mkDerivation rec {
   pname = "frida-core";
   inherit (srcs) version;
@@ -55,68 +44,32 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     meson
+    pkg-config
     ninja
     frida-vala
   ];
 
-  /*
-  TODO?
-  Has header "android/api-level.h" : NO
-  Has header "xlocale.h" : NO
-  Checking if "compiling for uClibc" compiles: NO
-  */
-
   buildInputs = [
-    pkg-config
     frida-gum
-    cmake
     frida-glib
+    frida-glib-networking
+    frida-usrsctp
+    frida-v8
+    cmake
     libgee
     json-glib
     libsoup_3
     brotli
-    frida-glib-networking # gioopenssl
     libnice
-    #usrsctp # build error: undefined reference to usrsctp_get_timeout https://github.com/sctplab/usrsctp/pull/591
-    frida-usrsctp
     python3 # src/compiler/generate-agent.py
     nodejs-19_x # npm, same nodejs version as frida-gum
-    frida-v8
-    /*
-    which
-    git
-    python3
-    nodejs
-    perl
-    */
   ];
 
-/*
-
-FIXME
-
-[1/144] Generating src/compiler/frida-compiler-agent with a custom command
-FAILED: src/compiler/agent.js src/compiler/snapshot.bin
-/build/source/src/compiler/generate-agent.py /build/source/src/compiler /build/source/build/src/compiler linux 64 ''
-/bin/sh: /build/source/src/compiler/generate-agent.py: not found
-
-      --replace \
-        'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
-        'frida_compile = Path("${nodePackages.frida-compile}/bin/frida-compile")' \
-
-*/
-
   patches = [
-    # Check required functions
-    # https://github.com/frida/frida-core/pull/452
-    (fetchpatch {
-      url = "https://github.com/frida/frida-core/pull/452.patch";
-      sha256 = "sha256-Sslimh/FafS7ZtMEgujT+IyWPEbXxUPJeirC9TzbQdc=";
-    })
     # fix build on linux
     # https://github.com/frida/frida-core/pull/454
     (fetchpatch {
-      url = "https://github.com/frida/frida-core/pull/454.patch";
+      url = "https://github.com/frida/frida-core/commit/d08e9e9ec5ba759e2ba530c077f0d8c66d20ed9a.patch";
       sha256 = "sha256-6ihcR/MOHP0Hbm9BHyGo8rOgyP5XYso/FtGyELSXb1I=";
     })
   ];
@@ -158,14 +111,4 @@ FAILED: src/compiler/agent.js src/compiler/snapshot.bin
     maintainers = with maintainers; [ milahu ];
     platforms = platforms.unix;
   };
-
-  passthru = {
-    /*
-    tools = frida.overrideAttrs (old: {
-
-    });
-    */
-
-  };
 }
-#; in frida
