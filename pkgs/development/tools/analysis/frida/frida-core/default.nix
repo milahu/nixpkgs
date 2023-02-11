@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     frida-gum
     frida-glib
-    frida-glib-networking
+    frida-glib-networking # gioopenssl
     frida-usrsctp
     frida-v8
     cmake
@@ -67,9 +67,19 @@ stdenv.mkDerivation rec {
 
   # lib/pkgconfig/frida-core-1.0.pc
   # Requires: glib-2.0, gobject-2.0, gio-2.0, json-glib-1.0
+  # Requires.private: gmodule-2.0, gee-0.8, libsoup-3.0, frida-gum-1.0, frida-gumjs-inspector-1.0, libbrotlidec, gioopenssl, nice, openssl, usrsctp
   propagatedBuildInputs = [
     frida-glib
     json-glib
+    libgee
+    libsoup_3
+    frida-gum
+    #frida-gumjs-inspector
+    brotli
+    frida-glib-networking # gioopenssl
+    libnice
+    #openssl
+    frida-usrsctp
   ];
 
   patches = [
