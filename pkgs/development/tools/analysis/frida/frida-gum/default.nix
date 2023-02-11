@@ -42,6 +42,13 @@ stdenv.mkDerivation rec {
     ./patches/0003-use-libdwarf-0.2.patch
     ./patches/0004-use-libdwarf-0.3.patch
     ./patches/0005-use-libdwarf-0.4-or-later.patch
+
+    # make it build with fixed frida-tinycc https://github.com/frida/tinycc/pull/7
+    # https://github.com/frida/frida-gum/pull/720
+    (fetchpatch {
+      url = "https://github.com/frida/frida-gum/commit/1f888c8f451c72f20c612f2b193d5ab4442c3840.patch";
+      sha256 = "sha256-2AAW9rV8+4okALRcV57S4clfDGnqQ8+VsmA9RQkfxTc=";
+    })
   ];
 
   # capture_output=False: show output of npm
@@ -57,6 +64,9 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     meson
+    pkg-config
+    cmake
+    ninja
   ];
 
   mesonFlags = []
@@ -72,9 +82,6 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     frida-glib-networking
-    pkg-config
-    cmake
-    ninja
     glib
     capstone_5
     lzma
