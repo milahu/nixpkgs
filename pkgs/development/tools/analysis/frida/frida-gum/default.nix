@@ -10,6 +10,7 @@ Run-time dependency gioopenssl found: NO (tried pkgconfig and cmake)
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch
 , meson
 #, frida-vala
 , pkg-config
@@ -56,6 +57,14 @@ stdenv.mkDerivation rec {
     # https://github.com/frida/frida-gum/issues/713
     ./patches/0006-fix-loading-unicode-strings.patch
     ./patches/0007-fix-codegen-for-missing-sourcemap.patch
+
+    # make it build with vanilla tinycc
+    # make it build with fixed frida-tinycc https://github.com/frida/tinycc/pull/7
+    # https://github.com/frida/frida-gum/pull/720
+    (fetchpatch {
+      url = "https://github.com/frida/frida-gum/pull/720.patch";
+      sha256 = "sha256-2AAW9rV8+4okALRcV57S4clfDGnqQ8+VsmA9RQkfxTc=";
+    })
   ];
 
   # capture_output=False: show output of npm
