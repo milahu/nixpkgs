@@ -23,6 +23,7 @@ stdenv.mkDerivation rec {
   gitTag = "release_${version}-based";
 
   src = fetchurl {
+      name = "ClangFormat.cpp";
       url = "https://code.qt.io/cgit/clang/llvm-project.git/plain/clang/tools/clang-format/ClangFormat.cpp?h=${gitTag}";
       sha256 = "sha256-6rN0VmUvl3xxqt4lvEzbbTnOpnmkDmNyZDF3mQQiFTc=";
     };
