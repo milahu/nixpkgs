@@ -18290,7 +18290,6 @@ with pkgs;
     inherit (linuxPackages) perf;
     # TODO: use latest llvm version of https://code.qt.io/cgit/clang/llvm-project.git/
     llvmPackages = llvmPackages_15;
-    buildLlvmTools = buildPackages.llvmPackages_15.tools;
   };
 
   qxmledit = libsForQt5.callPackage ../applications/editors/qxmledit {} ;
