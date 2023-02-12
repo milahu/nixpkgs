@@ -111,14 +111,14 @@ stdenv.mkDerivation rec {
   '' + lib.optionalString withClangPlugins ''
     # Fix paths for llvm/clang includes directories.
     substituteInPlace src/shared/clang/clang_defines.pri \
-      --replace '$$clean_path($${LLVM_LIBDIR}/clang/$${LLVM_VERSION}/include)' '${clang-unwrapped}/lib/clang/8.0.0/include' \
-      --replace '$$clean_path($${LLVM_BINDIR})' '${clang-unwrapped}/bin'
+      --replace '$$clean_path($${LLVM_LIBDIR}/clang/$${LLVM_VERSION}/include)' '${llvmPackages.clang-unwrapped}/lib/clang/8.0.0/include' \
+      --replace '$$clean_path($${LLVM_BINDIR})' '${llvmPackages.clang-unwrapped}/bin'
 
     # Fix paths to libclang library.
     substituteInPlace src/shared/clang/clang_installation.pri \
       --replace 'LIBCLANG_LIBS = -L$${LLVM_LIBDIR}' 'LIBCLANG_LIBS = -L${llvmPackages.libclang.lib}/lib' \
       --replace 'LIBCLANG_LIBS += $${CLANG_LIB}' 'LIBCLANG_LIBS += -lclang' \
-      --replace 'LIBTOOLING_LIBS = -L$${LLVM_LIBDIR}' 'LIBTOOLING_LIBS = -L${clang-unwrapped}/lib' \
+      --replace 'LIBTOOLING_LIBS = -L$${LLVM_LIBDIR}' 'LIBTOOLING_LIBS = -L${llvmPackages.clang-unwrapped}/lib' \
       --replace 'LLVM_CXXFLAGS ~= s,-gsplit-dwarf,' '${lib.concatStringsSep "\n" ["LLVM_CXXFLAGS ~= s,-gsplit-dwarf," "    LLVM_CXXFLAGS += -fno-rtti"]}'
   '';
 
@@ -133,7 +133,7 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
-    inherit clang-unwrapped qtcreator-clang-format;
+    inherit qtcreator-clang-format;
   };
 
   meta = with lib; {
