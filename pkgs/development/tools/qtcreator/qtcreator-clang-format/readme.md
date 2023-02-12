@@ -2,6 +2,57 @@
 
 build only clang-format of llvm-project
 
+## rebasing the patch
+
+rebasing is painful!
+
+its MUCH easier to cherry-pick:
+
+```
+version1=15.0.0
+version2=15.0.7
+
+git clone --depth 1 https://github.com/llvm/llvm-project -b llvmorg-$version2
+cd llvm-project
+git remote add qt https://code.qt.io/clang/llvm-project.git
+git fetch qt refs/heads/release_$version1-based:release_$version1-based
+git checkout llvmorg-$version2
+
+# TODO automate this step. get the branchoff point from code.qt.io?
+git cherry-pick release_$version1-based~2
+git cherry-pick release_$version1-based~1
+git cherry-pick release_$version1-based
+```
+
+
+
+## wrong source
+
+> unpacking source archive /nix/store/k7z49yww2hkca2ainyk72cxxzndnjz6i-clang-11.1.0.src.tar.xz
+
+wtf? should be 15.0.7
+
+```nix
+{
+  qtcreator = qt6Packages.callPackage ../development/tools/qtcreator {
+    inherit (linuxPackages) perf;
+    # TODO: use latest llvm version of https://code.qt.io/cgit/clang/llvm-project.git/
+    llvmPackages = llvmPackages_15;
+    buildLlvmTools = buildPackages.llvmPackages_15.tools;
+  };
+
+  llvmPackages_15 = recurseIntoAttrs (callPackage ../development/compilers/llvm/15 ({
+    inherit (stdenvAdapters) overrideCC;
+    buildLlvmTools = buildPackages.llvmPackages_15.tools;
+    targetLlvmLibraries = targetPackages.llvmPackages_15.libraries or llvmPackages_15.libraries;
+    targetLlvm = targetPackages.llvmPackages_15.llvm or llvmPackages_15.llvm;
+  }));
+```
+
+### fix
+
+set src explicitly
+
 
 
 ## dependencies
@@ -377,6 +428,23 @@ error: builder for '/nix/store/g87yw4h149q3fypvyyh2cnzicz7xg019-clang-15.0.7.drv
 ```nix
 {
   outputs = [ "out" ];
+```
+
+
+
+## error: missing GetErrcMessages
+
+```
+-- Performing Test LLVM_HAS_ATOMICS - Success
+CMake Error at CMakeLists.txt:121 (include):
+  include could not find requested file:
+
+    GetErrcMessages
+
+
+-- Found Python3: /nix/store/abax98471z8fshv4b9p46bkh3lxmpy0z-python3-3.10.9/bin/python3.10 (found version "3.10.9") found components: Interpreter
+CMake Error at CMakeLists.txt:196 (umbrella_lit_testsuite_begin):
+  Unknown CMake command "umbrella_lit_testsuite_begin".
 ```
 
 
