@@ -33,7 +33,10 @@
 let
 
   /*
+    TODO plugins? https://code.qt.io/cgit/ -> Ctrl-F qt-creator
+
     # TODO clazy?
+    # https://code.qt.io/cgit/clang/clazy.git/
     # Fetch clang from qt vendor, this contains submodules like this:
     # clang<-clang-tools-extra<-clazy.
     clang-unwrapped = llvmPackages.clang-unwrapped.overrideAttrs (oldAttrs: {
@@ -86,7 +89,6 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
   '' + lib.optionalString withClangPlugins ''
-    echo patching the clangformat plugin to use qtcreator-clang-format
     substituteInPlace src/plugins/beautifier/clangformat/clangformatsettings.cpp \
       --replace \
         'setCommand("clang-format");' \
@@ -107,13 +109,13 @@ stdenv.mkDerivation rec {
 
   #qtWrapperArgs = [ "--set-default PERFPROFILER_PARSER_FILEPATH ${lib.getBin perf}/bin" ];
 
+/* no such file
   preConfigure = ''
-  '' + lib.optionalString withClangPlugins ''
     # Fix paths for llvm/clang includes directories.
     substituteInPlace src/shared/clang/clang_defines.pri \
       --replace '$$clean_path($${LLVM_LIBDIR}/clang/$${LLVM_VERSION}/include)' '${llvmPackages.clang-unwrapped}/lib/clang/8.0.0/include' \
       --replace '$$clean_path($${LLVM_BINDIR})' '${llvmPackages.clang-unwrapped}/bin'
-
+  '' + lib.optionalString withClangPlugins ''
     # Fix paths to libclang library.
     substituteInPlace src/shared/clang/clang_installation.pri \
       --replace 'LIBCLANG_LIBS = -L$${LLVM_LIBDIR}' 'LIBCLANG_LIBS = -L${llvmPackages.libclang.lib}/lib' \
@@ -121,11 +123,14 @@ stdenv.mkDerivation rec {
       --replace 'LIBTOOLING_LIBS = -L$${LLVM_LIBDIR}' 'LIBTOOLING_LIBS = -L${llvmPackages.clang-unwrapped}/lib' \
       --replace 'LLVM_CXXFLAGS ~= s,-gsplit-dwarf,' '${lib.concatStringsSep "\n" ["LLVM_CXXFLAGS ~= s,-gsplit-dwarf," "    LLVM_CXXFLAGS += -fno-rtti"]}'
   '';
+*/
 
+/*
   # TODO qt6? remove?
   preBuild = lib.optionalString withDocumentation ''
     ln -s ${lib.getLib qtbase}/$qtDocPrefix $NIX_QT5_TMP/share
   '';
+*/
 
   postInstall = ''
     substituteInPlace $out/share/applications/org.qt-project.qtcreator.desktop \

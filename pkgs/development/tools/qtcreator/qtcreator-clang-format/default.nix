@@ -6,28 +6,27 @@
 }:
 
 let
-  getMajorMinor = s: lib.take 2 (lib.splitVersion s);
+  getMajorMinor = s: builtins.concatStringsSep "." (lib.take 2 (lib.splitVersion s));
 in
 
 stdenv.mkDerivation rec {
   pname = "qtcreator-clang-format";
-  version = "15.0.0";
+  version = let
+      version = "15.0.0";
+      actual = getMajorMinor version;
+      expected = getMajorMinor llvmPackages.llvm.version;
+    in
+    assert actual != expected ->
+      throw "version mismatch: actual=${pname}.version=${actual} expected=llvm.version=${expected}";
+    version;
+
   gitTag = "release_${version}-based";
 
-  src =
-    lib.traceSeq "${pname}.version=${version} llvm.version=${llvmPackages.llvm.version}"
-    (assert ((getMajorMinor llvmPackages.llvm.version) == (getMajorMinor version));
-    fetchurl {
+  src = fetchurl {
       url = "https://code.qt.io/cgit/clang/llvm-project.git/plain/clang/tools/clang-format/ClangFormat.cpp?h=${gitTag}";
       sha256 = "sha256-6rN0VmUvl3xxqt4lvEzbbTnOpnmkDmNyZDF3mQQiFTc=";
-    });
+    };
 
-  /*
-    substituteInPlace CMakeLists.txt \
-      --replace \
-        "OUTPUT_NAME clang-format" \
-        "OUTPUT_NAME ${pname}"
-  */
   unpackPhase = ''
     mkdir source
     cd source

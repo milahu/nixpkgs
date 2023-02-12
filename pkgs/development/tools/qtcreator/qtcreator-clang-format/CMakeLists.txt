@@ -32,8 +32,7 @@ target_link_libraries(qtcreator-clang-format
   PRIVATE
   ${CLANG_FORMAT_LIB_DEPS}
   )
-gi
-install(
-  TARGETS qtcreator-clang-format
+
+install(TARGETS qtcreator-clang-format
   DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
