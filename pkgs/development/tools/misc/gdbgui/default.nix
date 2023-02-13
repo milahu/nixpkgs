@@ -2,6 +2,7 @@
 , buildPythonApplication
 , stdenvNoCC
 , mkYarnPackage
+, yarn2nix-moretea-debug
 , fetchFromGitHub
 , fetchPypi
 , gdb
@@ -42,7 +43,7 @@ buildPythonApplication rec {
   };
 
   # TODO? mkYarnModules
-  gdbgui-static = mkYarnPackage {
+  gdbgui-static = yarn2nix-moretea-debug.mkYarnPackage {
     pname = "gdbgui-static";
     inherit version src;
 
