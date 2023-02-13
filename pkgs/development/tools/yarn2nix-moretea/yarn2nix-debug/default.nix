@@ -342,6 +342,10 @@ in rec {
         ${linkDirFunction}
 
         linkDirToDirLinks "$(dirname node_modules/${pname})"
+
+        echo FIXME
+        # error: ln: failed to create symbolic link - File exists
+
         ln -s "deps/${pname}" "node_modules/${pname}"
 
         ${workspaceDependencyCopy}
