@@ -343,6 +343,28 @@ in rec {
 
         linkDirToDirLinks "$(dirname node_modules/${pname})"
 
+        echo debug ...
+        set -x
+
+        ls -A deps | xargs echo
+        # -> only gdbgui
+        ls -A node_modules | xargs echo
+        # -> a million packages, including gdbgui
+
+        stat deps/${pname}
+        ls -A deps/${pname}
+        cat deps/${pname}/package.json
+
+        stat node_modules/${pname} || true
+        ls -A node_modules/${pname} || true
+        cat node_modules/${pname}/package.json || true
+
+        diff -r -u deps/${pname}/ node_modules/${pname}/ || true
+        # -> no difference
+
+        echo debug done
+        set +x
+
         echo FIXME
         # error: ln: failed to create symbolic link - File exists
 
