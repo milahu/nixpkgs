@@ -368,7 +368,9 @@ in rec {
         echo FIXME
         # error: ln: failed to create symbolic link - File exists
 
-        ln -s "deps/${pname}" "node_modules/${pname}"
+        #ln -s "deps/${pname}" "node_modules/${pname}"
+        # quickfix: ignore error
+        ln -s "deps/${pname}" "node_modules/${pname}" || true
 
         ${workspaceDependencyCopy}
 
