@@ -13477,6 +13477,8 @@ with pkgs;
     mkYarnModules
     fixup_yarn_lock;
 
+  yarn2nix-moretea-debug = callPackage ../development/tools/yarn2nix-moretea/yarn2nix-debug { pkgs = pkgs.__splicedPackages; };
+
   yarr = callPackage ../applications/networking/feedreaders/yarr { };
 
   yascreen = callPackage ../development/libraries/yascreen { };
