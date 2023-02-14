@@ -95,24 +95,6 @@ stdenv.mkDerivation rec {
     frida-usrsctp
   ];
 
-  patches = [
-    # fix build on linux
-    /*
-    # https://github.com/frida/frida-core/pull/454
-    (fetchpatch {
-      url = "https://github.com/frida/frida-core/commit/d08e9e9ec5ba759e2ba530c077f0d8c66d20ed9a.patch";
-      sha256 = "sha256-6ihcR/MOHP0Hbm9BHyGo8rOgyP5XYso/FtGyELSXb1I=";
-    })
-    */
-    # alternative
-    ./meson-build-shared-or-static-libraries.patch
-    ./fix-install-paths-for-frida-base-and-frida-payload.patch
-
-    # fix build for default_library=both
-    ./modulate-payload-instead-of-agent-and-gadget.patch
-    ./fixup-meson-raw_gadget-to-payload.patch
-  ];
-
   postPatch = ''
     patchShebangs .
     substituteInPlace src/compiler/generate-agent.py \
@@ -122,6 +104,12 @@ stdenv.mkDerivation rec {
       --replace '        (output_dir / "node_modules" / "@types" / "frida-gum"' '#' \
       --replace '    shutil.copyfileobj(response, frida_gum_types)' '#' \
 
+    # https://github.com/frida/frida-core/pull/454
+    substituteInPlace src/meson.build \
+      --replace \
+        "core = library('frida-core', core_sources," \
+        "core = static_library('frida-core', core_sources,"
+
   '';
 
   # https://github.com/frida/v8/issues/14
@@ -130,7 +118,8 @@ stdenv.mkDerivation rec {
   '';
 
   mesonFlags = [
-    "-Ddefault_library=both"
+    #"-Ddefault_library=both" # build error
+    #"-Ddefault_library=static" # ok
   ];
 
   preBuild = ''
