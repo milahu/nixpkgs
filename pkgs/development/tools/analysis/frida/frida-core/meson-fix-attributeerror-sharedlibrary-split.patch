@@ -1,0 +1,26 @@
+From 4e30511fa14bfb3eceb2a312913f00ee876cf4e0 Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Tue, 14 Feb 2023 18:46:20 +0100
+Subject: [PATCH] fix: AttributeError: 'SharedLibrary' object has no attribute
+ 'split'
+
+---
+ mesonbuild/backend/ninjabackend.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/mesonbuild/backend/ninjabackend.py b/mesonbuild/backend/ninjabackend.py
+index 92d9bdd95..7e37c586b 100644
+--- a/mesonbuild/backend/ninjabackend.py
++++ b/mesonbuild/backend/ninjabackend.py
+@@ -1493,6 +1493,8 @@ class NinjaBackend(backends.Backend):
+             for i in dep.sources:
+                 if hasattr(i, 'fname'):
+                     i = i.fname
++                else:
++                    i = str(i)
+                 if i.split('.')[-1] in compilers.lang_suffixes['vala']:
+                     vapiname = dep.vala_vapi
+                     fullname = os.path.join(self.get_target_dir(dep), vapiname)
+-- 
+2.39.0
+

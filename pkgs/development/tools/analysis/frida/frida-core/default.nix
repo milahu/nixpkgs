@@ -39,6 +39,7 @@ let
   meson = original-meson.overrideAttrs (oldAttrs: {
     patches = (oldAttrs.patches or []) ++ [
       ./meson-vala-fix-generated-paths.patch
+      ./meson-fix-attributeerror-sharedlibrary-split.patch
     ];
   });
 in
