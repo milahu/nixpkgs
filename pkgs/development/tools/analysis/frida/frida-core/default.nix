@@ -147,6 +147,7 @@ stdenv.mkDerivation rec {
 
   passthru = {
     inherit frida-compiler-agent;
+    inherit meson;
   };
 
   meta = with lib; {
