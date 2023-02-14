@@ -110,6 +110,7 @@ stdenv.mkDerivation rec {
 
     # fix build for default_library=both
     ./modulate-payload-instead-of-agent-and-gadget.patch
+    ./fixup-meson-raw_gadget-to-payload.patch
   ];
 
   postPatch = ''

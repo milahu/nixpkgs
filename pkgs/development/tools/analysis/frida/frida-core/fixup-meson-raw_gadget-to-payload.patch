@@ -1,0 +1,25 @@
+From 8daf9ad25862bbbbe28c10ef6b0d63ec841e5f56 Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Tue, 14 Feb 2023 18:51:07 +0100
+Subject: [PATCH] fixup meson raw_gadget to payload
+
+---
+ lib/payload/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/payload/meson.build b/lib/payload/meson.build
+index ca8d867..6f85c93 100644
+--- a/lib/payload/meson.build
++++ b/lib/payload/meson.build
+@@ -89,7 +89,7 @@ if get_option('strip')
+ endif
+ 
+ gadget_payload_modulated = custom_target('frida-gadget-payload-modulated',
+-  input: raw_gadget,
++  input: payload,
+   output: 'libfrida-gadget-payload-modulated' + shlib_suffix,
+   command: [
+     modulate,
+-- 
+2.39.0
+
