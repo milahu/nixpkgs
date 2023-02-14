@@ -1,0 +1,162 @@
+From e6bd112adf294c9327d1305b2d6e67c17ea5bb9f Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Tue, 14 Feb 2023 13:14:13 +0100
+Subject: [PATCH] meson: Build shared or static libraries
+
+---
+ lib/base/meson.build    |  2 +-
+ lib/payload/meson.build |  2 +-
+ lib/pipe/meson.build    |  2 +-
+ lib/selinux/meson.build |  2 +-
+ src/api/merge.sh        | 26 --------------------------
+ src/api/meson.build     | 12 +-----------
+ src/meson.build         |  4 ++--
+ tests/meson.build       |  2 +-
+ 8 files changed, 8 insertions(+), 44 deletions(-)
+ delete mode 100755 src/api/merge.sh
+
+diff --git a/lib/base/meson.build b/lib/base/meson.build
+index 2a3b3e3..b3ad3a4 100644
+--- a/lib/base/meson.build
++++ b/lib/base/meson.build
+@@ -15,7 +15,7 @@ if host_os_family != 'windows'
+   extra_deps += [gio_unix_dep]
+ endif
+ 
+-base = static_library('frida-base-' + api_version, base_sources,
++base = library('frida-base-' + api_version, base_sources,
+   c_args: frida_component_cflags,
+   vala_header: 'frida-base.h',
+   vala_vapi: f'frida-base-@api_version@.vapi',
+diff --git a/lib/payload/meson.build b/lib/payload/meson.build
+index dff3f8d..5f84dca 100644
+--- a/lib/payload/meson.build
++++ b/lib/payload/meson.build
+@@ -36,7 +36,7 @@ if host_os_family == 'linux'
+   extra_vala_args += ['--pkg=linux']
+ endif
+ 
+-payload = static_library('frida-payload-' + api_version, payload_sources,
++payload = library('frida-payload-' + api_version, payload_sources,
+   c_args: frida_component_cflags,
+   vala_args: extra_vala_args,
+   vala_header: 'frida-payload.h',
+diff --git a/lib/pipe/meson.build b/lib/pipe/meson.build
+index e11e8d6..4354dfb 100644
+--- a/lib/pipe/meson.build
++++ b/lib/pipe/meson.build
+@@ -27,7 +27,7 @@ if host_os == 'android'
+   vala_args += frida_selinux_vala_args
+ endif
+ 
+-pipe = static_library('frida-pipe', pipe_sources,
++pipe = library('frida-pipe', pipe_sources,
+   c_args: frida_component_cflags,
+   vala_args: vala_args,
+   vala_header: 'frida-pipe.h',
+diff --git a/lib/selinux/meson.build b/lib/selinux/meson.build
+index f317db5..42a5187 100644
+--- a/lib/selinux/meson.build
++++ b/lib/selinux/meson.build
+@@ -2,7 +2,7 @@ frida_selinux_incdir = include_directories('.')
+ 
+ install_headers('frida-selinux.h', subdir: 'frida-' + api_version)
+ 
+-frida_selinux = static_library('frida-selinux', 'patch.c',
++frida_selinux = library('frida-selinux', 'patch.c',
+   c_args: frida_component_cflags,
+   dependencies: [glib_dep, libselinux_dep, libsepol_dep],
+ )
+diff --git a/src/api/merge.sh b/src/api/merge.sh
+deleted file mode 100755
+index 5729f5a..0000000
+--- a/src/api/merge.sh
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#!/usr/bin/env bash
+-
+-ar_binary="$1"
+-libtool_binary="$2"
+-build_dir="$3"
+-output_lib="$4"
+-shift 4
+-
+-if [ -n "$libtool_binary" ]; then
+-  exec "$libtool_binary" -static -o "$output_lib" "$@"
+-else
+-  priv_dir="$build_dir/frida-core-library@mrg"
+-  mri_script="$priv_dir/merge.mri"
+-
+-  mkdir -p "$priv_dir"
+-
+-  echo "create $output_lib" > "$mri_script"
+-  while [[ $# > 0 ]]; do
+-    echo "addlib $1" >> "$mri_script"
+-    shift
+-  done
+-  echo "save" >> "$mri_script"
+-  echo "end" >> "$mri_script"
+-
+-  exec "$ar_binary" -M < "$mri_script"
+-fi
+diff --git a/src/api/meson.build b/src/api/meson.build
+index e268c71..42265e2 100644
+--- a/src/api/meson.build
++++ b/src/api/meson.build
+@@ -38,17 +38,7 @@ custom_target('frida-core-vapi',
+   install_dir: join_paths(get_option('datadir'), 'vala', 'vapi'),
+ )
+ 
+-custom_target('frida-core-library',
+-  input: [core] + internal_libs,
+-  output: 'libfrida-core-@0@.a'.format(api_version),
+-  command: [
+-    files('merge.sh'),
+-    ar,
+-    libtool,
+-    meson.current_build_dir(),
+-    '@OUTPUT@',
+-    '@INPUT@'
+-  ],
++library('frida-core-' + api_version, [core] + internal_libs,
+   install: true,
+   install_dir: get_option('libdir'),
+ )
+diff --git a/src/meson.build b/src/meson.build
+index fe4ed80..84cc0c9 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -85,7 +85,7 @@ if host_os_family == 'darwin'
+       'darwin/substituted2-client.c',
+     ]
+   endif
+-  helper_backend = static_library('frida-helper-backend', helper_backend_sources,
++  helper_backend = library('frida-helper-backend', helper_backend_sources,
+     c_args: frida_component_cflags,
+     vala_args: ['--pkg=frida-gum-darwin-1.0', '--pkg=posix'],
+     dependencies: [gmodule_dep, gio_dep, gio_unix_dep, gee_dep, gum_dep, base_dep, pipe_dep],
+@@ -216,7 +216,7 @@ if host_os_family == 'linux'
+   if host_os == 'android'
+     helper_backend_extra_deps += [frida_selinux_dep]
+   endif
+-  helper_backend = static_library('frida-helper-backend', helper_backend_sources,
++  helper_backend = library('frida-helper-backend', helper_backend_sources,
+     c_args: frida_component_cflags,
+     vala_args: ['--pkg=posix', '--pkg=frida-gum-linux-1.0'],
+     dependencies: [gio_dep, gio_unix_dep, gee_dep, gum_dep, base_dep] + helper_backend_extra_deps,
+diff --git a/tests/meson.build b/tests/meson.build
+index 987c857..0fe92e2 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -26,7 +26,7 @@ else
+   system_vala_args += ['--pkg=posix']
+ endif
+ 
+-frida_tests = static_library('frida-tests', test_sources + [labrats_stamp],
++frida_tests = library('frida-tests', test_sources + [labrats_stamp],
+   vala_args: system_vala_args,
+   dependencies: [gmodule_dep, json_glib_dep, core_dep],
+ )
+-- 
+2.39.0
+

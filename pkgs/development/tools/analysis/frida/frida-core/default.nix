@@ -84,11 +84,15 @@ stdenv.mkDerivation rec {
 
   patches = [
     # fix build on linux
+    /*
     # https://github.com/frida/frida-core/pull/454
     (fetchpatch {
       url = "https://github.com/frida/frida-core/commit/d08e9e9ec5ba759e2ba530c077f0d8c66d20ed9a.patch";
       sha256 = "sha256-6ihcR/MOHP0Hbm9BHyGo8rOgyP5XYso/FtGyELSXb1I=";
     })
+    */
+    # alternative
+    ./meson-build-shared-or-static-libraries.patch
   ];
 
   postPatch = ''
