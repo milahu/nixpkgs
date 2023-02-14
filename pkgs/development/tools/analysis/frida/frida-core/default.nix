@@ -107,6 +107,10 @@ stdenv.mkDerivation rec {
     export PATH=${frida-v8}/bin/linux-x86_64:$PATH
   '';
 
+  mesonFlags = [
+    "-Ddefault_library=both"
+  ];
+
   preBuild = ''
     mkdir -p src/compiler
     pushd src/compiler
