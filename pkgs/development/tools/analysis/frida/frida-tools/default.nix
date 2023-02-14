@@ -6,6 +6,7 @@
 , ninja
 , pkg-config
 , frida-core
+, frida-python
 , python3
 , nodejs-19_x
 , callPackage
@@ -35,13 +36,22 @@ stdenv.mkDerivation rec {
     pkg-config
     cmake
     ninja
+    python3.pkgs.wrapPython
   ];
 
   buildInputs = [
     frida-core
+    frida-python
     python3 # agents/build.py
     nodejs-19_x # npm, same nodejs version as frida-gum
   ];
+
+  propagatedBuildInputs = [
+    #frida-core
+    frida-python
+  ] ++ (with python3.pkgs; [
+    colorama # frida-ls frida-rm
+  ]);
 
   postPatch = ''
     chmod +x agents/build.py
@@ -68,6 +78,10 @@ stdenv.mkDerivation rec {
     chmod -R +w node_modules
     #export PATH=$PWD/node_modules/.bin:$PATH
     popd
+  '';
+
+  postFixup = ''
+    wrapPythonPrograms
   '';
 
   passthru = {
