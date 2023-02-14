@@ -130,6 +130,10 @@ stdenv.mkDerivation rec {
     popd
   '';
 
+  passthru = {
+    inherit frida-compiler-agent;
+  };
+
   meta = with lib; {
     description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers";
     homepage = "https://github.com/frida/frida-core";
