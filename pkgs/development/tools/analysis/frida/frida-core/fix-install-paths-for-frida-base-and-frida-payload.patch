@@ -1,0 +1,37 @@
+From 65dec528ba3b92ef631f90348931911e52690061 Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Tue, 14 Feb 2023 13:28:13 +0100
+Subject: [PATCH] fix install paths for frida-base and frida-payload
+
+---
+ lib/base/meson.build    | 1 -
+ lib/payload/meson.build | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/lib/base/meson.build b/lib/base/meson.build
+index b3ad3a4..5b6325b 100644
+--- a/lib/base/meson.build
++++ b/lib/base/meson.build
+@@ -21,7 +21,6 @@ base = library('frida-base-' + api_version, base_sources,
+   vala_vapi: f'frida-base-@api_version@.vapi',
+   dependencies: [glib_dep, gobject_dep, gio_dep, libsoup_dep, nice_dep, usrsctp_dep, gee_dep, json_glib_dep, gum_dep, openssl_dep] + extra_deps,
+   install: true,
+-  install_dir: [true, header_install_dir, true],
+ )
+ 
+ base_dep = declare_dependency(
+diff --git a/lib/payload/meson.build b/lib/payload/meson.build
+index 5f84dca..8065a69 100644
+--- a/lib/payload/meson.build
++++ b/lib/payload/meson.build
+@@ -43,7 +43,6 @@ payload = library('frida-payload-' + api_version, payload_sources,
+   vala_vapi: f'frida-payload-@api_version@.vapi',
+   dependencies: [gio_dep, gee_dep, json_glib_dep, gum_dep, gumjs_dep, base_dep],
+   install: true,
+-  install_dir: [true, header_install_dir, true],
+ )
+ 
+ payload_dep = declare_dependency(
+-- 
+2.39.0
+
