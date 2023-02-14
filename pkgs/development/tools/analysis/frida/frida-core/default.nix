@@ -24,11 +24,23 @@
 }:
 
 let
+  original-meson = meson;
+in
+
+let
   srcs = builtins.fromJSON (builtins.readFile ../srcs.json);
 
   frida-compiler-agent = callPackage ./frida-compiler-agent {
     nodejs = nodejs-19_x;
   };
+
+  # fix build for default_library=both
+  # https://github.com/mesonbuild/meson/issues/6960
+  meson = original-meson.overrideAttrs (oldAttrs: {
+    patches = (oldAttrs.patches or []) ++ [
+      ./meson-vala-fix-generated-paths.patch
+    ];
+  });
 in
 
 stdenv.mkDerivation rec {
