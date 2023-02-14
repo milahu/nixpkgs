@@ -93,6 +93,7 @@ stdenv.mkDerivation rec {
     */
     # alternative
     ./meson-build-shared-or-static-libraries.patch
+    ./fixup-set-default-library-static-by-default.patch
   ];
 
   postPatch = ''

@@ -1,0 +1,30 @@
+From 0b3db12df7fa22f7c032d13eac5edf8b8259cc62 Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Tue, 14 Feb 2023 13:22:49 +0100
+Subject: [PATCH] fixup: set default_library=static by default
+
+---
+ meson_options.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index 1eb4b7a..f836db3 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -11,6 +11,13 @@ option('asset_path_template',
+   description: 'Override the default installed asset path template'
+ )
+ 
++option('default_library',
++  type: 'string',
++  choices: ['shared', 'static', 'both'],
++  value: 'static',
++  description: 'Default library type'
++)
++
+ option('helper_modern',
+   type: 'string',
+   value: '',
+-- 
+2.39.0
+
