@@ -106,6 +106,9 @@ stdenv.mkDerivation rec {
     # alternative
     ./meson-build-shared-or-static-libraries.patch
     ./fix-install-paths-for-frida-base-and-frida-payload.patch
+
+    # fix build for default_library=both
+    ./modulate-payload-instead-of-agent-and-gadget.patch
   ];
 
   postPatch = ''
