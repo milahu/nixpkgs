@@ -53,6 +53,7 @@ stdenv.mkDerivation rec {
     ./cutter-debug-prints.patch
     ./cutter-fix-RAW_RIZIN_INCLUDE_DIRS-debug.patch
     ./cutter-fix-debug-prints.patch
+    ./cutter-use-rz_core_INCLUDE_DIRS-and-fix-debug-prints.patch
   ];
 
   #  source ${./patchphase-git-patch.sh}
