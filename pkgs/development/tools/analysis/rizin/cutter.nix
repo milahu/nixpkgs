@@ -53,8 +53,8 @@ stdenv.mkDerivation rec {
     ./cutter-debug-prints.patch
   ];
 
+  #  source ${./patchphase-git-patch.sh}
   postUnpack = ''
-    #source ${./patchphase-git-patch.sh}
   '';
 
   prePatch = ''
