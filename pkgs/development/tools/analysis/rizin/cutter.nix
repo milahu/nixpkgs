@@ -51,6 +51,7 @@ stdenv.mkDerivation rec {
       sha256 = "sha256-0r5eZvj+AJOC39Yy5jgM6RhXX3NyV6rl/G+DvkpP+AM=";
     })
     ./cutter-debug-prints.patch
+    ./cutter-fix-RAW_RIZIN_INCLUDE_DIRS-debug.patch
   ];
 
   #  source ${./patchphase-git-patch.sh}
