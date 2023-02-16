@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchurl
+, fetchFromGitHub
 , pkg-config
 , libusb-compat-0_1
 , readline
@@ -19,26 +19,53 @@
 , ninja
 , capstone
 , tree-sitter
+, libmspack
+, lzma
 }:
+
+let
+  srcs = builtins.fromJSON (builtins.readFile ./srcs.json);
+in
 
 stdenv.mkDerivation rec {
   pname = "rizin";
-  version = "0.4.1";
+  version = "0.4.1-unstable-2023-02-16";
 
-  src = fetchurl {
-    url = "https://github.com/rizinorg/rizin/releases/download/v${version}/rizin-src-v${version}.tar.xz";
-    sha256 = "sha256-Zp2Va5l4IKNuQjzzXUgqqZhJJUuWWM72hERZkS39v7g=";
-  };
+  src = fetchFromGitHub srcs.rizin.github;
+
+  # TODO move to separate file, share "meson subprojects infra" with other packages
+  postUnpack = ''
+    pushd $sourceRoot
+    ${builtins.concatStringsSep "\n" (
+      lib.mapAttrsToList (name: subproject:
+        let
+          src = fetchFromGitHub subproject.github;
+          dst = subproject.directory or name;
+        in
+        ''
+          echo copying subprojects/${dst}
+          cp -r --no-preserve=mode ${src} subprojects/${dst}
+          ${if !(builtins.hasAttr "patch_directory" subproject) then "" else
+            ''
+              echo patching subprojects/${dst}
+              d="subprojects/packagefiles/${subproject.patch_directory}"
+              while read path; do
+                if [ -d "$d/$path" ]; then
+                  mkdir -p "subprojects/${dst}/$path"
+                else
+                  cp -P "$d/$path" "subprojects/${dst}/$path"
+                fi
+              done < <(cd "$d" && find . -printf "%P\n")
+            ''
+          }
+        ''
+      ) srcs."rizin/subprojects"
+    )}
+    popd
+  '';
 
   mesonFlags = [
-    "-Duse_sys_capstone=enabled"
-    "-Duse_sys_magic=enabled"
-    "-Duse_sys_libzip=enabled"
-    "-Duse_sys_zlib=enabled"
-    "-Duse_sys_xxhash=enabled"
-    "-Duse_sys_lz4=enabled"
-    "-Duse_sys_openssl=enabled"
-    "-Duse_sys_tree_sitter=enabled"
+    "-Dinstall_sigdb=true"
   ];
 
   nativeBuildInputs = [
@@ -80,14 +107,26 @@ stdenv.mkDerivation rec {
     libuv
     tree-sitter
     xxHash
+    libmspack
+    lzma
   ];
 
   postPatch = ''
-    # find_installation without arguments uses Meson’s Python interpreter,
+    # find_installation without arguments uses Meson's Python interpreter,
     # which does not have any extra modules.
     # https://github.com/mesonbuild/meson/pull/9904
     substituteInPlace meson.build \
       --replace "import('python').find_installation()" "find_program('python3')"
+
+    # fix: meson.build: ERROR: Automatic wrap-based subproject downloading is disabled
+    set -x
+    sed -i.bak -E \
+      -e "s/(option\('use_sys_[^']+', type: 'feature', value:) 'disabled'/\1 'enabled'/" \
+      -e "s/(option\('use_sys_[^']+', type: 'boolean', value:) false/\1 true/" \
+      meson_options.txt
+    grep -HnE "*" meson_options.txt.bak
+    grep -Hn use_sys_ meson_options.txt
+    set +x
   '';
 
   meta = {

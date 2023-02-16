@@ -1,0 +1,49 @@
+{
+  "rizin": {
+    "github": {
+      "owner": "rizinorg",
+      "repo": "rizin",
+      "rev": "7f6f9049a20de04eeec88c63d27e6eb4ea68aa13",
+      "hash": "sha256-bOwHJlMF3bpz/m3xY/8uFkKGlxKWODWxRk3Xe7qbbP4="
+    }
+  },
+  "rizin/subprojects": {
+    "libdemangle": {
+      "github": {
+        "owner": "rizinorg",
+        "repo": "rz-libdemangle",
+        "rev": "f2f627ff2e4dde38d8025272398a9243b89b81a0",
+        "hash": "sha256-gmrjCbmsFeezLt03IzpD/9r5SlOwUPX/wJp6Qse0Yoo="
+      }
+    },
+    "blake3": {
+      "github": {
+        "owner": "BLAKE3-team",
+        "repo": "BLAKE3",
+        "rev": "f84636e59ce575e5dd127399e0c7de0c1ea595da",
+        "hash": "sha256-YtRiVdSluhj9Oi7hFvym+VEPkHCEmDhP4ZiqrWrITk4="
+      },
+      "patch_directory": "blake3"
+    },
+    "tree-sitter-c": {
+      "description": "C grammar for tree-sitter",
+      "github": {
+        "owner": "rizinorg",
+        "repo": "tree-sitter-c",
+        "rev": "51ecadb131b5712457b543db8d15ab141ae9f117",
+        "hash": "sha256-q+xohRTDqmPILcRg1/RIx0Ig55HFAjXKtTg+DSdIBSQ="
+      },
+      "patch_directory": "tree-sitter-c",
+      "directory": "tree-sitter-c"
+    },
+    "sigdb": {
+      "description": "Rizin FLIRT Signature Database",
+      "github": {
+        "owner": "rizinorg",
+        "repo": "sigdb",
+        "rev": "829baf835e3515923266898fd597f7f75046ebd2",
+        "hash": "sha256-zvGna2CEsDctc9P7hWTaz7kdtxAtPsXHNWOrRQ9ocdc="
+      }
+    }
+  }
+}
