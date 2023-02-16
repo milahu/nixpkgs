@@ -9,6 +9,7 @@
   },
   "rizin/subprojects": {
     "libdemangle": {
+      "description": "Rizin Library to demangle symbols",
       "github": {
         "owner": "rizinorg",
         "repo": "rz-libdemangle",
@@ -17,6 +18,7 @@
       }
     },
     "blake3": {
+      "description": "BLAKE3 cryptographic hash function",
       "github": {
         "owner": "BLAKE3-team",
         "repo": "BLAKE3",
