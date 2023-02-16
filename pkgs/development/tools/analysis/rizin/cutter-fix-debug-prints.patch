@@ -1,0 +1,45 @@
+From 4eeebb3b3d4dfc05b194970dff0798ee069dae67 Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Thu, 16 Feb 2023 20:22:18 +0100
+Subject: [PATCH] fix debug prints
+
+---
+ CMakeLists.txt     | 5 +++--
+ src/CMakeLists.txt | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 08f5920..ab18bbe 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,8 +77,9 @@ else()
+     find_package(Rizin COMPONENTS Core REQUIRED)
+ 
+     # FIXME empty -> /build/source/src/core/CutterCommon.h:8:10: fatal: 'rz_core.h' file not found
+-    message("debug: Rizin_INCLUDE_DIRS = ${Rizin_INCLUDE_DIRS}")
+-    message("debug: rz_core_INCLUDE_DIRS = ${rz_core_INCLUDE_DIRS}")
++    message("debug: CMakeLists.txt: Rizin_INCLUDE_DIRS = ${Rizin_INCLUDE_DIRS}")
++    message("debug: CMakeLists.txt: RAW_RIZIN_INCLUDE_DIRS = ${RAW_RIZIN_INCLUDE_DIRS}")
++    message("debug: CMakeLists.txt: rz_core_INCLUDE_DIRS = ${rz_core_INCLUDE_DIRS}")
+ 
+     set(RIZIN_TARGET Rizin::Core)
+ endif()
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 6bff0fd..84faedb 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -436,8 +436,9 @@ if(CUTTER_ENABLE_PYTHON_BINDINGS)
+     endforeach()
+ 
+     # FIXME empty -> /build/source/src/core/CutterCommon.h:8:10: fatal: 'rz_core.h' file not found
+-    message("debug: Rizin_INCLUDE_DIRS = ${Rizin_INCLUDE_DIRS}")
+-    message("debug: RAW_RIZIN_INCLUDE_DIRS = ${RAW_RIZIN_INCLUDE_DIRS}")
++    message("debug: src/CMakeLists.txt: Rizin_INCLUDE_DIRS = ${Rizin_INCLUDE_DIRS}")
++    message("debug: src/CMakeLists.txt: RAW_RIZIN_INCLUDE_DIRS = ${RAW_RIZIN_INCLUDE_DIRS}")
++    message("debug: src/CMakeLists.txt: rz_core_INCLUDE_DIRS = ${rz_core_INCLUDE_DIRS}")
+ 
+     list(APPEND SHIBOKEN_INCLUDE_DIRS ${RAW_RIZIN_INCLUDE_DIRS})
+     if (NOT WIN32)
+-- 
+2.39.0
+
