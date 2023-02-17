@@ -129,6 +129,7 @@ if(CUTTER_ENABLE_PYTHON)
             message("debug: PYSIDE_INCLUDE_DIR = ${PYSIDE_INCLUDE_DIR}")
             # Check the presence of "pysidecleanup.h"
             include(CheckIncludeFileCXX)
+            set(CMAKE_REQUIRED_INCLUDES ${PYSIDE_INCLUDE_DIR})
             CHECK_INCLUDE_FILE_CXX("pysidecleanup.h" HAVE_PYSIDECLEANUP)
             message("debug: HAVE_PYSIDECLEANUP = ${HAVE_PYSIDECLEANUP}")
             message(FATAL_ERROR "FIXME this should be true")
