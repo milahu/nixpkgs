@@ -26,6 +26,8 @@ in
 (qt6 // {
   # LIBRARIES
 
+  inherit kdeFrameworks;
+
   inherit (kdeFrameworks) kcoreaddons;
 
   qtpbfimageplugin = callPackage ../development/libraries/qtpbfimageplugin { };
