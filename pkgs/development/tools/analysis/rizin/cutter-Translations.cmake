@@ -1,5 +1,3 @@
-message("debug: TS_FILES 0 = ${TS_FILES}")
-
 # note: glob returns absolute paths
 file(GLOB TS_FILES
     LIST_DIRECTORIES false
@@ -7,17 +5,11 @@ file(GLOB TS_FILES
     "translations/*/cutter_*.ts"
 )
 
-message("debug: TS_FILES 1 = ${TS_FILES}")
-
 # problems with fonts
 list(FILTER TS_FILES EXCLUDE REGEX "translations/ko/cutter_ko.ts$")
 
 # #2321 handling multiple versions of a language
 list(FILTER TS_FILES EXCLUDE REGEX "translations/pt-BR/cutter_pt.ts$")
-
-message("debug: TS_FILES 2 = ${TS_FILES}")
-
-message(FATAL_ERROR "todo")
 
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/translations)
 if (CUTTER_QT6)
