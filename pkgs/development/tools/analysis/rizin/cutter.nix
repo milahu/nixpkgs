@@ -104,6 +104,7 @@ only rz_core_INCLUDE_DIRS is set
   ];
 
   buildInputs = [
+    python3.pkgs.pyside6
     qtbase
     qt5compat
     qttools
