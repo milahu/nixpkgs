@@ -127,6 +127,7 @@ if(CUTTER_ENABLE_PYTHON)
             include(CheckIncludeFileCXX)
             set(CMAKE_REQUIRED_INCLUDES "${PYSIDE_INCLUDE_DIR};${LIBSHIBOKEN_INCLUDE_DIRS}")
             CHECK_INCLUDE_FILE_CXX("pysidecleanup.h" HAVE_PYSIDECLEANUP)
+            add_compile_definitions("HAVE_PYSIDECLEANUP=${HAVE_PYSIDECLEANUP}")
         else()
             # 5.12.3 => 5.12
             if("${Qt5_VERSION}" MATCHES "^([0-9]+\\.[0-9]+)\\.[0-9]+")
