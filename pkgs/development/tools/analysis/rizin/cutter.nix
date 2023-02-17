@@ -49,14 +49,21 @@ stdenv.mkDerivation rec {
       url = "https://github.com/rizinorg/cutter/commit/3de84f1f545c0921cdc01bf364b560a83322f1f0.patch";
       sha256 = "sha256-HjiUks11oyGBMc8syaYN4xd46Axy3lTElzy4g0H7h5Y=";
     })
+    /* replaced by f565bb49cd35f6538151fee352252efe9d98fb08
     (fetchpatch {
       url = "https://github.com/rizinorg/cutter/commit/06b0834bb78415504810c2670deb892f76047eff.patch";
       sha256 = "sha256-0r5eZvj+AJOC39Yy5jgM6RhXX3NyV6rl/G+DvkpP+AM=";
     })
-    ./cutter-debug-prints.patch
-    ./cutter-fix-RAW_RIZIN_INCLUDE_DIRS-debug.patch
-    ./cutter-fix-debug-prints.patch
-    ./cutter-use-rz_core_INCLUDE_DIRS-and-fix-debug-prints.patch
+    */
+    (fetchpatch {
+      url = "https://github.com/rizinorg/cutter/commit/f565bb49cd35f6538151fee352252efe9d98fb08.patch";
+      sha256 = "sha256-fgPi55MSGtX/Mp+mcyQFmcIRs4Llw/p1hRAXsLwHvz0=";
+    })
+
+    #./cutter-debug-prints.patch
+    #./cutter-fix-RAW_RIZIN_INCLUDE_DIRS-debug.patch
+    #./cutter-fix-debug-prints.patch
+    #./cutter-use-rz_core_INCLUDE_DIRS-and-fix-debug-prints.patch
   ];
 
   #  source ${./patchphase-git-patch.sh}
@@ -78,8 +85,8 @@ stdenv.mkDerivation rec {
     # build faster
     rm -rf src/translations/*
 
-    cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
-    cp -v ${./cutter-PythonManager.cpp} src/common/PythonManager.cpp
+    #cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
+    #cp -v ${./cutter-PythonManager.cpp} src/common/PythonManager.cpp
     cp -v ${./cutter-Translations.cmake} cmake/Translations.cmake
   '';
 
