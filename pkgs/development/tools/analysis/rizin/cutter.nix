@@ -12,6 +12,7 @@
 , qttools
 , rizin
 , python3
+, qt6Packages
 , wrapQtAppsHook
 , git
 }:
@@ -114,6 +115,7 @@ only rz_core_INCLUDE_DIRS is set
     qtwebengine
     rizin
     python3
+    qt6Packages.kdeFrameworks.syntax-highlighting
   ];
 
   cmakeFlags = [
