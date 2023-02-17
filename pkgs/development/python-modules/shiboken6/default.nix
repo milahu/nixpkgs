@@ -13,6 +13,7 @@ llvmPackages.stdenv.mkDerivation rec {
 
   version = "6.4.2";
 
+  # https://code.qt.io/pyside/pyside-setup.git
   src = fetchurl {
     # https://download.qt.io/official_releases/QtForPython/shiboken6/
     url = "https://download.qt.io/official_releases/QtForPython/shiboken6/PySide6-${version}-src/pyside-setup-opensource-src-${version}.tar.xz";
