@@ -12,7 +12,7 @@
 , qttools
 , rizin
 , python3
-, qt6Packages
+#, qt6Packages
 , wrapQtAppsHook
 , git
 , graphviz
@@ -108,7 +108,7 @@ stdenv.mkDerivation rec {
     rizin
     python3
     graphviz
-    qt6Packages.kdeFrameworks.syntax-highlighting
+    #qt6Packages.kdeFrameworks.syntax-highlighting # qt5 only
     jsdec
   ];
 
