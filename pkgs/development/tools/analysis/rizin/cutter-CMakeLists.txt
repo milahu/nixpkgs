@@ -82,8 +82,8 @@ else()
     message("debug: CMakeLists.txt:80: rz_core_INCLUDE_DIRS = ${rz_core_INCLUDE_DIRS}")
 
     #[[
-    debug: CMakeLists.txt: Rizin_INCLUDE_DIRS = 
-    debug: CMakeLists.txt: RAW_RIZIN_INCLUDE_DIRS = 
+    debug: CMakeLists.txt: Rizin_INCLUDE_DIRS =
+    debug: CMakeLists.txt: RAW_RIZIN_INCLUDE_DIRS =
     debug: CMakeLists.txt: rz_core_INCLUDE_DIRS = /nix/store/wmdk06q14wgfznms23ypmazimw9g4idj-rizin-0.4.1-unstable-2023-02-16/include/librz;/nix/store/wmdk06q14wgfznms23ypmazimw9g4idj-rizin-0.4.1-unstable-2023-02-16/include/librz/sdb
     ]]#
 
@@ -125,6 +125,8 @@ if(CUTTER_ENABLE_PYTHON)
             # Check the presence of "pysidecleanup.h"
             include(CheckIncludeFileCXX)
             CHECK_INCLUDE_FILE_CXX("pysidecleanup.h" HAVE_PYSIDECLEANUP)
+            message("debug: HAVE_PYSIDECLEANUP = ${HAVE_PYSIDECLEANUP}")
+            message(FATAL_ERROR "FIXME this should be true")
         else()
             # 5.12.3 => 5.12
             if("${Qt5_VERSION}" MATCHES "^([0-9]+\\.[0-9]+)\\.[0-9]+")
