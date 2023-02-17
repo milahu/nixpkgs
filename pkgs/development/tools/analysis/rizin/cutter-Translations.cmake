@@ -1,5 +1,6 @@
 message("debug: TS_FILES 0 = ${TS_FILES}")
 
+# note: glob returns absolute paths
 file(GLOB TS_FILES
     LIST_DIRECTORIES false
     CONFIGURE_DEPENDS
@@ -8,12 +9,11 @@ file(GLOB TS_FILES
 
 message("debug: TS_FILES 1 = ${TS_FILES}")
 
-list(REMOVE_ITEM TS_FILES
-    # problems with fonts
-    translations/ko/cutter_ko.ts
-    # #2321 handling multiple versions of a language
-    translations/pt-BR/cutter_pt.ts
-)
+# problems with fonts
+list(FILTER TS_FILES EXCLUDE REGEX "translations/ko/cutter_ko.ts$")
+
+# #2321 handling multiple versions of a language
+list(FILTER TS_FILES EXCLUDE REGEX "translations/pt-BR/cutter_pt.ts$")
 
 message("debug: TS_FILES 2 = ${TS_FILES}")
 
