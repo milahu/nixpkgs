@@ -7,4 +7,5 @@ mkDerivation {
   nativeBuildInputs = [ extra-cmake-modules perl ];
   buildInputs = [ qttools ];
   propagatedBuildInputs = [ qtbase ];
+  dontWrapQtApps = true;
 }
