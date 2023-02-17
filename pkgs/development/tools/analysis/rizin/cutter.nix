@@ -122,7 +122,7 @@ stdenv.mkDerivation rec {
     #"-DCUTTER_PACKAGE_RZ_LIBSWIFT=ON" # macos?
     #"-DCUTTER_PACKAGE_RZ_LIBYARA=ON"
     #"-DCUTTER_ENABLE_SIGDB=ON"
-    #"--trace-expand"
+    "--trace-expand"
   ];
 
   preBuild = ''
