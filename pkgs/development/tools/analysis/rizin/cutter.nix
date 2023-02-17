@@ -76,6 +76,7 @@ stdenv.mkDerivation rec {
     rm -rf src/translations/*
 
     cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
+    cp -v ${./cutter-PythonManager.cpp} src/common/PythonManager.cpp
   '';
 
   nativeBuildInputs = [
@@ -120,7 +121,7 @@ only rz_core_INCLUDE_DIRS is set
     "-DCUTTER_ENABLE_PYTHON_BINDINGS=ON"
     "-DCUTTER_QT6=ON"
 
-    "--trace-expand"
+    #"--trace-expand"
   ];
 
 /*
