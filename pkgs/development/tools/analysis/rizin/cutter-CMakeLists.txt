@@ -140,15 +140,13 @@ if(CUTTER_ENABLE_PYTHON)
             get_target_property(PYSIDE_INCLUDE_DIR PySide2::pyside2 INTERFACE_INCLUDE_DIRECTORIES)
         endif()
 
-        # should not be needed
-        #[[
-        list(GET PYSIDE_INCLUDE_DIR 0 PYSIDE_INCLUDE_DIR)
-        include_directories(${PYSIDE_INCLUDE_DIR}
-            ${PYSIDE_INCLUDE_DIR}/QtCore
-            ${PYSIDE_INCLUDE_DIR}/QtGui
-            ${PYSIDE_INCLUDE_DIR}/QtWidgets)
-        ]]#
-        include_directories(${PYSIDE_INCLUDE_DIR})
+        foreach(_dir PYSIDE_INCLUDE_DIRS)
+            message("debug: PYSIDE_INCLUDE_DIRS: _dir = ${_dir}")
+            include_directories(${_dir}
+                ${_dir}/QtCore
+                ${_dir}/QtGui
+                ${_dir}/QtWidgets)
+        endforeach()
 
         add_definitions(-DCUTTER_ENABLE_PYTHON_BINDINGS)
     endif()
