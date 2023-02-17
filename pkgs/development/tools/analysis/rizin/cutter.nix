@@ -76,7 +76,7 @@ stdenv.mkDerivation rec {
     fi
 
     # build faster
-    #rm -rf src/translations/*
+    rm -rf src/translations/*
 
     cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
     cp -v ${./cutter-PythonManager.cpp} src/common/PythonManager.cpp
@@ -118,11 +118,11 @@ stdenv.mkDerivation rec {
     "-DCUTTER_ENABLE_PYTHON_BINDINGS=ON"
     "-DCUTTER_QT6=ON"
     "-DCUTTER_PACKAGE_JSDEC=ON"
-    #"-DCUTTER_PACKAGE_RZ_GHIDRA=ON"
-    #"-DCUTTER_PACKAGE_RZ_LIBSWIFT=ON" # macos?
-    #"-DCUTTER_PACKAGE_RZ_LIBYARA=ON"
-    #"-DCUTTER_ENABLE_SIGDB=ON"
-    "--trace-expand"
+    "-DCUTTER_PACKAGE_RZ_GHIDRA=ON"
+    "-DCUTTER_PACKAGE_RZ_LIBSWIFT=ON" # macos?
+    "-DCUTTER_PACKAGE_RZ_LIBYARA=ON"
+    "-DCUTTER_ENABLE_SIGDB=ON"
+    #"--trace-expand"
   ];
 
   preBuild = ''
