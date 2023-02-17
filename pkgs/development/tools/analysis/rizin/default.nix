@@ -29,7 +29,7 @@ in
 
 stdenv.mkDerivation rec {
   pname = "rizin";
-  version = "0.4.1-unstable-2023-02-16";
+  version = srcs.rizin.version or "${srcs.rizin.baseVersion}-unstable-${srcs.rizin.date}";
 
   src = fetchFromGitHub srcs.rizin.github;
 

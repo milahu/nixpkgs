@@ -1,10 +1,12 @@
 {
   "rizin": {
+    "baseVersion": "0.4.1",
+    "date": "2023-02-17",
     "github": {
       "owner": "rizinorg",
       "repo": "rizin",
-      "rev": "7f6f9049a20de04eeec88c63d27e6eb4ea68aa13",
-      "hash": "sha256-bOwHJlMF3bpz/m3xY/8uFkKGlxKWODWxRk3Xe7qbbP4="
+      "rev": "4ee166e231182eb24ee5994bc6e42aab9766f7b9",
+      "hash": "sha256-HngWn5wgOf9Uotecswo3hiVGlIGllkUj/Q7BYKfGtOQ="
     }
   },
   "rizin/subprojects": {
