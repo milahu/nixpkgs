@@ -74,6 +74,8 @@ stdenv.mkDerivation rec {
 
     # build faster
     rm -rf src/translations/*
+
+    cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
   '';
 
   nativeBuildInputs = [
