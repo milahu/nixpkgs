@@ -119,6 +119,8 @@ only rz_core_INCLUDE_DIRS is set
     "-DCUTTER_ENABLE_PYTHON=ON"
     "-DCUTTER_ENABLE_PYTHON_BINDINGS=ON"
     "-DCUTTER_QT6=ON"
+
+    "--trace-expand"
   ];
 
 /*
