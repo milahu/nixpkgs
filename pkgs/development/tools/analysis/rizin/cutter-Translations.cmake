@@ -1,8 +1,12 @@
+message("debug: TS_FILES 0 = ${TS_FILES}")
+
 file(GLOB TS_FILES
     LIST_DIRECTORIES false
     CONFIGURE_DEPENDS
     "translations/*/cutter_*.ts"
 )
+
+message("debug: TS_FILES 1 = ${TS_FILES}")
 
 list(REMOVE_ITEM TS_FILES
     # problems with fonts
@@ -10,6 +14,8 @@ list(REMOVE_ITEM TS_FILES
     # #2321 handling multiple versions of a language
     translations/pt-BR/cutter_pt.ts
 )
+
+message("debug: TS_FILES 2 = ${TS_FILES}")
 
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/translations)
 if (CUTTER_QT6)

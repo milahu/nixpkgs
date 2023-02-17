@@ -76,7 +76,7 @@ stdenv.mkDerivation rec {
     fi
 
     # build faster
-    rm -rf src/translations/*
+    #rm -rf src/translations/*
 
     cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
     cp -v ${./cutter-PythonManager.cpp} src/common/PythonManager.cpp
