@@ -14,7 +14,10 @@
 #    include <shiboken.h>
 #    include <pyside.h>
 #ifdef HAVE_PYSIDECLEANUP
+#pragma message "HAVE_PYSIDECLEANUP=1: including pysidecleanup.h"
 #    include <pysidecleanup.h>
+#else
+#pragma message "HAVE_PYSIDECLEANUP=0: not including pysidecleanup.h"
 #endif
 #    include <signalmanager.h>
 #endif
