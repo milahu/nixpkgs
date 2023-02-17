@@ -122,8 +122,14 @@ if(CUTTER_ENABLE_PYTHON)
 
             find_package(Shiboken6 "${Shiboken6_VERSION_REQUIRED}" REQUIRED)
             message("debug: Shiboken6_FOUND = ${Shiboken6_FOUND}")
-            get_target_property(SHIBOKEN_INCLUDE_DIRS Shiboken6::shiboken6 INTERFACE_INCLUDE_DIRECTORIES)
+            #get_target_property(SHIBOKEN_INCLUDE_DIRS Shiboken6::shiboken6 INTERFACE_INCLUDE_DIRECTORIES)
+            #   get_target_property() called with non-existent target
+            #  "Shiboken6::shiboken6".
+            get_target_property(SHIBOKEN_INCLUDE_DIRS Shiboken6::shiboken INTERFACE_INCLUDE_DIRECTORIES)
             message("debug: SHIBOKEN_INCLUDE_DIRS = ${SHIBOKEN_INCLUDE_DIRS}")
+
+            get_target_property(LIBSHIBOKEN_INCLUDE_DIRS Shiboken6::libshiboken INTERFACE_INCLUDE_DIRECTORIES)
+            message("debug: LIBSHIBOKEN_INCLUDE_DIRS = ${LIBSHIBOKEN_INCLUDE_DIRS}")
 
             find_package(Shiboken6Tools "${Shiboken6_VERSION_REQUIRED}" REQUIRED)
             message("debug: Shiboken6Tools_FOUND = ${Shiboken6Tools_FOUND}")
@@ -141,7 +147,8 @@ if(CUTTER_ENABLE_PYTHON)
             # /build/source/build/CMakeFiles/CMakeTmp/CheckIncludeFile.cxx:1:10: fatal error: pysidecleanup.h: No such file or directory
             #set(CMAKE_REQUIRED_INCLUDES ${PYSIDE_INCLUDE_DIR})
             # /nix/store/b0n3qa3wqskqb8ipqb2kbzk71z7i299b-pyside6-6.4.2/include/PySide6/pysidemacros.h:7:10: fatal error: shibokenmacros.h: No such file or directory
-            set(CMAKE_REQUIRED_INCLUDES "${PYSIDE_INCLUDE_DIR};${SHIBOKEN_INCLUDE_DIRS}")
+            set(CMAKE_REQUIRED_INCLUDES "${PYSIDE_INCLUDE_DIR};${LIBSHIBOKEN_INCLUDE_DIRS}")
+            # /nix/store/b0n3qa3wqskqb8ipqb2kbzk71z7i299b-pyside6-6.4.2/include/PySide6/pysidemacros.h:7:10: fatal error: shibokenmacros.h: No such file or directory
             CHECK_INCLUDE_FILE_CXX("pysidecleanup.h" HAVE_PYSIDECLEANUP)
             message("debug: HAVE_PYSIDECLEANUP = ${HAVE_PYSIDECLEANUP}")
             message(FATAL_ERROR "FIXME this should be true")
