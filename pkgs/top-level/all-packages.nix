@@ -18212,6 +18212,8 @@ with pkgs;
 
   cutter = qt6Packages.callPackage ../development/tools/analysis/rizin/cutter.nix { };
 
+  jsdec = pkgs.callPackage ../development/tools/analysis/rizin/jsdec.nix { };
+
   ragel = ragelStable;
 
   randoop = callPackage ../development/tools/analysis/randoop { };
