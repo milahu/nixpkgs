@@ -1,0 +1,51 @@
+From 4c31d5bfb7280e5d1557b61afd6055a144cec145 Mon Sep 17 00:00:00 2001
+From: milahu <milahu@gmail.com>
+Date: Fri, 17 Feb 2023 10:24:23 +0100
+Subject: [PATCH] treat all headers as standard headers
+
+---
+ .../clangparser/compilersupport.cpp           | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp b/sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
+index 4145c8d..17a6de1 100644
+--- a/sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
++++ b/sources/shiboken6/ApiExtractor/clangparser/compilersupport.cpp
+@@ -338,9 +338,23 @@ QByteArrayList emulatedCompilerOptions()
+             appendClangBuiltinIncludes(&headerPaths);
+         break;
+     case Compiler::Clang:
+-        headerPaths.append(gppInternalIncludePaths(compilerFromCMake(u"clang++"_s)));
++    // fix: error: cannot jump from switch statement to this case label: case Compiler::Gpp
++    // note: jump bypasses variable initialization: const HeaderPaths clangPaths
++    {
++        // fix: shiboken ApiExtractor: fatal: 'some_header.h' file not found
++        // PySide ignores system headers (-isystem)
++        // https://bugreports.qt.io/browse/PYSIDE-787
++        // https://github.com/rizinorg/cutter/issues/2942
++        // generic fix, also for non-qt packages:
++        // treat all headers as standard headers (-I)
++        //headerPaths.append(gppInternalIncludePaths(compilerFromCMake(u"clang++"_s)));
++        const HeaderPaths clangPaths = gppInternalIncludePaths(compilerFromCMake(u"clang++"_qs));
++        for (const HeaderPath &h : clangPaths) {
++            headerPaths.append({h.path, HeaderType::Standard});
++        }
+         result.append(noStandardIncludeOption());
+         break;
++    }
+     case Compiler::Gpp:
+         if (needsClangBuiltinIncludes())
+             appendClangBuiltinIncludes(&headerPaths);
+@@ -349,8 +363,7 @@ QByteArrayList emulatedCompilerOptions()
+         // <type_traits> etc (g++ 11.3).
+         const HeaderPaths gppPaths = gppInternalIncludePaths(compilerFromCMake(u"g++"_qs));
+         for (const HeaderPath &h : gppPaths) {
+-            if (h.path.contains("c++") || h.path.contains("sysroot"))
+-                headerPaths.append(h);
++            headerPaths.append({h.path, HeaderType::Standard});
+         }
+         break;
+     }
+-- 
+2.39.0
+

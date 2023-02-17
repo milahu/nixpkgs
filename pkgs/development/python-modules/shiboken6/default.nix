@@ -21,7 +21,7 @@ llvmPackages.stdenv.mkDerivation rec {
 
   patches = [
     ./0001-use-llvm-config-includedir.patch
-    ./0002-fix-include-qt-headers.patch
+    ./treat-all-headers-as-standard-headers.patch
   ];
 
   postPatch = ''
