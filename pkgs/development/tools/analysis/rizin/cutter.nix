@@ -15,6 +15,8 @@
 , qt6Packages
 , wrapQtAppsHook
 , git
+, graphviz
+, jsdec
 }:
 
 stdenv.mkDerivation rec {
@@ -91,19 +93,9 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [
     python3.pkgs.pyside6
-    rizin # runtime dep?
+    #rizin # runtime dep?
+    #jsdec # runtime dep?
     #sigdb? CUTTER_ENABLE_SIGDB
-    /*
-option(CUTTER_PACKAGE_RZ_GHIDRA "Compile and install rz-ghidra during install step." OFF)
-option(CUTTER_PACKAGE_RZ_LIBSWIFT, "Compile and install rz-libswift demangler during the install step." OFF)
-option(CUTTER_PACKAGE_RZ_LIBYARA, "Compile and install rz-libyara during the install step." OFF)
-option(CUTTER_PACKAGE_JSDEC "Compile and install jsdec during install step." OFF)
-
-Rizin_INCLUDE_DIRS is not set with old rizin version
-only rz_core_INCLUDE_DIRS is set
--> try new rizin version
-
-    */
   ];
 
   buildInputs = [
@@ -115,33 +107,23 @@ only rz_core_INCLUDE_DIRS is set
     qtwebengine
     rizin
     python3
+    graphviz
     qt6Packages.kdeFrameworks.syntax-highlighting
+    jsdec
   ];
 
   cmakeFlags = [
-    "-DCUTTER_USE_BUNDLED_RIZIN=OFF"
+    "-DCUTTER_USE_BUNDLED_RIZIN=OFF" # TODO on?
     "-DCUTTER_ENABLE_PYTHON=ON"
     "-DCUTTER_ENABLE_PYTHON_BINDINGS=ON"
     "-DCUTTER_QT6=ON"
-
+    "-DCUTTER_PACKAGE_JSDEC=ON"
+    #"-DCUTTER_PACKAGE_RZ_GHIDRA=ON"
+    #"-DCUTTER_PACKAGE_RZ_LIBSWIFT=ON" # macos?
+    #"-DCUTTER_PACKAGE_RZ_LIBYARA=ON"
+    #"-DCUTTER_ENABLE_SIGDB=ON"
     #"--trace-expand"
   ];
-
-/*
--- - Bundled rizin: OFF
--- - Python: ON
--- - Python Bindings: ON
--- - KSyntaxHighlighting: OFF (KSyntaxHighlighting not found)
--- - Graphviz: FALSE
--- - Downloads dependencies: OFF
--- - Enable Packaging: OFF
--- - Package Dependencies: OFF
--- - Package RzGhidra: OFF
--- - Package RzLibSwift:
--- - Package RzLibYara:
--- - Package JSDec: OFF
--- - QT6: ON
-*/
 
   preBuild = ''
     qtWrapperArgs+=(--prefix PYTHONPATH : "$PYTHONPATH")
