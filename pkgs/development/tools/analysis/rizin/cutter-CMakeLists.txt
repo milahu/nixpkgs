@@ -140,7 +140,7 @@ if(CUTTER_ENABLE_PYTHON)
             get_target_property(PYSIDE_INCLUDE_DIR PySide2::pyside2 INTERFACE_INCLUDE_DIRECTORIES)
         endif()
 
-        foreach(_dir PYSIDE_INCLUDE_DIRS)
+        foreach(_dir ${PYSIDE_INCLUDE_DIRS})
             message("debug: PYSIDE_INCLUDE_DIRS: _dir = ${_dir}")
             include_directories(${_dir}
                 ${_dir}/QtCore
