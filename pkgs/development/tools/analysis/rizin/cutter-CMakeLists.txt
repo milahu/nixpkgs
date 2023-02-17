@@ -129,7 +129,8 @@ if(CUTTER_ENABLE_PYTHON)
             message("debug: PYSIDE_INCLUDE_DIR = ${PYSIDE_INCLUDE_DIR}")
             # Check the presence of "pysidecleanup.h"
             include(CheckIncludeFileCXX)
-            set(CMAKE_REQUIRED_INCLUDES ${PYSIDE_INCLUDE_DIR})
+            #set(CMAKE_REQUIRED_INCLUDES ${PYSIDE_INCLUDE_DIR})
+            # /nix/store/b0n3qa3wqskqb8ipqb2kbzk71z7i299b-pyside6-6.4.2/include/PySide6/pysidemacros.h:7:10: fatal error: shibokenmacros.h: No such file or directory
             CHECK_INCLUDE_FILE_CXX("pysidecleanup.h" HAVE_PYSIDECLEANUP)
             message("debug: HAVE_PYSIDECLEANUP = ${HAVE_PYSIDECLEANUP}")
             message(FATAL_ERROR "FIXME this should be true")
