@@ -77,7 +77,7 @@ stdenv.mkDerivation rec {
 
     cp -v ${./cutter-CMakeLists.txt} CMakeLists.txt
     cp -v ${./cutter-PythonManager.cpp} src/common/PythonManager.cpp
-    cp -v ${./Translations.cmake} cmake/Translations.cmake
+    cp -v ${./cutter-Translations.cmake} cmake/Translations.cmake
   '';
 
   nativeBuildInputs = [
