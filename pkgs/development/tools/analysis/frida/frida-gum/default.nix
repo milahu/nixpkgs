@@ -43,12 +43,15 @@ stdenv.mkDerivation rec {
     ./patches/0004-use-libdwarf-0.3.patch
     ./patches/0005-use-libdwarf-0.4-or-later.patch
 
+    /*
+    # merged in 24cb96a446b56d927aa3f2b28746e90e1a5b28cc
     # make it build with fixed frida-tinycc https://github.com/frida/tinycc/pull/7
     # https://github.com/frida/frida-gum/pull/720
     (fetchpatch {
       url = "https://github.com/frida/frida-gum/commit/1f888c8f451c72f20c612f2b193d5ab4442c3840.patch";
       sha256 = "sha256-2AAW9rV8+4okALRcV57S4clfDGnqQ8+VsmA9RQkfxTc=";
     })
+    */
   ];
 
   # capture_output=False: show output of npm
