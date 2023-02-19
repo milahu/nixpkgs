@@ -83,7 +83,8 @@ stdenv.mkDerivation rec {
       "-Dfrida_java_bridge=auto"
       #"-Dtests=enabled"
       "-Dtests=disabled"
-      # FIXME tests break with frida-glib
+      # FIXME tests break
+      # blame "-Dquickjs=disabled"?
       # undefined reference to gum_quick_script_backend_get_type
       # https://github.com/frida/frida-gum/issues/723
     ]
