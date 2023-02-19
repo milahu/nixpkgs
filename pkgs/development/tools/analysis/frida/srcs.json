@@ -12,24 +12,24 @@
       "github": {
         "owner": "frida",
         "repo": "frida-core",
-        "rev": "c6754979ff4ae7f96f910f95477d6af224ffd541",
-        "sha256": "vgrhkZFomHdCEjlPCwhMFQ57PThBwhDOp/7YZWigDg0="
+        "rev": "21a9f6cb2e856df9fd081dea051bc7f783af85e9",
+        "sha256": "DTiKih5zLDRy8zSABqurEU9wxdosGzTtZOz8u5iAsnY="
       }
     },
     "frida-go": {
       "github": {
         "owner": "frida",
         "repo": "frida-go",
-        "rev": "eb3b734e5d8cbfb1a00308c636a3429ab9a1836f",
-        "sha256": "oYqiYQtxa56Cu1Ua0pOFr5XCXaXXMtLA+zIeqNycBIQ="
+        "rev": "2bd6b3d7eec6c4e6b20d3715a79af52188bcaad6",
+        "sha256": "9L3Xd3b6NF1KL9gm3EWTt01qs8IohphOo7M/PtDwA14="
       }
     },
     "frida-gum": {
       "github": {
         "owner": "frida",
         "repo": "frida-gum",
-        "rev": "acaec42263a89bbc8a8ac045e1d5c91003c9dd9a",
-        "sha256": "sha256-jYEkyFUtGKaPEv+a5DL0/vdbV/vROOPwxIbN+cwQW5k="
+        "rev": "7a5b0b5ab0cb3f0ef7e5e445dd8f3fa5e6a850ac",
+        "sha256": "2kDbg56Wd3W3g+Wnr3ScxV0NDClQYR+zHS49nry786g="
       }
     },
     "frida-node": {
@@ -44,8 +44,8 @@
       "github": {
         "owner": "frida",
         "repo": "frida-python",
-        "rev": "b236764ef0744d85a423b67bf9c434912d3d756f",
-        "sha256": "HvTFazqVK/8J9k3odMQ62095OrfiJTERMzMs2lBC0LU="
+        "rev": "1d35663c97730de6e1d8fa5ad97a166f3145b368",
+        "sha256": "ElRU/UiuU61ZOB/ShIUF0/fOSP7wXcLYed6UELJFKSg="
       }
     },
     "frida-qml": {
@@ -68,8 +68,8 @@
       "github": {
         "owner": "frida",
         "repo": "frida-tools",
-        "rev": "8b4905958541aef72c2b304dc366994f8daecfb9",
-        "sha256": "5/p2vuT27tGVszxzL7l4nvn3ATXcYZpDae810fEJp40="
+        "rev": "2c1621e12bfd43ee33e6d3bd03fce4d816cceb24",
+        "sha256": "oOLkWC+dQKGzK4LjT5CKKp6voyvg5ZOpZatr+RZsHJU="
       }
     },
     "releng/meson": {
@@ -81,5 +81,5 @@
       }
     }
   },
-  "version": "16.0.8"
+  "version": "16.0.10"
 }
