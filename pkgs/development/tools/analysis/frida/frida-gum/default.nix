@@ -6,7 +6,8 @@
 , pkg-config
 , cmake
 , ninja
-, frida-glib
+#, frida-glib
+, glib
 , frida-glib-networking
 , frida-tinycc
 , frida-v8
@@ -92,7 +93,10 @@ stdenv.mkDerivation rec {
     ];
 
   buildInputs = [
-    frida-glib
+    # undefined reference to gum_quick_script_backend_get_type
+    # https://github.com/frida/frida-gum/issues/723
+    #frida-glib
+    glib
     frida-glib-networking
     capstone_5
     lzma
@@ -114,7 +118,8 @@ stdenv.mkDerivation rec {
     libunwind
     libelf
     libdwarf
-    frida-glib # gio gio-unix
+    #frida-glib # gio gio-unix
+    glib # gio gio-unix
   ] ++ lib.optionals enableGumjs [
     frida-v8
     json-glib
