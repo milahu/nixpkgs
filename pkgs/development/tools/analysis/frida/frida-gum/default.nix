@@ -81,7 +81,9 @@ stdenv.mkDerivation rec {
       "-Dfrida_objc_bridge=auto"
       "-Dfrida_swift_bridge=auto"
       "-Dfrida_java_bridge=auto"
-      #"-Dtests=enabled" # FIXME tests break with frida-glib
+      #"-Dtests=enabled"
+      "-Dtests=disabled"
+      # FIXME tests break with frida-glib
       # undefined reference to gum_quick_script_backend_get_type
       # https://github.com/frida/frida-gum/issues/723
     ]
