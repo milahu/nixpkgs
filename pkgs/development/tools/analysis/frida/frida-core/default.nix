@@ -24,7 +24,6 @@
 , libunwind
 , libelf
 , libdwarf
-, glib
 
 , capstone_5
 #, frida-v8
