@@ -6,10 +6,10 @@
 , pkg-config
 , cmake
 , ninja
+, frida-glib
 , frida-glib-networking
 , frida-tinycc
 , frida-v8
-, glib
 , capstone_5
 , lzma
 , gobject-introspection
@@ -21,6 +21,7 @@
 , libsoup_3
 , python3
 , nodePackages
+, libffi
 , enableGumjs ? true # Build JavaScript bindings
 , enableGumpp ? true # Build C++ bindings
 }:
@@ -91,8 +92,8 @@ stdenv.mkDerivation rec {
     ];
 
   buildInputs = [
+    frida-glib
     frida-glib-networking
-    glib
     capstone_5
     lzma
     libunwind
@@ -110,6 +111,16 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [
     capstone_5
+    libunwind
+    libelf
+    libdwarf
+    frida-glib # gio gio-unix
+  ] ++ lib.optionals enableGumjs [
+    frida-v8
+    json-glib
+    libffi
+    frida-tinycc # libtcc
+    sqlite # sqlite3
   ];
 
   meta = with lib; {
