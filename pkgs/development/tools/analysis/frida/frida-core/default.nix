@@ -101,12 +101,6 @@ stdenv.mkDerivation rec {
       --replace '        (output_dir / "node_modules" / "@types" / "frida-gum"' '#' \
       --replace '    shutil.copyfileobj(response, frida_gum_types)' '#' \
 
-    # https://github.com/frida/frida-core/pull/454
-    substituteInPlace src/meson.build \
-      --replace \
-        "core = library('frida-core', core_sources," \
-        "core = static_library('frida-core', core_sources,"
-
   '';
 
   # https://github.com/frida/v8/issues/14
