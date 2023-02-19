@@ -24,24 +24,11 @@
 }:
 
 let
-  original-meson = meson;
-in
-
-let
   srcs = builtins.fromJSON (builtins.readFile ../srcs.json);
 
   frida-compiler-agent = callPackage ./frida-compiler-agent {
     nodejs = nodejs-19_x;
   };
-
-  # fix build for default_library=both
-  # https://github.com/mesonbuild/meson/issues/6960
-  meson = original-meson.overrideAttrs (oldAttrs: {
-    patches = (oldAttrs.patches or []) ++ [
-      ./meson-vala-fix-generated-paths.patch
-      ./meson-fix-attributeerror-sharedlibrary-split.patch
-    ];
-  });
 in
 
 stdenv.mkDerivation rec {
@@ -118,9 +105,13 @@ stdenv.mkDerivation rec {
   '';
 
   mesonFlags = [
-    #"-Ddefault_library=both" # build error
-    #"-Ddefault_library=static" # ok
-  ];
+      # based on github CI of https://github.com/frida/frida
+      "-Ddefault_library=static"
+      "-Doptimization=s"
+      "-Db_ndebug=true"
+      "-Dconnectivity=enabled"
+      "-Dmapper=auto"
+    ];
 
   preBuild = ''
     mkdir -p src/compiler
