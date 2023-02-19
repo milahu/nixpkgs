@@ -3,7 +3,7 @@
 
 repourl='https://github.com/frida/frida'
 
-source_json_file='src.json'
+source_json_file='srcs.json'
 
 # check dependencies
 for cmd in git nix-prefetch-github jq; do
