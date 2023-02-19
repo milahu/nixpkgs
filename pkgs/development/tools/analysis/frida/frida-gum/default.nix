@@ -69,7 +69,18 @@ stdenv.mkDerivation rec {
     ninja
   ];
 
-  mesonFlags = []
+  mesonFlags = [
+      # based on github CI of https://github.com/frida/frida
+      "--default-library" "static"
+      "-Doptimization=s"
+      "-Db_ndebug=true"
+      "-Djailbreak=auto"
+      "-Ddatabase=enabled"
+      "-Dfrida_objc_bridge=auto"
+      "-Dfrida_swift_bridge=auto"
+      "-Dfrida_java_bridge=auto"
+      "-Dtests=enabled"
+    ]
     ++ lib.optionals enableGumjs [
       "-Dgumjs=enabled"
       "-Dquickjs=disabled"
