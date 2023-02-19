@@ -25,6 +25,13 @@
 , libelf
 , libdwarf
 , glib
+
+, capstone_5
+#, frida-v8
+#, json-glib
+, libffi # no?
+, frida-tinycc # libtcc
+, sqlite # sqlite3
 }:
 
 let
@@ -60,9 +67,17 @@ stdenv.mkDerivation rec {
     libunwind
     libelf
     libdwarf
-    #frida-glib
+    #frida-glib # gio gio-unix
+    # gumjs
+    # Requires: frida-gum-1.0, glib-2.0 >= 2.56, capstone >= 5.0.0, gobject-2.0, v8-10.0 >= 10.6.122, gio-2.0, gio-unix-2.0, json-glib-1.0, libffi, libtcc, sqlite3
+    capstone_5
+    #frida-v8
+    #json-glib
+    libffi # no?
+    frida-tinycc # libtcc
+    sqlite # sqlite3
 
-    frida-glib # gio
+    frida-glib
     frida-glib-networking # gioopenssl
     frida-usrsctp
     frida-v8
