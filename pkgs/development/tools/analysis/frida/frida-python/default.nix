@@ -36,12 +36,19 @@ stdenv.mkDerivation rec {
     python3
     libgee
     libsoup_3
+    # pkg-config --cflags --libs --static frida-core-1.0
     # ${libsoup_3.dev}/lib/pkgconfig/libsoup-3.0.pc
     # Requires.private: sysprof-capture-4, sqlite3, libpsl >=  0.20, libbrotlidec, zlib, libnghttp2
     libsysprof-capture
     sqlite
     libpsl
     libnghttp2
+    zstd
+    gnutls
+    libtasn1
+    libidn2
+    p11-kit
+    gupnp-igd
   ];
 
   propagatedBuildInputs = [
