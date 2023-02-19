@@ -22,6 +22,9 @@
 , nodejs-19_x
 , callPackage
 , libunwind
+, libelf
+, libdwarf
+, glib
 }:
 
 let
@@ -55,9 +58,11 @@ stdenv.mkDerivation rec {
 
     # TODO propagate from frida-gum
     libunwind
+    libelf
+    libdwarf
+    #frida-glib
 
-
-    frida-glib
+    frida-glib # gio
     frida-glib-networking # gioopenssl
     frida-usrsctp
     frida-v8
