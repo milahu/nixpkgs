@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
 
   mesonFlags = [
       # based on github CI of https://github.com/frida/frida
-      "--default-library" "static"
+      "-Ddefault_library=static"
       "-Doptimization=s"
       "-Db_ndebug=true"
       "-Djailbreak=auto"
@@ -88,8 +88,7 @@ stdenv.mkDerivation rec {
     ]
     ++ lib.optionals enableGumpp [
       "-Dgumpp=enabled"
-    ]
-  ;
+    ];
 
   buildInputs = [
     frida-glib-networking
