@@ -21,6 +21,7 @@
 , python3
 , nodejs-19_x
 , callPackage
+, libunwind
 }:
 
 let
@@ -51,6 +52,11 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     frida-gum
+
+    # TODO propagate from frida-gum
+    libunwind
+
+
     frida-glib
     frida-glib-networking # gioopenssl
     frida-usrsctp
