@@ -119,7 +119,12 @@ stdenv.mkDerivation rec {
     libelf
     libdwarf
     #frida-glib # gio gio-unix
-    glib # gio gio-unix
+    # dont propagate glib
+    # this would break frida-core:
+    # undefined reference to g_thread_garbage_collect
+    # undefined reference to gio_prepare_to_fork
+    # undefined reference to glib_prepare_to_fork
+    #glib # gio gio-unix
   ] ++ lib.optionals enableGumjs [
     frida-v8
     json-glib
