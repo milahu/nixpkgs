@@ -13,6 +13,12 @@
 , sqlite
 , libpsl
 , libnghttp2
+, zstd
+, gnutls
+, libtasn1
+, libidn2
+, p11-kit
+, gupnp-igd
 }:
 
 let
