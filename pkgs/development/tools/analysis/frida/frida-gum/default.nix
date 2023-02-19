@@ -11,6 +11,7 @@
 , frida-glib-networking
 , frida-tinycc
 , frida-v8
+, frida-quickjs
 , capstone_5
 , lzma
 , gobject-introspection
@@ -74,8 +75,8 @@ stdenv.mkDerivation rec {
       "-Dfrida_objc_bridge=auto"
       "-Dfrida_swift_bridge=auto"
       "-Dfrida_java_bridge=auto"
-      #"-Dtests=enabled"
-      "-Dtests=disabled"
+      "-Dtests=enabled"
+      #"-Dtests=disabled"
       # FIXME tests break
       # blame "-Dquickjs=disabled"?
       # undefined reference to gum_quick_script_backend_get_type
@@ -83,7 +84,7 @@ stdenv.mkDerivation rec {
     ]
     ++ lib.optionals enableGumjs [
       "-Dgumjs=enabled"
-      "-Dquickjs=disabled"
+      "-Dquickjs=enabled"
       "-Dv8=enabled"
     ]
     ++ lib.optionals enableGumpp [
@@ -106,6 +107,7 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
+    frida-quickjs
     json-glib
     sqlite
     libsoup_3
