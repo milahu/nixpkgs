@@ -11,7 +11,7 @@
 , frida-glib-networking
 , frida-tinycc
 , frida-v8
-, frida-quickjs
+#, frida-quickjs
 , capstone_5
 , lzma
 , gobject-introspection
@@ -84,7 +84,8 @@ stdenv.mkDerivation rec {
     ]
     ++ lib.optionals enableGumjs [
       "-Dgumjs=enabled"
-      "-Dquickjs=enabled"
+      #"-Dquickjs=enabled"
+      #"-Dquickjs=disabled"
       "-Dv8=enabled"
     ]
     ++ lib.optionals enableGumpp [
@@ -107,7 +108,9 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
-    frida-quickjs
+    # build with quickjs is broken
+    # https://github.com/frida/frida-gum/issues/724
+    #frida-quickjs
     json-glib
     sqlite
     libsoup_3
