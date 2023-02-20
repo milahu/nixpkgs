@@ -11,7 +11,7 @@
 , frida-glib-networking
 , frida-tinycc
 , frida-v8
-#, frida-quickjs
+, frida-quickjs
 , capstone_5
 , lzma
 , gobject-introspection
@@ -70,11 +70,11 @@ stdenv.mkDerivation rec {
       "-Ddefault_library=static"
       "-Doptimization=s"
       "-Db_ndebug=true"
-      "-Djailbreak=auto"
+      #"-Djailbreak=auto"
       "-Ddatabase=enabled"
-      "-Dfrida_objc_bridge=auto"
-      "-Dfrida_swift_bridge=auto"
-      "-Dfrida_java_bridge=auto"
+      #"-Dfrida_objc_bridge=auto"
+      #"-Dfrida_swift_bridge=auto"
+      #"-Dfrida_java_bridge=auto"
       "-Dtests=enabled"
       #"-Dtests=disabled"
       # FIXME tests break
@@ -86,7 +86,7 @@ stdenv.mkDerivation rec {
       "-Dgumjs=enabled"
       #"-Dquickjs=enabled"
       #"-Dquickjs=disabled"
-      "-Dv8=enabled"
+      #"-Dv8=enabled"
     ]
     ++ lib.optionals enableGumpp [
       "-Dgumpp=enabled"
@@ -108,9 +108,7 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
-    # build with quickjs is broken
-    # https://github.com/frida/frida-gum/issues/724
-    #frida-quickjs
+    frida-quickjs
     json-glib
     sqlite
     libsoup_3
