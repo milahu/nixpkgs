@@ -13,6 +13,7 @@
 , frida-tinycc
 , frida-v8
 , frida-quickjs
+, frida-compile
 , capstone_5
 , lzma
 , gobject-introspection
@@ -24,35 +25,12 @@
 , libsoup_3
 , python3
 , libffi
-, nodejs_latest
 , enableGumjs ? true # Build JavaScript bindings
 , enableGumpp ? true # Build C++ bindings
 }:
 
 let
   srcs = builtins.fromJSON (builtins.readFile ../srcs.json);
-in
-
-let
-  frida-compile = stdenvNoCC.mkDerivation {
-    pname = "frida-compile";
-    version = "10.2.5";
-    outputHash = "sha256-P0ZDniykK+LH43AHLQChRCzY2EUUoyWZ7WZmjqOpfCA=";
-    outputHashMode = "recursive";
-    outputHashAlgo = "sha256";
-    buildInputs = [
-      nodejs_latest
-    ];
-    buildCommand = ''
-      mkdir $out
-      cd $out
-      cp ${./package.json} package.json
-      cp ${./package-lock.json} package-lock.json
-      export HOME=$TMP
-      npm ci
-      patchShebangs $out
-    '';
-  };
 in
 
 stdenv.mkDerivation rec {
@@ -163,10 +141,6 @@ stdenv.mkDerivation rec {
     frida-tinycc # libtcc
     sqlite # sqlite3
   ];
-
-  passthru = {
-    inherit frida-compile;
-  };
 
   meta = with lib; {
     description = "instrumentation and introspection library";

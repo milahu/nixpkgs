@@ -7359,6 +7359,7 @@ with pkgs;
   frida-tools = callPackage ../development/tools/analysis/frida/frida-tools { };
   frida-python = callPackage ../development/tools/analysis/frida/frida-python { };
   frida-quickjs = callPackage ../development/tools/analysis/frida/frida-quickjs { };
+  frida-compile = callPackage ../development/tools/analysis/frida/frida-compile { };
 
   frostwire = callPackage ../applications/networking/p2p/frostwire { };
   frostwire-bin = callPackage ../applications/networking/p2p/frostwire/frostwire-bin.nix { };
