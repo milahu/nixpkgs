@@ -42,10 +42,15 @@ stdenv.mkDerivation rec {
   inherit (srcs) version;
   src = fetchFromGitHub srcs.paths.${pname}.github;
 
+/*
+overkill
+    ${lib.toShellVar "patches" frida-gum.patches}
+*/
+
   patchPhase = ''
     runHook prePatch
     pushd frida-gum
-    for patch in ${frida-gum.patches}; do
+    for patch in ${builtins.concatStringsSep " " frida-gum.patches}; do
       echo frida-gum: applying patch $patch
       patch -p1 < $patch
     done
