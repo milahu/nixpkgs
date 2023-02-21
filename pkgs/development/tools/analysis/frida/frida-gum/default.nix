@@ -41,6 +41,9 @@ stdenv.mkDerivation rec {
   frida-compile = stdenvNoCC.mkDerivation {
     pname = "frida-compile";
     version = "10.2.5";
+    outputHash = "sha256-l7xL2LQvnBq31fctGH3TXB3ezTPmF+d8tLjCiPKzBDc=";
+    outputHashMode = "recursive";
+    outputHashAlgo = "sha256";
     buildInputs = [
       nodejs_latest
     ];
@@ -51,14 +54,8 @@ stdenv.mkDerivation rec {
       cp ${./package-lock.json} package-lock.json
       export HOME=$TMP
       npm ci
-      chmod -R +x $out/node_modules/.bin
-      patchShebangs $out/node_modules/.bin
-      # todo: dont write to $HOME
-      ls -A $HOME
+      patchShebangs $out
     '';
-    outputHashMode = "recursive";
-    outputHashAlgo = "sha256";
-    outputHash = "sha256-l7xL2LQvnBq31fctGH3TXB3ezTPmF+d8tLjCiPKzBDc=";
   };
 
   patches = [
