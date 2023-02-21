@@ -51,6 +51,8 @@ stdenv.mkDerivation rec {
       cp ${./package-lock.json} package-lock.json
       export HOME=$TMP
       npm ci
+      patchShebangs $out/node_modules/.bin
+      # todo: dont write to $HOME
       ls -A $HOME
     '';
     outputHashMode = "recursive";
