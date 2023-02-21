@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
   frida-compile = stdenvNoCC.mkDerivation {
     pname = "frida-compile";
     version = "10.2.5";
-    outputHash = "sha256-l7xL2LQvnBq31fctGH3TXB3ezTPmF+d8tLjCiPKzBDc=";
+    outputHash = "sha256-P0ZDniykK+LH43AHLQChRCzY2EUUoyWZ7WZmjqOpfCA=";
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     buildInputs = [
