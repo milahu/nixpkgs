@@ -61,10 +61,37 @@ overkill
         'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
         'frida_compile = Path("${nodePackages.frida-compile}/bin/frida-compile")'
     popd
+
+    substituteInPlace releng/detect-variant.sh \
+      --replace 'ldd /bin/ls' 'ldd $(which ls)'
+
+    substituteInPlace releng/setup-env.sh \
+    --replace '
+      echo "Please install curl or wget: required for downloading prebuilt dependencies." > /dev/stderr
+      exit 1
+    ' '
+      download_command="echo TODO download"
+    '
+
+    # dont install build env (toolchain)
+    # NOTE: must use tabs for makefile
+    substituteInPlace Makefile.linux.mk \
+    --replace '
+    build/$1-%/lib/pkgconfig/frida-gum-1.0.pc: build/$1-env-%.rc build/.frida-gum-submodule-stamp
+    ' '
+    build/$1-%/lib/pkgconfig/frida-gum-1.0.pc: build/.frida-gum-submodule-stamp
+    ' \
+    --replace '
+        $$(call meson-setup-for-env,$1,$$*) \
+          --prefix $$(FRIDA)/build/$1-$$* \
+          --libdir $$(FRIDA)/build/$1-$$*/lib \
+    ' '
+        meson setup \
+    '
+
     patchShebangs .
     runHook postPatch
   '';
-  # TODO patch "ldd /bin/ls" calls in Makefile
 
   buildPhase = ''
     runHook preBuild
@@ -122,15 +149,17 @@ overkill
     git config --global user.email nixbld@localhost
     git config --global user.name nixbld
     git commit -m init
+    # disable ninja line-clearing
+    export TERM=dumb
   '';
 
   buildInputs = [
     /*
     meson
-    pkg-config
     cmake
     ninja
     */
+    pkg-config
 
     git
     which
