@@ -51,6 +51,7 @@ stdenv.mkDerivation rec {
   # capture_output=False: show output of npm
   postPatch = ''
     patchShebangs .
+    ${if enableGumjs then ''
     substituteInPlace bindings/gumjs/generate-runtime.py \
     --replace 'capture_output=True' 'capture_output=False' \
     --replace \
@@ -63,6 +64,7 @@ stdenv.mkDerivation rec {
         if not frida_compile.exists():
             raise Exception(f"frida-compile not found in {frida_compile}")
     '
+    '' else ""}
   '';
 
   nativeBuildInputs = [
@@ -120,6 +122,7 @@ stdenv.mkDerivation rec {
     sqlite
     libsoup_3
     python3 # generate-bindings.py
+    frida-compile
   ];
 
   propagatedBuildInputs = [
