@@ -132,6 +132,7 @@ stdenv.mkDerivation rec {
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
+    frida-compile
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
