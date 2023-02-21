@@ -33,11 +33,7 @@ let
   srcs = builtins.fromJSON (builtins.readFile ../srcs.json);
 in
 
-stdenv.mkDerivation rec {
-  pname = "frida-gum";
-  inherit (srcs) version;
-  src = fetchFromGitHub srcs.paths.${pname}.github;
-
+let
   frida-compile = stdenvNoCC.mkDerivation {
     pname = "frida-compile";
     version = "10.2.5";
@@ -57,6 +53,12 @@ stdenv.mkDerivation rec {
       patchShebangs $out
     '';
   };
+in
+
+stdenv.mkDerivation rec {
+  pname = "frida-gum";
+  inherit (srcs) version;
+  src = fetchFromGitHub srcs.paths.${pname}.github;
 
   patches = [
     # make it build with latest libdwarf
@@ -132,7 +134,6 @@ stdenv.mkDerivation rec {
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
-    frida-compile
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
