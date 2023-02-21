@@ -35,7 +35,12 @@ in
 stdenv.mkDerivation rec {
   pname = "frida-gum";
   inherit (srcs) version;
-  src = fetchFromGitHub srcs.paths.${pname}.github;
+  #src = fetchFromGitHub srcs.paths.${pname}.github;
+  src = fetchFromGitHub srcs.paths."frida".github;
+
+  prePatch = ''
+    pushd frida-gum
+  '';
 
   patches = [
     # make it build with latest libdwarf
@@ -49,6 +54,7 @@ stdenv.mkDerivation rec {
 
   # capture_output=False: show output of npm
   postPatch = ''
+    popd
     patchShebangs .
     substituteInPlace bindings/gumjs/generate-runtime.py \
       --replace 'capture_output=True' 'capture_output=False' \
@@ -58,12 +64,9 @@ stdenv.mkDerivation rec {
 
   '';
 
-  nativeBuildInputs = [
-    meson
-    pkg-config
-    cmake
-    ninja
-  ];
+  nativeBuildInputs = [];
+
+  makeTargets = [ "gum-linux-x86_64" ];
 
   mesonFlags = [
       # based on github CI of https://github.com/frida/frida
@@ -93,6 +96,11 @@ stdenv.mkDerivation rec {
     ];
 
   buildInputs = [
+    meson
+    pkg-config
+    cmake
+    ninja
+
     # undefined reference to gum_quick_script_backend_get_type
     # https://github.com/frida/frida-gum/issues/723
     # quickfix: disable tests
