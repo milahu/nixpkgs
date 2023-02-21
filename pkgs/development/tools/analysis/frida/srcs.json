@@ -1,5 +1,14 @@
 {
   "paths": {
+    "frida": {
+      "github": {
+        "owner": "frida",
+        "repo": "frida",
+        "rev": "b761deb798ee2bb1aaa73bffd62de8823aafb47e",
+        "sha256": "sha256-ZPjYm98IoDj5WZAMeiPtDqCu8/xTXzhRD2VsRZ0wuAo=",
+        "fetchSubmodules": true
+      }
+    },
     "frida-clr": {
       "github": {
         "owner": "frida",
