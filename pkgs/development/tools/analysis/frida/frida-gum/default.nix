@@ -51,6 +51,7 @@ stdenv.mkDerivation rec {
       cp ${./package-lock.json} package-lock.json
       export HOME=$TMP
       npm ci
+      chmod -R +x $out/node_modules/.bin
       patchShebangs $out/node_modules/.bin
       # todo: dont write to $HOME
       ls -A $HOME
