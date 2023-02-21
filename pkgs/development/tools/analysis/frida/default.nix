@@ -208,6 +208,52 @@ overkill
     sqlite # sqlite3
   ];
 
+  passthru = {
+    env = (buildFHSUserEnv {
+      name = "frida-env";
+    targetPkgs = pkgs: (with pkgs; [
+
+      meson
+      cmake
+      ninja
+      pkg-config
+
+      git
+      which
+      perl
+      nodejs
+
+      # undefined reference to gum_quick_script_backend_get_type
+      # https://github.com/frida/frida-gum/issues/723
+      # quickfix: disable tests
+      frida-glib
+      #glib
+      frida-glib-networking
+      capstone_5
+      lzma
+      libunwind
+      libelf
+      libdwarf
+      gobject-introspection # g-ir-scanner
+    ] ++ lib.optionals enableGumjs [
+      frida-tinycc
+      frida-v8
+      frida-quickjs
+      json-glib
+      sqlite
+      libsoup_3
+      python3 # generate-bindings.py
+
+    ]);
+    /*
+    multiPkgs = pkgs: (with pkgs;
+      [ udev
+        alsaLib
+      ]);
+    */
+    }).env;
+  };
+
   meta = with lib; {
     description = "instrumentation and introspection library";
     homepage = "https://github.com/frida/frida";
