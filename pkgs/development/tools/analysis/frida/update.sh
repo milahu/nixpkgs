@@ -5,6 +5,9 @@ repourl='https://github.com/frida/frida'
 
 source_json_file='srcs.json'
 
+echo FIXME also add path=frida with fetchSubmodules=true
+exit 1
+
 # check dependencies
 for cmd in git nix-prefetch-github jq; do
   if ! command -v $cmd >/dev/null; then
