@@ -11,7 +11,9 @@ stdenv.mkDerivation {
   buildInputs = [
     nodejs_latest
   ];
-  buildCommand = ''
+  dontUnpack = true;
+  dontInstall = true;
+  buildPhase = ''
     mkdir $out
     cd $out
     cp ${./package.json} package.json
