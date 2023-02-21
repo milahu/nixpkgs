@@ -81,7 +81,7 @@ stdenv.mkDerivation rec {
             pkg_files = [output_dir / "package.json", output_dir / "package-lock.json"]
     ' '
         if not frida_compile.exists():
-            raise Error(f"frida-compile not found in {frida_compile}")
+            raise Exception(f"frida-compile not found in {frida_compile}")
     '
   '';
 
