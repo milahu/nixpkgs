@@ -52,6 +52,7 @@ stdenv.mkDerivation rec {
   postPatch = ''
     patchShebangs .
     ${if enableGumjs then ''
+    echo javascript bindings are enabled. patching frida-compile to ${frida-compile}/node_modules/.bin/frida-compile
     substituteInPlace bindings/gumjs/generate-runtime.py \
     --replace 'capture_output=True' 'capture_output=False' \
     --replace \
