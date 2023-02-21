@@ -1,0 +1,10 @@
+{
+  "name": "frida-gum",
+  "version": "0.0.0",
+  "dependencies": {
+    "frida-compile": "^10.2.5",
+    "frida-java-bridge": "^6.2.3",
+    "frida-objc-bridge": "^7.0.2",
+    "frida-swift-bridge": "^2.0.6"
+  }
+}

@@ -1,5 +1,6 @@
 { lib
 , stdenv
+, stdenvNoCC
 , fetchFromGitHub
 , fetchpatch
 , meson
@@ -22,8 +23,8 @@
 , sqlite
 , libsoup_3
 , python3
-, nodePackages
 , libffi
+, nodejs_latest
 , enableGumjs ? true # Build JavaScript bindings
 , enableGumpp ? true # Build C++ bindings
 }:
@@ -36,6 +37,26 @@ stdenv.mkDerivation rec {
   pname = "frida-gum";
   inherit (srcs) version;
   src = fetchFromGitHub srcs.paths.${pname}.github;
+
+  frida-compile = stdenvNoCC.mkDerivation {
+    pname = "frida-compile";
+    version = "10.2.5";
+    buildInputs = [
+      nodejs_latest
+    ];
+    buildCommand = ''
+      mkdir $out
+      cd $out
+      cp ${./package.json} package.json
+      cp ${./package-lock.json} package-lock.json
+      export HOME=$TMP
+      npm ci
+      ls -A $HOME
+    '';
+    outputHashMode = "recursive";
+    outputHashAlgo = "sha256";
+    outputHash = "sha256-l7xL2LQvnBq31fctGH3TXB3ezTPmF+d8tLjCiPKzBDc=";
+  };
 
   patches = [
     # make it build with latest libdwarf
@@ -54,7 +75,7 @@ stdenv.mkDerivation rec {
       --replace 'capture_output=True' 'capture_output=False' \
       --replace \
         'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
-        'frida_compile = Path("${nodePackages.frida-compile}/bin/frida-compile")' \
+        'frida_compile = Path("${frida-compile}/node_modules/.bin/frida-compile")' \
 
   '';
 
@@ -134,6 +155,10 @@ stdenv.mkDerivation rec {
     frida-tinycc # libtcc
     sqlite # sqlite3
   ];
+
+  passthru = {
+    inherit frida-compile;
+  };
 
   meta = with lib; {
     description = "instrumentation and introspection library";
