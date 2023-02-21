@@ -1,3 +1,7 @@
+{ stdenv
+, nodejs_latest
+}:
+
 stdenv.mkDerivation {
   pname = "frida-compile";
   version = "10.2.5";
