@@ -72,11 +72,17 @@ stdenv.mkDerivation rec {
   postPatch = ''
     patchShebangs .
     substituteInPlace bindings/gumjs/generate-runtime.py \
-      --replace 'capture_output=True' 'capture_output=False' \
-      --replace \
-        'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
-        'frida_compile = Path("${frida-compile}/node_modules/.bin/frida-compile")' \
-
+    --replace 'capture_output=True' 'capture_output=False' \
+    --replace \
+      'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
+      'frida_compile = Path("${frida-compile}/node_modules/.bin/frida-compile")' \
+    --replace '
+        if not frida_compile.exists():
+            pkg_files = [output_dir / "package.json", output_dir / "package-lock.json"]
+    ' '
+        if not frida_compile.exists():
+            raise Error(f"frida-compile not found in {frida_compile}")
+    '
   '';
 
   nativeBuildInputs = [
