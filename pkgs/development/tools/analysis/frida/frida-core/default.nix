@@ -10,7 +10,7 @@
 , frida-vala
 , glib
 , glib-networking
-, frida-usrsctp
+, usrsctp
 , frida-v8
 , cmake
 , libgee
@@ -63,7 +63,7 @@ stdenv.mkDerivation rec {
     frida-gum
     glib
     glib-networking # gioopenssl
-    frida-usrsctp
+    usrsctp
     frida-v8
     cmake
     libgee
@@ -89,7 +89,7 @@ stdenv.mkDerivation rec {
     glib-networking # gioopenssl
     libnice
     #openssl
-    frida-usrsctp
+    usrsctp
   ];
 
   postPatch = ''

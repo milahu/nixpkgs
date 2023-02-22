@@ -4,7 +4,7 @@
 }:
 
 usrsctp.overrideAttrs (oldAttrs: rec {
-  pname = "frida-usrsctp";
+  pname = "usrsctp";
   patches = (oldAttrs.patches or []) ++ [
     # https://github.com/sctplab/usrsctp/pull/591
     # add Add usrsctp_get_timeout
