@@ -123,7 +123,6 @@ stdenv.mkDerivation rec {
     sqlite
     libsoup_3
     python3 # generate-bindings.py
-    frida-compile
   ];
 
   propagatedBuildInputs = [
