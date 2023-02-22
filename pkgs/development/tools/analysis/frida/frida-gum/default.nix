@@ -52,12 +52,12 @@ stdenv.mkDerivation rec {
   postPatch = ''
     patchShebangs .
     ${if enableGumjs then ''
-    echo javascript bindings are enabled. patching frida-compile to ${frida-compile}/lib/node_modules/frida-gum/node_modules/.bin/frida-compile
+    echo javascript bindings are enabled. patching frida-compile to ${frida-compile.nodeDependencies}/lib/node_modules/frida-gum/node_modules/.bin/frida-compile
     substituteInPlace bindings/gumjs/generate-runtime.py \
     --replace 'capture_output=True' 'capture_output=False' \
     --replace \
       'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
-      'frida_compile = Path("${frida-compile}/lib/node_modules/frida-gum/node_modules/.bin/frida-compile")' \
+      'frida_compile = Path("${frida-compile.nodeDependencies}/lib/node_modules/frida-gum/node_modules/.bin/frida-compile")' \
     --replace '
         if not frida_compile.exists():
             pkg_files = [output_dir / "package.json", output_dir / "package-lock.json"]
