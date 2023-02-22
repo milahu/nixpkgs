@@ -79,6 +79,9 @@ stdenv.mkDerivation rec {
     ninja
   ];
 
+  # TODO disable
+  mesonBuildType = "debug";
+
   mesonFlags = [
       # based on github CI of https://github.com/frida/frida
       "-Ddefault_library=static"

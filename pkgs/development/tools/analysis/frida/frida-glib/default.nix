@@ -78,6 +78,9 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
     done
   '';
 
+  # TODO disable
+  mesonBuildType = "debug";
+
   mesonFlags = [
     # Avoid the need for gobject introspection binaries in PATH in cross-compiling case.
     # Instead we just copy them over from the native output.

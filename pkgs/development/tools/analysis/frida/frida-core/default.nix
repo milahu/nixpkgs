@@ -108,6 +108,9 @@ stdenv.mkDerivation rec {
     export PATH=${frida-v8}/bin/linux-x86_64:$PATH
   '';
 
+  # TODO disable
+  mesonBuildType = "debug";
+
   mesonFlags = [
       # based on github CI of https://github.com/frida/frida
       "-Ddefault_library=static"
