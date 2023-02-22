@@ -6,6 +6,11 @@
 , vala
 }:
 
+/*
+FIXME override "glib = self.glib" for all inputs of this scope
+example: frida-core -> libsoup_3 -> glib
+*/
+
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
   frida-core = callPackage ./frida-core { };
   frida-gum = callPackage ./frida-gum { };
