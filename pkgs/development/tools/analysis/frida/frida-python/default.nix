@@ -8,7 +8,7 @@
 , frida-core
 , python3
 , libgee
-, libsoup_3
+, frida-libsoup
 , libsysprof-capture
 , sqlite
 , libpsl
@@ -41,9 +41,9 @@ stdenv.mkDerivation rec {
     frida-core
     python3
     libgee
-    libsoup_3
+    frida-libsoup
     # pkg-config --cflags --libs --static frida-core-1.0
-    # ${libsoup_3.dev}/lib/pkgconfig/libsoup-3.0.pc
+    # ${frida-libsoup.dev}/lib/pkgconfig/libsoup-3.0.pc
     # Requires.private: sysprof-capture-4, sqlite3, libpsl >=  0.20, libbrotlidec, zlib, libnghttp2
     libsysprof-capture
     sqlite
@@ -60,7 +60,7 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [
     frida-core
     libgee
-    libsoup_3
+    frida-libsoup
   ];
 
   mesonFlags = [

@@ -22,7 +22,7 @@
 , libdwarf
 , json-glib
 , sqlite
-, libsoup_3
+, frida-libsoup
 , python3
 , libffi
 # TODO is this actually optional? seems like these are required for frida-core, frida-python, frida-tools
@@ -130,7 +130,7 @@ stdenv.mkDerivation rec {
     frida-quickjs
     json-glib
     sqlite
-    libsoup_3
+    frida-libsoup
     python3 # generate-bindings.py
   ];
 

@@ -15,7 +15,7 @@
 , cmake
 , libgee
 , json-glib
-, libsoup_3
+, frida-libsoup
 , brotli
 , libnice
 , python3
@@ -68,7 +68,7 @@ stdenv.mkDerivation rec {
     cmake
     libgee
     json-glib
-    libsoup_3
+    frida-libsoup # fix: breaks with libsoup: free(): invalid pointer
     brotli
     libnice
     python3 # src/compiler/generate-agent.py
@@ -82,7 +82,7 @@ stdenv.mkDerivation rec {
     frida-glib
     json-glib
     libgee
-    libsoup_3
+    frida-libsoup
     frida-gum
     #frida-gumjs-inspector
     brotli
