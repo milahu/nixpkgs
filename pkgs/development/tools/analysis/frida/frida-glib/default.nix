@@ -101,5 +101,6 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
     changelog = "https://github.com/frida/glib/blob/${src.rev}/NEWS";
     license = licenses.lgpl21Only;
     maintainers = with maintainers; [ ];
+    inherit (glib.meta) platforms;
   };
 })
