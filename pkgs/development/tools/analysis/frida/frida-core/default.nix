@@ -11,7 +11,7 @@
 , glib
 , glib-networking
 , usrsctp
-, frida-v8
+, v8
 , cmake
 , libgee
 , json-glib
@@ -26,7 +26,7 @@
 , libdwarf
 
 , capstone_5
-#, frida-v8
+#, v8
 #, json-glib
 , libffi # no?
 , tinycc # libtcc
@@ -64,7 +64,7 @@ stdenv.mkDerivation rec {
     glib
     glib-networking # gioopenssl
     usrsctp
-    frida-v8
+    v8
     cmake
     libgee
     json-glib
@@ -112,7 +112,7 @@ stdenv.mkDerivation rec {
 
   # https://github.com/frida/v8/issues/14
   preConfigure = ''
-    export PATH=${frida-v8}/bin/linux-x86_64:$PATH
+    export PATH=${v8}/bin/linux-x86_64:$PATH
   '';
 
   # TODO disable

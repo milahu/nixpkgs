@@ -21,7 +21,7 @@ FIXME fatal error: gnu/stubs-32.h: No such file or directory
 #, glib
 , glib-networking
 , tinycc
-, frida-v8
+, v8
 , frida-quickjs
 , capstone_5
 , lzma
@@ -198,7 +198,7 @@ overkill
     frida-libiconv # for glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
     tinycc
-    frida-v8
+    v8
     frida-quickjs
     json-glib
     sqlite
@@ -219,7 +219,7 @@ overkill
     # undefined reference to glib_prepare_to_fork
     #glib # gio gio-unix
   ] ++ lib.optionals enableGumjs [
-    frida-v8
+    v8
     json-glib
     libffi
     tinycc # libtcc
@@ -255,7 +255,7 @@ overkill
       gobject-introspection # g-ir-scanner
     ] ++ lib.optionals enableGumjs [
       tinycc
-      frida-v8
+      v8
       frida-quickjs
       json-glib
       sqlite

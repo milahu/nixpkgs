@@ -11,7 +11,7 @@
 #, glib
 , glib-networking
 , tinycc
-, frida-v8
+, v8
 , frida-quickjs
 , frida-compile
 , capstone_5
@@ -126,7 +126,7 @@ stdenv.mkDerivation rec {
     gobject-introspection # g-ir-scanner
   ] ++ lib.optionals enableGumjs [
     tinycc
-    frida-v8
+    v8
     frida-quickjs
     json-glib
     sqlite
@@ -147,7 +147,7 @@ stdenv.mkDerivation rec {
     # undefined reference to glib_prepare_to_fork
     #glib # gio gio-unix
   ] ++ lib.optionals enableGumjs [
-    frida-v8
+    v8
     json-glib
     libffi
     tinycc # libtcc
