@@ -133,6 +133,9 @@ originalGlib.overrideAttrs (oldeAttrs: {
   ] ++ lib.optionals (!stdenv.isDarwin) [
     "-Dman=true"                # broken on Darwin
   ];
+
+  outputs = [ "bin" "out" "dev" ]; # "devdoc"
+
 })
 
 else
