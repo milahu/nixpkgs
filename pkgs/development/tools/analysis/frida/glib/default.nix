@@ -121,6 +121,18 @@ originalGlib.overrideAttrs (oldeAttrs: {
     chmod +x tools/gen-visibility-macros.py
     patchShebangs tools/gen-visibility-macros.py
   '';
+
+  mesonFlags = [
+    # ERROR: Error in gtkdoc helper script
+    #"-Dgtk_doc=${lib.boolToString buildDocs}"
+    "-Dgtk_doc=false"
+    "-Dnls=enabled"
+    "-Ddevbindir=${placeholder "dev"}/bin"
+    #"-Doptimization=s" # debug
+    "-Dstrip=false" # debug
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    "-Dman=true"                # broken on Darwin
+  ];
 })
 
 else
