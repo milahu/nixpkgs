@@ -79,6 +79,7 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
   '';
 
   # TODO disable
+  buildType = "debug"; # fix: stripping (with command strip and flags -S)
   mesonBuildType = "debug";
 
   mesonFlags = [
@@ -86,6 +87,8 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
     # Instead we just copy them over from the native output.
     #"-Dgtk_doc=${lib.boolToString buildDocs}"
     "-Dnls=enabled"
+    #"-Doptimization=s" # debug
+    "-Dstrip=false" # debug
     # split-dev-programs.patch
     "-Ddevbindir=${placeholder "dev"}/bin"
   ] ++ lib.optionals (!stdenv.isDarwin) [

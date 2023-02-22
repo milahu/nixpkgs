@@ -80,12 +80,14 @@ stdenv.mkDerivation rec {
   ];
 
   # TODO disable
+  buildType = "debug"; # fix: stripping (with command strip and flags -S)
   mesonBuildType = "debug";
 
   mesonFlags = [
       # based on github CI of https://github.com/frida/frida
       "-Ddefault_library=static"
-      "-Doptimization=s"
+      #"-Doptimization=s" # debug
+      "-Dstrip=false" # debug
       "-Db_ndebug=true"
       #"-Djailbreak=auto"
       "-Ddatabase=enabled"
