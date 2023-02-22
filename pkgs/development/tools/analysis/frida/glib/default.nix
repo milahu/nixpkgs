@@ -116,6 +116,11 @@ originalGlib.overrideAttrs (oldeAttrs: {
       sha256 = "+S44AnC86HfbMwkRe1ll54IK9pLxaFD3LqiVhPelnXI=";
     })
   ];
+
+  postPatch = oldeAttrs.postPatch + ''
+    chmod +x tools/gen-visibility-macros.py
+    patchShebangs tools/gen-visibility-macros.py
+  '';
 })
 
 else
@@ -324,6 +329,9 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs glib/tests/gen-casemap-txt.py
     chmod +x tools/gen-visibility-macros.py
     patchShebangs tools/gen-visibility-macros.py
+    stat tools/gen-visibility-macros.py
+    head tools/gen-visibility-macros.py
+    exit 1
 
     # Needs machine-id, comment the test
     sed -e '/\/gdbus\/codegen-peer-to-peer/ s/^\/*/\/\//' -i gio/tests/gdbus-peer.c
