@@ -25,6 +25,7 @@
 , libsoup_3
 , python3
 , libffi
+# TODO is this actually optional? seems like these are required for frida-core, frida-python, frida-tools
 , enableGumjs ? true # Build JavaScript bindings
 , enableGumpp ? true # Build C++ bindings
 }:
@@ -146,6 +147,7 @@ stdenv.mkDerivation rec {
     libffi
     frida-tinycc # libtcc
     sqlite # sqlite3
+    frida-quickjs
   ];
 
   meta = with lib; {
