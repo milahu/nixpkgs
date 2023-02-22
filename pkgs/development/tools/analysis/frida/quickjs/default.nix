@@ -8,7 +8,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "frida-quickjs";
+  pname = "quickjs";
   version = "unstable-2023-01-26";
 
   src = fetchFromGitHub {

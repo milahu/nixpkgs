@@ -22,7 +22,7 @@ FIXME fatal error: gnu/stubs-32.h: No such file or directory
 , glib-networking
 , tinycc
 , v8
-, frida-quickjs
+, quickjs
 , capstone_5
 , lzma
 , gobject-introspection
@@ -199,7 +199,7 @@ overkill
   ] ++ lib.optionals enableGumjs [
     tinycc
     v8
-    frida-quickjs
+    quickjs
     json-glib
     sqlite
     libsoup_3
@@ -256,7 +256,7 @@ overkill
     ] ++ lib.optionals enableGumjs [
       tinycc
       v8
-      frida-quickjs
+      quickjs
       json-glib
       sqlite
       libsoup_3

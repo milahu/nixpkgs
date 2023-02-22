@@ -12,7 +12,7 @@
 , glib-networking
 , tinycc
 , v8
-, frida-quickjs
+, quickjs
 , frida-compile
 , capstone_5
 , lzma
@@ -127,7 +127,7 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals enableGumjs [
     tinycc
     v8
-    frida-quickjs
+    quickjs
     json-glib
     sqlite
     libsoup_3
@@ -152,7 +152,7 @@ stdenv.mkDerivation rec {
     libffi
     tinycc # libtcc
     sqlite # sqlite3
-    frida-quickjs
+    quickjs
   ];
 
   meta = with lib; {
