@@ -29,7 +29,7 @@
 #, frida-v8
 #, json-glib
 , libffi # no?
-, frida-tinycc # libtcc
+, tinycc # libtcc
 , sqlite # sqlite3
 }:
 

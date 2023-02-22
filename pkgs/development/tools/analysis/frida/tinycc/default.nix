@@ -8,7 +8,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "frida-tinycc";
+  pname = "tinycc";
   version = "unstable-2022-04-01";
 
   src = fetchFromGitHub {

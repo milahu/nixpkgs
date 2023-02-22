@@ -20,7 +20,7 @@ FIXME fatal error: gnu/stubs-32.h: No such file or directory
 , glib
 #, glib
 , glib-networking
-, frida-tinycc
+, tinycc
 , frida-v8
 , frida-quickjs
 , capstone_5
@@ -197,7 +197,7 @@ overkill
     #libiconv # wontfix: Run-time dependency libiconv found: NO (tried pkgconfig and cmake)
     frida-libiconv # for glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
-    frida-tinycc
+    tinycc
     frida-v8
     frida-quickjs
     json-glib
@@ -222,7 +222,7 @@ overkill
     frida-v8
     json-glib
     libffi
-    frida-tinycc # libtcc
+    tinycc # libtcc
     sqlite # sqlite3
   ];
 
@@ -254,7 +254,7 @@ overkill
       libdwarf
       gobject-introspection # g-ir-scanner
     ] ++ lib.optionals enableGumjs [
-      frida-tinycc
+      tinycc
       frida-v8
       frida-quickjs
       json-glib

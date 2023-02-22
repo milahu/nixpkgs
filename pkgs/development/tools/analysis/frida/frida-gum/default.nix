@@ -10,7 +10,7 @@
 , glib
 #, glib
 , glib-networking
-, frida-tinycc
+, tinycc
 , frida-v8
 , frida-quickjs
 , frida-compile
@@ -125,7 +125,7 @@ stdenv.mkDerivation rec {
     libdwarf
     gobject-introspection # g-ir-scanner
   ] ++ lib.optionals enableGumjs [
-    frida-tinycc
+    tinycc
     frida-v8
     frida-quickjs
     json-glib
@@ -150,7 +150,7 @@ stdenv.mkDerivation rec {
     frida-v8
     json-glib
     libffi
-    frida-tinycc # libtcc
+    tinycc # libtcc
     sqlite # sqlite3
     frida-quickjs
   ];
