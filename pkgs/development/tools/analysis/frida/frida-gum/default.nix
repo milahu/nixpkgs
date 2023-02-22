@@ -55,9 +55,6 @@ stdenv.mkDerivation rec {
     echo javascript bindings are enabled. patching frida-compile to ${frida-compile.nodeDependencies}/lib/node_modules/.bin/frida-compile
     substituteInPlace bindings/gumjs/generate-runtime.py \
     --replace 'capture_output=True' 'capture_output=False' \
-    --replace \
-      'frida_compile = output_dir / "node_modules" / ".bin" / make_script_filename("frida-compile")' \
-      'frida_compile = Path("${frida-compile.nodeDependencies}/lib/node_modules/.bin/frida-compile")' \
     --replace '
         if not frida_compile.exists():
             pkg_files = [output_dir / "package.json", output_dir / "package-lock.json"]
@@ -65,6 +62,12 @@ stdenv.mkDerivation rec {
         if not frida_compile.exists():
             raise Exception(f"frida-compile not found in {frida_compile}")
     '
+
+    # node_modules must be in this path
+    # frida-compile does not work as global install
+    # https://github.com/frida/frida-compile/issues/63
+    mkdir -p build/bindings/gumjs
+    ln -sr ${frida-compile.nodeDependencies}/lib/node_modules build/bindings/gumjs/node_modules
     '' else ""}
   '';
 
