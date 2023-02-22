@@ -16,7 +16,7 @@
 # based on pkgs/development/compilers/vala/default.nix
 
 vala.overrideAttrs (oldAttrs: rec {
-  pname = "frida-vala";
+  pname = "vala";
   version = "0.58.0-unstable-2022-11-07";
   abiVersion = lib.concatStringsSep "." (lib.take 2 (lib.splitVersion version));
 
@@ -48,7 +48,7 @@ vala.overrideAttrs (oldAttrs: rec {
   ]
   ++ lib.optional (stdenv.isDarwin && (lib.versionAtLeast version "0.38")) expat;
 
-  # fix: ./frida-vala/bin/valac: error while loading shared libraries: libvalacodegen.so: cannot open shared object file: No such file or directory
+  # fix: ./vala/bin/valac: error while loading shared libraries: libvalacodegen.so: cannot open shared object file: No such file or directory
   # TODO better?
   postFixup = ''
     patchelf --add-rpath $out/lib/vala-${abiVersion} $out/bin/valac

@@ -7,7 +7,7 @@
 , ninja
 , pkg-config
 , frida-gum
-, frida-vala
+, vala
 , glib
 , glib-networking
 , usrsctp
@@ -56,7 +56,7 @@ stdenv.mkDerivation rec {
     meson
     pkg-config
     ninja
-    frida-vala
+    vala
   ];
 
   buildInputs = [
