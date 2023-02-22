@@ -79,7 +79,7 @@ glib.overrideAttrs (oldAttrs: let finalAttrs = oldAttrs; in rec {
   '';
 
   # TODO disable
-  buildType = "debug"; # fix: stripping (with command strip and flags -S)
+  dontStrip = true; # fix: stripping (with command strip and flags -S)
   mesonBuildType = "debug";
 
   mesonFlags = [
