@@ -20,8 +20,8 @@
 }:
 
 stdenv.mkDerivation rec {
-  #pname = "frida-glib-networking-static"; # TODO?
-  pname = "frida-glib-networking";
+  #pname = "glib-networking-static"; # TODO?
+  pname = "glib-networking";
   version = "unstable-2022-12-12";
 
   src = fetchFromGitHub {

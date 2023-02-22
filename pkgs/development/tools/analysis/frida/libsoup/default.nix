@@ -1,10 +1,10 @@
 { lib
 , libsoup_3
-, frida-glib
-, frida-glib-networking
+, glib
+, glib-networking
 }:
 
 libsoup_3.override {
-  glib = frida-glib;
-  glib-networking = frida-glib-networking;
+  glib = glib;
+  glib-networking = glib-networking;
 }

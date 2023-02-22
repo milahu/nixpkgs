@@ -17,9 +17,9 @@ FIXME fatal error: gnu/stubs-32.h: No such file or directory
 , pkg-config
 , cmake
 , ninja
-, frida-glib
+, glib
 #, glib
-, frida-glib-networking
+, glib-networking
 , frida-tinycc
 , frida-v8
 , frida-quickjs
@@ -183,19 +183,19 @@ overkill
     # undefined reference to gum_quick_script_backend_get_type
     # https://github.com/frida/frida-gum/issues/723
     # quickfix: disable tests
-    frida-glib
+    glib
     #glib
-    frida-glib-networking
+    glib-networking
     capstone_5
     lzma
     libunwind
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
-    glibc_multi # for frida-glib. fix: Compiler provides no native 16-bit integer type. fatal error: gnu/stubs-32.h: No such file or directory
+    glibc_multi # for glib. fix: Compiler provides no native 16-bit integer type. fatal error: gnu/stubs-32.h: No such file or directory
     # FIXME fatal error: gnu/stubs-32.h: No such file or directory
     #libiconv # wontfix: Run-time dependency libiconv found: NO (tried pkgconfig and cmake)
-    frida-libiconv # for frida-glib. libiconv with pkgconfig files
+    frida-libiconv # for glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
@@ -211,7 +211,7 @@ overkill
     libunwind
     libelf
     libdwarf
-    frida-glib # gio gio-unix
+    glib # gio gio-unix
     # dont propagate glib
     # this would break frida-core:
     # undefined reference to g_thread_garbage_collect
@@ -244,9 +244,9 @@ overkill
       # undefined reference to gum_quick_script_backend_get_type
       # https://github.com/frida/frida-gum/issues/723
       # quickfix: disable tests
-      frida-glib
+      glib
       #glib
-      frida-glib-networking
+      glib-networking
       capstone_5
       lzma
       libunwind

@@ -7,9 +7,9 @@
 , pkg-config
 , cmake
 , ninja
-, frida-glib
+, glib
 #, glib
-, frida-glib-networking
+, glib-networking
 , frida-tinycc
 , frida-v8
 , frida-quickjs
@@ -115,9 +115,9 @@ stdenv.mkDerivation rec {
     # undefined reference to gum_quick_script_backend_get_type
     # https://github.com/frida/frida-gum/issues/723
     # quickfix: disable tests
-    frida-glib
+    glib
     #glib
-    frida-glib-networking
+    glib-networking
     capstone_5
     lzma
     libunwind
@@ -139,7 +139,7 @@ stdenv.mkDerivation rec {
     libunwind
     libelf
     libdwarf
-    frida-glib # gio gio-unix
+    glib # gio gio-unix
     # dont propagate glib
     # this would break frida-core:
     # undefined reference to g_thread_garbage_collect
