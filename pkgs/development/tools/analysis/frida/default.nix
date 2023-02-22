@@ -190,6 +190,7 @@ overkill
     libdwarf
     gobject-introspection # g-ir-scanner
     glibc_multi # for frida-glib. fix: Compiler provides no native 16-bit integer type. fatal error: gnu/stubs-32.h: No such file or directory
+    #libiconv # wontfix: Run-time dependency libiconv found: NO (tried pkgconfig and cmake)
     frida-libiconv # for frida-glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
