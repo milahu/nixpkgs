@@ -31,7 +31,7 @@ FIXME fatal error: gnu/stubs-32.h: No such file or directory
 , libdwarf
 , json-glib
 , sqlite
-, frida-libsoup
+, libsoup_3
 , python3
 , nodePackages
 , libffi
@@ -202,7 +202,7 @@ overkill
     frida-quickjs
     json-glib
     sqlite
-    frida-libsoup
+    libsoup_3
     python3 # generate-bindings.py
   ];
 
@@ -259,7 +259,7 @@ overkill
       frida-quickjs
       json-glib
       sqlite
-      frida-libsoup
+      libsoup_3
       python3 # generate-bindings.py
 
     ]);
