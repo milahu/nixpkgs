@@ -43,6 +43,79 @@ originalGlib.overrideAttrs (oldeAttrs: {
     # subprojects/gvdb
     fetchSubmodules = true;
   };
+
+  patches = lib.optionals stdenv.isDarwin [
+    ../../../../../development/libraries/glib/darwin-compilation.patch
+  ] ++ lib.optionals stdenv.hostPlatform.isMusl [
+    ../../../../../development/libraries/glib/quark_init_on_demand.patch
+    ../../../../../development/libraries/glib/gobject_init_on_demand.patch
+
+    # Fix error about missing sentinel in glib/tests/cxx.cpp
+    # These two commits are part of already merged glib MRs 3033 and 3031:
+    # https://gitlab.gnome.org/GNOME/glib/-/merge_requests/3033
+    (fetchpatch {
+      url = "https://gitlab.gnome.org/GNOME/glib/-/commit/0ca5254c5d92aec675b76b4bfa72a6885cde6066.patch";
+      sha256 = "OfD5zO/7JIgOMLc0FAgHV9smWugFJuVPHCn9jTsMQJg=";
+    })
+    # https://gitlab.gnome.org/GNOME/glib/-/merge_requests/3031
+    (fetchpatch {
+      url = "https://gitlab.gnome.org/GNOME/glib/-/commit/7dc19632f3115e3f517c6bc80436fe72c1dcdeb4.patch";
+      sha256 = "v28Yk+R0kN9ssIcvJudRZ4vi30rzQEE8Lsd1kWp5hbM=";
+    })
+  ] ++ [
+    ../../../../../development/libraries/glib/glib-appinfo-watch.patch
+    ../../../../../development/libraries/glib/schema-override-variable.patch
+
+    # Add support for the GNOME’s default terminal emulator.
+    # https://gitlab.gnome.org/GNOME/glib/-/issues/2618
+    # patch fails: 3 out of 3 hunks FAILED
+    #../../../../../development/libraries/glib/gnome-console-support.patch
+    # Do the same for Pantheon’s terminal emulator.
+    # patch fails: 1 out of 1 hunk FAILED
+    #../../../../../development/libraries/glib/elementary-terminal-support.patch
+
+    # GLib contains many binaries used for different purposes;
+    # we will install them to different outputs:
+    # 1. Tools for desktop environment ($bin)
+    #    * gapplication (non-darwin)
+    #    * gdbus
+    #    * gio
+    #    * gio-launch-desktop (symlink to $out)
+    #    * gsettings
+    # 2. Development/build tools ($dev)
+    #    * gdbus-codegen
+    #    * gio-querymodules
+    #    * glib-compile-resources
+    #    * glib-compile-schemas
+    #    * glib-genmarshal
+    #    * glib-gettextize
+    #    * glib-mkenums
+    #    * gobject-query
+    #    * gresource
+    #    * gtester
+    #    * gtester-report
+    # 3. Tools for desktop environment that cannot go to $bin due to $out depending on them ($out)
+    #    * gio-launch-desktop
+    ../../../../../development/libraries/glib/split-dev-programs.patch
+
+    # Disable flaky test.
+    # https://gitlab.gnome.org/GNOME/glib/-/issues/820
+    ../../../../../development/libraries/glib/skip-timer-test.patch
+
+    # GVariant security fixes
+    # https://discourse.gnome.org/t/multiple-fixes-for-gvariant-normalisation-issues-in-glib/12835
+    (fetchpatch {
+      url = "https://gitlab.gnome.org/GNOME/glib/-/merge_requests/3126.patch";
+      sha256 = "CNCxouYy8xNHt4eJtPZ2eOi9b0SxzI2DkklNfQMk3d8=";
+    })
+
+    # Menu model security fix
+    # https://discourse.gnome.org/t/fixes-for-gdbusmenumodel-crashes-in-glib/12846
+    (fetchpatch {
+      url = "https://gitlab.gnome.org/GNOME/glib/-/commit/4f4d770a1e40f719d5a310cffdac29cbb4e20c11.patch";
+      sha256 = "+S44AnC86HfbMwkRe1ll54IK9pLxaFD3LqiVhPelnXI=";
+    })
+  ];
 })
 
 else
