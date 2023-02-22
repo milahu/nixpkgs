@@ -1,4 +1,10 @@
-# FHS env for debugging the various frida packages
+/*
+FHS env for debugging the various frida packages
+git clone --depth=1 --recurse-submodules --shallow-submodules https://github.com/frida/frida
+cd frida
+make gum-linux-x86_64
+make core-linux-x86_64
+*/
 
 { lib
 , stdenv
