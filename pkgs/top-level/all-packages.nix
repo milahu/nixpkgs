@@ -7360,6 +7360,7 @@ with pkgs;
   frida-python = callPackage ../development/tools/analysis/frida/frida-python { };
   frida-quickjs = callPackage ../development/tools/analysis/frida/frida-quickjs { };
   frida-compile = callPackage ../development/tools/analysis/frida/frida-compile { };
+  frida-libiconv = callPackage ../development/tools/analysis/frida/frida-libiconv { };
 
   frostwire = callPackage ../applications/networking/p2p/frostwire { };
   frostwire-bin = callPackage ../applications/networking/p2p/frostwire/frostwire-bin.nix { };
