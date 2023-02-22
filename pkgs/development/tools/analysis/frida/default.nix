@@ -34,6 +34,7 @@
 , nodejs
 , frida-gum
 , buildFHSUserEnv
+, frida-libiconv
 }:
 
 let
@@ -181,6 +182,7 @@ overkill
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
+    frida-libiconv # for frida-glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
     frida-v8
