@@ -40,6 +40,7 @@ make core-linux-x86_64
 , nodejs
 , frida-gum
 , buildFHSUserEnv
+, glibc_multi
 , frida-libiconv
 }:
 
@@ -188,6 +189,7 @@ overkill
     libelf
     libdwarf
     gobject-introspection # g-ir-scanner
+    glibc_multi # for frida-glib. fix: Compiler provides no native 16-bit integer type. fatal error: gnu/stubs-32.h: No such file or directory
     frida-libiconv # for frida-glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
     frida-tinycc
