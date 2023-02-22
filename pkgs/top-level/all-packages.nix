@@ -7347,21 +7347,13 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) AppKit CoreFoundation DiskArbitration Foundation IOKit;
   };
 
-  frida-fhs-env = callPackage ../development/tools/analysis/frida/frida-fhs-env { };
-  frida-core = callPackage ../development/tools/analysis/frida/frida-core { };
-  frida-gum = callPackage ../development/tools/analysis/frida/frida-gum { };
-  frida-v8 = callPackage ../development/tools/analysis/frida/frida-v8 { };
-  frida-tinycc = callPackage ../development/tools/analysis/frida/frida-tinycc { };
-  frida-glib = callPackage ../development/tools/analysis/frida/frida-glib { };
-  frida-glib-networking = callPackage ../development/tools/analysis/frida/frida-glib-networking { };
-  frida-vala = callPackage ../development/tools/analysis/frida/frida-vala { };
-  frida-usrsctp = callPackage ../development/tools/analysis/frida/frida-usrsctp { };
-  frida-tools = callPackage ../development/tools/analysis/frida/frida-tools { };
-  frida-python = callPackage ../development/tools/analysis/frida/frida-python { };
-  frida-quickjs = callPackage ../development/tools/analysis/frida/frida-quickjs { };
-  frida-compile = callPackage ../development/tools/analysis/frida/frida-compile { };
-  frida-libiconv = callPackage ../development/tools/analysis/frida/frida-libiconv { };
-  frida-libsoup = callPackage ../development/tools/analysis/frida/frida-libsoup { };
+  frida = fridaPackages.frida-tools;
+
+  #fridaPackages = dontRecurseIntoAttrs (callPackage ../development/tools/analysis/frida {
+  fridaPackages = recurseIntoAttrs (callPackage ../development/tools/analysis/frida {
+    #openjdk = openjdk8; # TODO: remove override https://github.com/NixOS/nixpkgs/pull/89731
+    #libressl = libressl_3_4;
+  });
 
   frostwire = callPackage ../applications/networking/p2p/frostwire { };
   frostwire-bin = callPackage ../applications/networking/p2p/frostwire/frostwire-bin.nix { };
