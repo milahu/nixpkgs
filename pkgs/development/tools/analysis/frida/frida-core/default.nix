@@ -101,6 +101,13 @@ stdenv.mkDerivation rec {
       --replace '        (output_dir / "node_modules" / "@types" / "frida-gum"' '#' \
       --replace '    shutil.copyfileobj(response, frida_gum_types)' '#' \
 
+    substituteInPlace inject/post-process.sh \
+    --replace '
+    if [ "$strip_enabled" = "true" ]; then
+    ' '
+    echo "debug: post-process.sh: strip_enabled = $strip_enabled"
+    if [ "$strip_enabled" = "true" ]; then
+    '
   '';
 
   # https://github.com/frida/v8/issues/14
@@ -114,7 +121,8 @@ stdenv.mkDerivation rec {
   mesonFlags = [
       # based on github CI of https://github.com/frida/frida
       "-Ddefault_library=static"
-      "-Doptimization=s"
+      #"-Doptimization=s" # debug
+      "-Dstrip=false" # debug
       "-Db_ndebug=true"
       "-Dconnectivity=enabled"
       "-Dmapper=auto"
