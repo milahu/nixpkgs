@@ -1,3 +1,5 @@
+# FHS env for debugging the various frida packages
+
 { lib
 , stdenv
 , fetchFromGitHub
@@ -31,6 +33,7 @@
 , perl
 , nodejs
 , frida-gum
+, buildFHSUserEnv
 }:
 
 let
