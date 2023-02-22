@@ -1,5 +1,7 @@
 /*
 FHS env for debugging the various frida packages
+
+nix-shell . -A frida.env
 git clone --depth=1 --recurse-submodules --shallow-submodules https://github.com/frida/frida
 cd frida
 make gum-linux-x86_64
