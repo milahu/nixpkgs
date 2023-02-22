@@ -3,9 +3,10 @@ FHS env for debugging the various frida packages
 
 nix-shell . -A frida.env
 git clone --depth=1 --recurse-submodules --shallow-submodules https://github.com/frida/frida
-cd frida
-make gum-linux-x86_64
-make core-linux-x86_64
+make -C frida/ gum-linux-x86_64
+make -C frida/ core-linux-x86_64
+
+FIXME fatal error: gnu/stubs-32.h: No such file or directory
 */
 
 { lib
@@ -192,6 +193,7 @@ overkill
     libdwarf
     gobject-introspection # g-ir-scanner
     glibc_multi # for frida-glib. fix: Compiler provides no native 16-bit integer type. fatal error: gnu/stubs-32.h: No such file or directory
+    # FIXME fatal error: gnu/stubs-32.h: No such file or directory
     #libiconv # wontfix: Run-time dependency libiconv found: NO (tried pkgconfig and cmake)
     frida-libiconv # for frida-glib. libiconv with pkgconfig files
   ] ++ lib.optionals enableGumjs [
