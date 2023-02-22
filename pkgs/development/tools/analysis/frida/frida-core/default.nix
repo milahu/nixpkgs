@@ -120,6 +120,14 @@ stdenv.mkDerivation rec {
       "-Dmapper=auto"
     ];
 
+/*
+TODO?
+			-Dhelper_modern=$(FRIDA)/build/tmp-linux-x86_64/frida-core/src/frida-helper \
+			-Dhelper_legacy=$(FRIDA)/build/tmp-linux-x86/frida-core/src/frida-helper \
+			-Dagent_modern=$(FRIDA)/build/tmp-linux-x86_64/frida-core/lib/agent/frida-agent.so \
+			-Dagent_legacy=$(FRIDA)/build/tmp-linux-x86/frida-core/lib/agent/frida-agent.so \
+*/
+
   preBuild = ''
     mkdir -p src/compiler
     pushd src/compiler
