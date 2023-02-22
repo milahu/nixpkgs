@@ -48,7 +48,7 @@ FIXME fatal error: gnu/stubs-32.h: No such file or directory
 }:
 
 let
-  srcs = builtins.fromJSON (builtins.readFile ./srcs.json);
+  srcs = builtins.fromJSON (builtins.readFile ../srcs.json);
 in
 
 stdenv.mkDerivation rec {
