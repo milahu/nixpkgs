@@ -19,7 +19,33 @@
 , desktop-file-utils, shared-mime-info
 , darwin
 , makeHardcodeGsettingsPatch
+
+, originalGlib
+, fetchFromGitHub
 }:
+
+if true then
+
+originalGlib.overrideAttrs (oldeAttrs: {
+  version = "2.75.0-unstable-2022-12-10";
+  src = fetchFromGitHub {
+    owner = "frida";
+    repo = "glib";
+    /*
+    rev = "805e42d63aa17f58b90a57c71f4b1896f154a535";
+    hash = "sha256-XSOukzSm8c6XbkafKSWhcxbwJSE71P3tYat6Il+NsDU=";
+    */
+    # fix: error: ignoring return value of posix_memalign
+    # https://github.com/frida/glib/issues/10
+    rev = "6bb81f198823f47c571da5700158eb841ec26e16";
+    hash = "sha256-Et4BwBDTcaulI78ZTt+igY9DsFSi/fKoCABLad8s3u4=";
+
+    # subprojects/gvdb
+    fetchSubmodules = true;
+  };
+})
+
+else
 
 assert stdenv.isLinux -> util-linuxMinimal != null;
 
@@ -55,12 +81,28 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "glib";
-  version = "2.74.3";
+  version = "2.75.0-unstable-2022-12-10";
 
-  src = fetchurl {
-    url = "mirror://gnome/sources/glib/${lib.versions.majorMinor finalAttrs.version}/glib-${finalAttrs.version}.tar.xz";
-    sha256 = "6bxB7NlpDZvGqXDMc4ARm4KOW2pLFsOTxjiz3CuHy8s=";
+  src = fetchFromGitHub {
+    owner = "frida";
+    repo = "glib";
+    /*
+    rev = "805e42d63aa17f58b90a57c71f4b1896f154a535";
+    hash = "sha256-XSOukzSm8c6XbkafKSWhcxbwJSE71P3tYat6Il+NsDU=";
+    */
+    # fix: error: ignoring return value of posix_memalign
+    # https://github.com/frida/glib/issues/10
+    rev = "6bb81f198823f47c571da5700158eb841ec26e16";
+    hash = "sha256-Et4BwBDTcaulI78ZTt+igY9DsFSi/fKoCABLad8s3u4=";
+
+    # subprojects/gvdb
+    fetchSubmodules = true;
   };
+
+
+  # TODO disable
+  dontStrip = true; # fix: stripping (with command strip and flags -S)
+  mesonBuildType = "debug";
 
   patches = lib.optionals stdenv.isDarwin [
     ./darwin-compilation.patch
@@ -186,6 +228,8 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dgtk_doc=${lib.boolToString buildDocs}"
     "-Dnls=enabled"
     "-Ddevbindir=${placeholder "dev"}/bin"
+    #"-Doptimization=s" # debug
+    "-Dstrip=false" # debug
   ] ++ lib.optionals (!stdenv.isDarwin) [
     "-Dman=true"                # broken on Darwin
   ];
@@ -205,6 +249,8 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs glib/gen-unicode-tables.pl
     patchShebangs glib/tests/gen-casefold-txt.py
     patchShebangs glib/tests/gen-casemap-txt.py
+    chmod +x tools/gen-visibility-macros.py
+    patchShebangs tools/gen-visibility-macros.py
 
     # Needs machine-id, comment the test
     sed -e '/\/gdbus\/codegen-peer-to-peer/ s/^\/*/\/\//' -i gio/tests/gdbus-peer.c

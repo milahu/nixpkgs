@@ -1,9 +1,9 @@
 { lib
-, usrsctp
+, originalUsrsctp
 , fetchpatch
 }:
 
-usrsctp.overrideAttrs (oldAttrs: rec {
+originalUsrsctp.overrideAttrs (oldAttrs: rec {
   pname = "usrsctp";
   patches = (oldAttrs.patches or []) ++ [
     # https://github.com/sctplab/usrsctp/pull/591

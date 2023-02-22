@@ -7,7 +7,7 @@
 , libxslt
 #, graphviz
 , expat
-, vala
+, originalVala
 , meson
 , ninja
 , patchelf
@@ -15,7 +15,7 @@
 
 # based on pkgs/development/compilers/vala/default.nix
 
-vala.overrideAttrs (oldAttrs: rec {
+originalVala.overrideAttrs (oldAttrs: rec {
   pname = "vala";
   version = "0.58.0-unstable-2022-11-07";
   abiVersion = lib.concatStringsSep "." (lib.take 2 (lib.splitVersion version));
@@ -43,7 +43,7 @@ vala.overrideAttrs (oldAttrs: rec {
     libxslt
     meson
     ninja
-    vala # vala is self-hosted. dont bootstrap vala here
+    originalVala # vala is self-hosted. dont bootstrap vala here
     patchelf
   ]
   ++ lib.optional (stdenv.isDarwin && (lib.versionAtLeast version "0.38")) expat;
