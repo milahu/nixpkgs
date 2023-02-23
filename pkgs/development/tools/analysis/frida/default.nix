@@ -32,6 +32,8 @@ let
     vala = final.callPackage ./vala {
       originalVala = prev.vala;
     };
+    # gobject-introspection does not appear in frida/releng/
+    /*
     gobject-introspection = (prev.gobject-introspection.override {
       inherit (final) glib gobject-introspection-unwrapped;
     }).overrideAttrs (oldAttrs: rec {
@@ -58,13 +60,14 @@ let
         sha256 = "sha256-mCXH0M1xL5Red9JfpdTxhqWmNJ0NCr2lwKeC/guFMQ8=";
       };
     });
+    */
   });
 in
 
 with frida-pkgs;
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
-  inherit glib glib-networking json-glib vala gobject-introspection gobject-introspection-unwrapped;
+  inherit glib glib-networking json-glib vala;
   frida-core = callPackage ./frida-core {
     inherit (self) glib json-glib;
   };
