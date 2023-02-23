@@ -74,9 +74,7 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
   frida-gum = callPackage ./frida-gum {
     inherit (self) glib json-glib;
   };
-  frida-tools = callPackage ./frida-tools {
-    inherit (self) glib json-glib;
-  };
+  frida-tools = callPackage ./frida-tools { };
   frida-python = callPackage ./frida-python { };
   frida-compile = callPackage ./frida-compile { };
 
