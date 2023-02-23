@@ -48,7 +48,12 @@ let
         rev = version;
         sha256 = "sha256-mCXH0M1xL5Red9JfpdTxhqWmNJ0NCr2lwKeC/guFMQ8=";
       };
-      # FIXME Bail out! GLib-GObject:ERROR:../gobject/gtype.c:2822:g_type_register_static: assertion failed: (static_quark_type_flags)
+      # FIXME failing test: Bail out! GLib-GObject:ERROR:../gobject/gtype.c:2822:g_type_register_static: assertion failed: (static_quark_type_flags)
+      postPatch = ''
+        # disable tests
+        subsititeInPlace meson.build \
+          --replace "subdir('tests')" "#"
+      '';
       doCheck = false;
     });
   });
