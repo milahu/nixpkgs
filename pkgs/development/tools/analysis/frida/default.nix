@@ -4,12 +4,11 @@
 , glib
 , usrsctp
 , vala
+, json-glib
+, libnice
+, libsoup_3
+, glib-networking
 }:
-
-/*
-FIXME override "glib = self.glib" for all inputs of this scope
-example: frida-core -> libsoup_3 -> glib
-*/
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
   frida-core = callPackage ./frida-core { };
@@ -27,7 +26,9 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
   glib = callPackage ./glib {
     originalGlib = glib;
   };
-  glib-networking = callPackage ./glib-networking { };
+  glib-networking = callPackage ./glib-networking {
+    inherit (self) glib;
+  };
   vala = callPackage ./vala {
     originalVala = vala;
   };
@@ -35,10 +36,20 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
     originalUsrsctp = usrsctp;
   };
   quickjs = callPackage ./quickjs { };
-  libiconv = callPackage ./libiconv { };
-  libsoup = callPackage ./libsoup { };
-})
 
-/*
-v8 tinycc glib glib-networking vala usrsctp quickjs libiconv libsoup
-*/
+  # libiconv with pkgconfig files
+  libiconv = callPackage ./libiconv { };
+
+  # override glib in dependencies
+  # ( cd nixpkgs && nix why-depends --all .#fridaPackages.frida-tools .#glib )
+  # ( cd nixpkgs && nix why-depends --all .#fridaPackages.frida-tools .#glib-networking )
+  libsoup_3 = libsoup_3.override {
+    inherit (self) glib glib-networking;
+  };
+  json-glib = json-glib.override {
+    inherit (self) glib;
+  };
+  libnice = libnice.override {
+    inherit (self) glib;
+  };
+})
