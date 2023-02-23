@@ -32,19 +32,39 @@ let
     vala = final.callPackage ./vala {
       originalVala = prev.vala;
     };
-    gobject-introspection = prev.gobject-introspection.override {
+    gobject-introspection = (prev.gobject-introspection.override {
       inherit (final) glib;
-    };
-    gobject-introspection-unwrapped = prev.gobject-introspection-unwrapped.override {
+    }).overrideAttrs (oldAttrs: rec {
+      # https://gitlab.gnome.org/GNOME/gobject-introspection
+      version = "1.75.6";
+      src = final.fetchFromGitLab {
+        domain = "gitlab.gnome.org";
+        owner = "GNOME";
+        repo = "gobject-introspection";
+        rev = version;
+        sha256 = "sha256-mCXH0M1xL5Red9JfpdTxhqWmNJ0NCr2lwKeC/guFMQ8=";
+      };
+    });
+    gobject-introspection-unwrapped = (prev.gobject-introspection-unwrapped.override {
       inherit (final) glib;
-    };
+    }).overrideAttrs (oldAttrs: rec {
+      # https://gitlab.gnome.org/GNOME/gobject-introspection
+      version = "1.75.6";
+      src = final.fetchFromGitLab {
+        domain = "gitlab.gnome.org";
+        owner = "GNOME";
+        repo = "gobject-introspection";
+        rev = version;
+        sha256 = "sha256-mCXH0M1xL5Red9JfpdTxhqWmNJ0NCr2lwKeC/guFMQ8=";
+      };
+    });
   });
 in
 
 with frida-pkgs;
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
-  inherit glib glib-networking json-glib vala;
+  inherit glib glib-networking json-glib vala gobject-introspection;
   frida-core = callPackage ./frida-core {
     inherit (self) glib json-glib;
   };
