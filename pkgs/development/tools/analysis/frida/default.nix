@@ -33,7 +33,7 @@ let
       originalVala = prev.vala;
     };
     gobject-introspection = (prev.gobject-introspection.override {
-      inherit (final) glib;
+      inherit (final) glib gobject-introspection-unwrapped;
     }).overrideAttrs (oldAttrs: rec {
       # https://gitlab.gnome.org/GNOME/gobject-introspection
       version = "1.75.6";
