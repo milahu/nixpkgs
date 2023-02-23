@@ -32,6 +32,9 @@ let
     vala = final.callPackage ./vala {
       originalVala = prev.vala;
     };
+    # dont override
+    inherit (prev) gobject-introspection gobject-introspection-unwrapped;
+    /*
     # gobject-introspection does not appear in frida/releng/
     gobject-introspection = prev.gobject-introspection.override {
       inherit (final) glib gobject-introspection-unwrapped;
@@ -56,6 +59,7 @@ let
       '';
       doCheck = false;
     });
+    */
   });
 in
 
