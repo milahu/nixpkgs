@@ -1,3 +1,4 @@
+/*
 { lib
 , newScope
 , fetchFromGitHub
@@ -8,9 +9,36 @@
 , libsoup_3
 , glib-networking
 , json-glib
+, pkgs
 }:
+*/
+
+{ pkgs }:
+
+let
+  frida-pkgs = pkgs.extend (final: prev: {
+    #firefox = prev.firefox.override { ... };
+    #myBrowser = final.firefox;
+    glib = final.callPackage ./glib {
+      originalGlib = prev.glib;
+    };
+    glib-networking = final.callPackage ./glib-networking {
+      #inherit (self) glib json-glib;
+    };
+    json-glib = final.callPackage ./json-glib {
+      original-json-glib = prev.json-glib;
+      ##inherit (self) glib;
+    };
+    vala = final.callPackage ./vala {
+      originalVala = prev.vala;
+    };
+  });
+in
+
+with frida-pkgs;
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
+  inherit glib glib-networking json-glib vala;
   frida-core = callPackage ./frida-core {
     inherit (self) glib json-glib;
   };
@@ -29,19 +57,7 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
   # frida's forks of dependencies
   v8 = callPackage ./v8 { };
   tinycc = callPackage ./tinycc { };
-  glib = callPackage ./glib {
-    originalGlib = glib;
-  };
-  glib-networking = callPackage ./glib-networking {
-    inherit (self) glib json-glib;
-  };
-  json-glib = callPackage ./json-glib {
-    original-json-glib = json-glib;
-    inherit (self) glib;
-  };
-  vala = callPackage ./vala {
-    originalVala = vala;
-  };
+
   usrsctp = callPackage ./usrsctp {
     originalUsrsctp = usrsctp;
   };
