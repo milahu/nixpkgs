@@ -32,10 +32,16 @@ let
     vala = final.callPackage ./vala {
       originalVala = prev.vala;
     };
-    # dont override
-    inherit (prev) gobject-introspection gobject-introspection-unwrapped;
+    gobject-introspection-unwrapped = final.callPackage ./gobject-introspection {
+      inherit (final) gobject-introspection-unwrapped; # wtf?
+      inherit (final) glib;
+      nixStoreDir = final.config.nix.storeDir or builtins.storeDir;
+      inherit (final.darwin) cctools;
+    };
+    gobject-introspection = final.callPackage ./gobject-introspection/wrapper.nix {
+      inherit (final) gobject-introspection-unwrapped;
+    };
     /*
-    # gobject-introspection does not appear in frida/releng/
     gobject-introspection = prev.gobject-introspection.override {
       inherit (final) glib gobject-introspection-unwrapped;
     };
