@@ -51,7 +51,7 @@ let
       # FIXME failing test: Bail out! GLib-GObject:ERROR:../gobject/gtype.c:2822:g_type_register_static: assertion failed: (static_quark_type_flags)
       postPatch = ''
         # disable tests
-        subsititeInPlace meson.build \
+        substituteInPlace meson.build \
           --replace "subdir('tests')" "#"
       '';
       doCheck = false;
