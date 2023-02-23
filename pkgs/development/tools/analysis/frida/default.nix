@@ -64,7 +64,7 @@ in
 with frida-pkgs;
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
-  inherit glib glib-networking json-glib vala gobject-introspection;
+  inherit glib glib-networking json-glib vala gobject-introspection gobject-introspection-unwrapped;
   frida-core = callPackage ./frida-core {
     inherit (self) glib json-glib;
   };
