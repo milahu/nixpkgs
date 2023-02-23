@@ -26,7 +26,7 @@
 
 if true then
 
-originalGlib.overrideAttrs (oldeAttrs: {
+originalGlib.overrideAttrs (oldAttrs: {
   version = "2.75.0-unstable-2022-12-10";
   src = fetchFromGitHub {
     owner = "frida";
@@ -117,7 +117,7 @@ originalGlib.overrideAttrs (oldeAttrs: {
     })
   ];
 
-  postPatch = oldeAttrs.postPatch + ''
+  postPatch = oldAttrs.postPatch + ''
     chmod +x tools/gen-visibility-macros.py
     patchShebangs tools/gen-visibility-macros.py
   '';
