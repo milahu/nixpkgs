@@ -7,6 +7,7 @@
 , libnice
 , libsoup_3
 , glib-networking
+, json-glib
 }:
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
@@ -35,6 +36,7 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
     inherit (self) glib json-glib;
   };
   json-glib = callPackage ./json-glib {
+    original-json-glib = json-glib;
     inherit (self) glib;
   };
   vala = callPackage ./vala {

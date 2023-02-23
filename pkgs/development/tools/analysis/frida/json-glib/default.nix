@@ -1,35 +1,23 @@
 { lib
-, stdenv
 , fetchFromGitHub
-, meson
-, pkg-config
-, cmake
-, ninja
+, glib
+, gobject-introspection
+, original-json-glib
 }:
 
-stdenv.mkDerivation rec {
-  pname = "json-glib";
+(original-json-glib.override {
+  inherit glib gobject-introspection;
+}).overrideAttrs (oldAttrs: {
   version = "unstable-2022-11-16";
-
   src = fetchFromGitHub {
     owner = "frida";
     repo = "json-glib";
     rev = "fd29bf6dda9dcf051d2d98838e3086566bf91411";
     hash = "sha256-aVJ9rWfkN0MZ+lelO4tfLCgn3RGF1txcsDK072DnuLk=";
   };
-
-  nativeBuildInputs = [
-    meson
-    pkg-config
-    cmake
-    ninja
+  patches = [];
+  outputs = [ "out" "dev" "devdoc" ]; #  "installedTests"
+  mesonFlags = [
+    #"-Dinstalled_test_prefix=${placeholder "installedTests"}"
   ];
-
-  meta = with lib; {
-    description = "Frida fork of json-glib";
-    homepage = "https://github.com/frida/json-glib";
-    changelog = "https://github.com/frida/json-glib/blob/${src.rev}/NEWS";
-    license = licenses.lgpl21Only;
-    maintainers = with maintainers; [ ];
-  };
-}
+})
