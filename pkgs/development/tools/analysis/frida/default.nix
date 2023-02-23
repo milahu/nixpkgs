@@ -4,16 +4,21 @@
 , glib
 , usrsctp
 , vala
-, json-glib
 , libnice
 , libsoup_3
 , glib-networking
 }:
 
 lib.makeScope newScope (self: let inherit (self) callPackage; in {
-  frida-core = callPackage ./frida-core { };
-  frida-gum = callPackage ./frida-gum { };
-  frida-tools = callPackage ./frida-tools { };
+  frida-core = callPackage ./frida-core {
+    inherit (self) glib json-glib;
+  };
+  frida-gum = callPackage ./frida-gum {
+    inherit (self) glib json-glib;
+  };
+  frida-tools = callPackage ./frida-tools {
+    inherit (self) glib json-glib;
+  };
   frida-python = callPackage ./frida-python { };
   frida-compile = callPackage ./frida-compile { };
 
@@ -27,6 +32,9 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
     originalGlib = glib;
   };
   glib-networking = callPackage ./glib-networking {
+    inherit (self) glib json-glib;
+  };
+  json-glib = callPackage ./json-glib {
     inherit (self) glib;
   };
   vala = callPackage ./vala {
@@ -45,9 +53,6 @@ lib.makeScope newScope (self: let inherit (self) callPackage; in {
   # ( cd nixpkgs && nix why-depends --all .#fridaPackages.frida-tools .#glib-networking )
   libsoup_3 = libsoup_3.override {
     inherit (self) glib glib-networking;
-  };
-  json-glib = json-glib.override {
-    inherit (self) glib;
   };
   libnice = libnice.override {
     inherit (self) glib;
