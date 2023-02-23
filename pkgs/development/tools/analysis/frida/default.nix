@@ -32,6 +32,12 @@ let
     vala = final.callPackage ./vala {
       originalVala = prev.vala;
     };
+    gobject-introspection = prev.gobject-introspection.override {
+      inherit (final) glib;
+    };
+    gobject-introspection-unwrapped = prev.gobject-introspection-unwrapped.override {
+      inherit (final) glib;
+    };
   });
 in
 
