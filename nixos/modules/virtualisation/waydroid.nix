@@ -21,6 +21,8 @@ in
 
   options.virtualisation.waydroid = {
     enable = lib.mkEnableOption "Waydroid";
+
+    package = lib.mkPackageOption pkgs "waydroid" { };
   };
 
   config = lib.mkIf cfg.enable {
@@ -43,7 +45,7 @@ in
 
     environment.etc."gbinder.d/waydroid.conf".source = waydroidGbinderConf;
 
-    environment.systemPackages = with pkgs; [ waydroid ];
+    environment.systemPackages = [ cfg.package ];
 
     networking.firewall.trustedInterfaces = [ "waydroid0" ];
 
@@ -57,7 +59,7 @@ in
       serviceConfig = {
         Type = "dbus";
         UMask = "0022";
-        ExecStart = "${pkgs.waydroid}/bin/waydroid -w container start";
+        ExecStart = "${cfg.package}/bin/waydroid -w container start";
         BusName = "id.waydro.Container";
       };
     };
@@ -66,7 +68,7 @@ in
       "d /var/lib/misc 0755 root root -" # for dnsmasq.leases
     ];
 
-    services.dbus.packages = with pkgs; [ waydroid ];
+    services.dbus.packages = [ cfg.package ];
   };
 
 }
